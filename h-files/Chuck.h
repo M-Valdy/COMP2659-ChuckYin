@@ -1,4 +1,4 @@
 typedef struct {
     unsigned int x,y;
-    bool isWalking;
+    int isWalking;
 } Chuck;
