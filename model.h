@@ -1,8 +1,8 @@
 typedef struct {
     Chuck Chuck;
-    WomenWalking WomenWalking;
-    WomenSwimming WomenSwimming;
-    Tree Tree;
+    WomenWalking WomenWalking[5];
+    WomenSwimming WomenSwimming[3];
+    Tree Tree[10];
     Water Water;
     Shelf Shelf;
     Meat Meat;
@@ -12,5 +12,6 @@ typedef struct {
     Door Door;
     Timer Timer;
     Vampire Vampire;
-    Bats Bats;
+    Bats Bats[3];
+    Puddle Puddle;
 } Model;
