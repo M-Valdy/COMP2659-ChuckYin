@@ -82,8 +82,6 @@ Any assumptions, limitations, or known bugs.
 
 ## TASK ASSIGNMENTS
 
-### Gaurik's
-
-### Meagan's
-
-### Paolo's
+> ***Gaurik's currently*** working on the raster graphics library.
+> ***Meagan's currently***
+> ***Paolo's currently***
