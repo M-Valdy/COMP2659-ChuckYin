@@ -1,6 +1,6 @@
 #include "Chuck.h";
-#include "WomenWalking.h";
-#include "WomenSwimming.h";
+#include "women-walking.h";
+#include "women-swimming.h";
 typedef struct {
     Chuck Chuck;
     WomenWalking WomenWalking[5];
