@@ -1,6 +1,8 @@
 #include "Chuck.h";
 #include "women-walking.h";
 #include "women-swimming.h";
+#include "tree.h";
+#include "water.h";
 typedef struct {
     Chuck Chuck;
     WomenWalking WomenWalking[5];
