@@ -83,5 +83,5 @@ Any assumptions, limitations, or known bugs.
 ## TASK ASSIGNMENTS
 
 > ***Gaurik's currently*** working on the raster graphics library.
-> ***Meagan's currently***
-> ***Paolo's currently creating the structs for objects from 2nd level***
+> ***Meagan's currently*** working on adding basic functions for the first level.
+> ***Paolo's currently*** creating the structs for objects from 2nd level
