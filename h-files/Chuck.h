@@ -2,7 +2,7 @@ typedef struct {
     unsigned int x,y;
     int isWalking;
     int deltaX, deltaY;
-    int isColliding;
+    int isColliding; // 1 = obstacle collision, 0 = no collision, 2 = death collision
 } Chuck;
 
 void initChuck(Chuck* chuck, unsigned int x, unsigned int y);

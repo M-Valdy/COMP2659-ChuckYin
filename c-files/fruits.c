@@ -30,5 +30,10 @@ void initFruits(Fruits* fruits, unsigned int x, unsigned int y) {
 
 void isChuckCollidingWithFruits(Fruits* fruits, Chuck* chuck) {
     // TO DO tomorrow
+
+    // comment from Meagan: are you gonna add a collision state for Chuck? 
+    // like isColliding = 1 for obstacle collision, isColliding = 0 for no collision, 
+    // and isColliding = 2 for death collision?. Or are you adding another one
+
     // if (chuck is colliding with fruits) { fruits->isGathered = 1 }
 }

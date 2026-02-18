@@ -23,6 +23,6 @@ void collisionWomenWalking(WomenWalking* womenWalking, Chuck* chuck) {
         womenWalking->deltaX = 0;
         womenWalking->deltaY = 0;
         chuck->isWalking = 0; // Stop Chuck from walking
-        chuck->isColliding = 1; // Set collision flag for Chuck
+        chuck->isColliding = 2; // Set collision flag for Chuck
     }
 }
