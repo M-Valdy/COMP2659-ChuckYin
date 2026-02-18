@@ -1,4 +1,4 @@
-#include "women-walking.h";
+#include "w-walk.h";
 #include "raster.h";
 
 void initWomenWalking(WomenWalking* womenWalking, unsigned int x, unsigned int y) {

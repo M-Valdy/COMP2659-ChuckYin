@@ -1,4 +1,4 @@
-#include "storeDoor.h";
+#include "st-door.h";
 #include "cashier.h";
 #include "Chuck.h";
 

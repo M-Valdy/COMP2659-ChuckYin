@@ -1,14 +1,15 @@
 #include "Chuck.h";
-#include "women-walking.h";
-#include "women-swimming.h";
+#include "w-walk.h";
+#include "w-swim.h";
 #include "tree.h";
 #include "water.h";
 #include "fruits.h";
 #include "meats.h";
 #include "cashier.h";
 #include "breads.h";
-#include "storeDoor.h";
-#include "storeAisle.h";
+#include "st-door.h";
+#include "st-aisle.h";
+
 typedef struct {
     Chuck Chuck;
     WomenWalking WomenWalking[5];

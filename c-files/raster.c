@@ -1,5 +1,4 @@
 #include "raster.h"
-#include "types.h"
 
 /* constants */
 #define SCREEN_WIDTH 640 /* the horizontal size */
