@@ -108,14 +108,66 @@ void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row,
     UINT32 *start_point;  /* starting location */
     UINT32 *end_point; /* ending location */
     UINT32 *current; /* to track the current lonword */
+    UINT32 temp;
+    
+    /* Bresenham Algoirthm stuff */
+    int dx;
+    int dy;
+    int sx;
+    int sy;
+    int err;
+    int e2;
 
+    /* Initial pointers (useful if you optimize the loop later) */
     start_point = base + (start_row * LONGS_PER_ROW) + (start_col >> 5);
     end_point = base + (end_row * LONGS_PER_ROW) + (end_col >> 5);
 
-    if (start_row == end_row){ /* */
+    /* 1. Specialized cases: Horizontal and Vertical */
+    if (start_row == end_row) {
+        if (start_col > end_col) {
+            temp = start_col; start_col = end_col; end_col = temp;
+        }
         plot_horizontal_line(base, start_row, start_col, (end_col - start_col));
-    } else if (start_col == end_col){
+    } else if (start_col == end_col) {
+        if (start_row > end_row) {
+            temp = start_row; start_row = end_row; end_row = temp;
+        }
         plot_vertical_line(base, start_row, start_col, (end_row - start_row));
+    } else {
+        /* 2. General Case: Bresenham Algorithm 
+        * Based on and adapted from https://gist.github.com/bert/1085538#file-circle-c-L1
+        */
+        
+        /* Calculate absolute differences safely for UINT16 */
+        dx = (int)(end_col > start_col ? end_col - start_col : start_col - end_col);
+        dy = -(int)(end_row > start_row ? end_row - start_row : start_row - end_row);
+
+        /* Determine step direction */
+        sx = (start_col < end_col) ? 1 : -1;
+        sy = (start_row < end_row) ? 1 : -1;
+
+        err = dx + dy; /* error value e_xy */
+
+        for (;;) {  /* loop */
+            /* Plot current pixel using your base pointer and coordinates */
+            plot_pixel(base, start_row, start_col);
+
+            if (start_col == end_col && start_row == end_row) {
+                break;
+            }
+
+            e2 = 2 * err;
+
+            if (e2 >= dy) { 
+                err += dy; 
+                start_col += sx; 
+            } /* e_xy+e_x > 0 */
+            
+            if (e2 <= dx) { 
+                err += dx; 
+                start_row += sy; 
+            } /* e_xy+e_y < 0 */
+        }
     }
 }
 
@@ -134,14 +186,5 @@ void plot_rectangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 
 }
 
 void plot_square(UINT32 *base, UINT16 row, UINT16 col, UINT16 side){
-  
-   /* top line */
-    plot_line(base, row, col, row, (col + (side - 1)));
-    /* bottom line */
-    plot_line(base, (row + (side - 1)), col, (row + (side - 1)), (col + (side - 1)));
-    /* left line */
-    plot_line(base, row, col, (row + (side - 1)), col);
-    /* right line */
-    plot_line(base, row, (col + (side - 1)), (row + (side - 1)), (col + (side - 1)));
-
+    plot_rectangle(base, row, col, side, side);
 }
