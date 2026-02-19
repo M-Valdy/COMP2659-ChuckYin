@@ -1,4 +1,4 @@
-#include "women-swimming.h";
+#include "w-swim.h";
 #include "raster.h";
 #include "Chuck.h";
 
@@ -101,7 +101,7 @@ void collisionWomenSwimming(WomenSwimming* womenSwimming, Chuck* chuck) {
         womenSwimming->deltaX = 0;
         womenSwimming->deltaY = 0;
         chuck->isWalking = 0; // Stop Chuck from walking
-        chuck->isColliding = 1; // Set collision flag for Chuck
+        chuck->isColliding = 2; // Set collision flag for Chuck
     }
 }
 

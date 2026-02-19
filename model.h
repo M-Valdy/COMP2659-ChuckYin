@@ -1,20 +1,27 @@
 #include "Chuck.h";
-#include "women-walking.h";
-#include "women-swimming.h";
+#include "w-walk.h";
+#include "w-swim.h";
 #include "tree.h";
 #include "water.h";
+#include "fruits.h";
+#include "meats.h";
+#include "cashier.h";
+#include "breads.h";
+#include "st-door.h";
+#include "st-aisle.h";
+
 typedef struct {
     Chuck Chuck;
     WomenWalking WomenWalking[5];
     WomenSwimming WomenSwimming[3];
     Tree Tree[10];
     Water Water;
-    Shelf Shelf;
-    Meat Meat;
-    Bread Bread;
-    Fruit Fruit;
+    Meats Meats;
+    Breads Breads;
+    Fruits Fruits;
     Cashier Cashier;
-    Door Door;
+    StoreDoor StoreDoor;
+    StoreAisle StoreAisle[3];
     Timer Timer;
     Vampire Vampire;
     Bats Bats[3];

@@ -1,6 +1,7 @@
 # CHECKPOINT II *(due February 23 <sup>rd</sup>)*
 
 > Use a **GITPULL** to get the latest assignments and documentation.
+> Since we are on C89 version of C, all varibles must be declared at the very top of each function.
 
 ## COMP 2659 - Checkpoint 2 Task List
 

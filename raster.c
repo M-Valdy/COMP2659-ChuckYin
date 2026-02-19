@@ -1,5 +1,4 @@
 #include "raster.h"
-#include "types.h"
 
 /* constants */
 #define SCREEN_WIDTH 640 /* the horizontal size */
@@ -16,7 +15,6 @@
  * Purpose: Checks if a coordinate is within the 640x400 screen limits.
  * Input: x-coordinate (column), y-coordinate (row)
  * Return: 1 if in bounds, 0 if out of bounds.
- * 
  * @author Gaurik
  */
 int px_in_bounds(UINT16 row, UINT16 col) {
@@ -29,7 +27,8 @@ void clear_screen(UINT32 *base){
 	640*400 = 256,000 pixels; 256000/32 = 8000 iterations */
 	UINT32 *current = base;
 	UINT16 section_count = PIXEL_COUNT >> 5;
-	for (UINT16 i = 0; i < section_count; i++){
+	UINT16 i;
+    for (i = 0; i < section_count; i++){
 		*current = 0; /* set the current section to all zeros */
 		/* current is a longword and a single increment will move to the next longword */
 		current++;
@@ -45,8 +44,10 @@ void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 wi
 	UINT16 long_width = width >> 5; /* the width in longwords instead of bits(indivisual pixels) */
 	/* again, delaing with longwords, divided by 32 */
 
+    UINT16 r;
+    UINT16 c;
     /* II. loop to clear the region, outer loop for vertical and inner for horizontal */
-    for (UINT16 r = 0; r < length; r++) {
+    for (r = 0; r < length; r++) {
         /* calculate the start of the current row */
         /* recalcualting everytime to reset the horizontal when moving to the next line 
          * using LONGWORDS instead of bytes because "current" is a longword pointer so moves a longword
@@ -61,7 +62,7 @@ void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 wi
         current = base + ((row + r) * LONGS_PER_ROW) + (col >> 5); 
         
         /* loop through each longword in the horizontal section to clear it */
-        for (UINT16 c = 0; c < long_width; c++) {
+        for (c = 0; c < long_width; c++) {
             *current = 0;   /* set the current section to all zeros */
             current++;      /* Move to the next word */
         }
@@ -78,16 +79,4 @@ void plot_pixel(UINT8 *base, UINT16 row, UINT16 col){
         *current |= (1 << (7 - (col & 7)));
     }
 }
-
-void plot_horizontal_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length){
-	
-}
-
-void plot_vertical_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
-
-void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col);
-
-void plot_rectangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
-
-void plot_square(UINT32 *base, UINT16 row, UINT16 col, UINT16 side);
 
