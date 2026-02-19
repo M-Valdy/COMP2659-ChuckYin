@@ -6,3 +6,4 @@ typedef struct {
 
 void initTree(Tree* tree, unsigned int x, unsigned int y);
 void isTreeColliding(Tree* tree, Chuck* chuck);
+void render_tree(Tree* Tree);

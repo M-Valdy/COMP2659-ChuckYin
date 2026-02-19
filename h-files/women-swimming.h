@@ -9,3 +9,4 @@ typedef struct {
 void initWomenSwimming(WomenSwimming* womenSwimming, unsigned int x, unsigned int y);
 void updateWomenSwimming(WomenSwimming* womenSwimming);
 void collisionWomenSwimming(WomenSwimming* womenSwimming, Chuck* chuck);
+void render_womenSwimming(WomenSwimming* womenSwimming);

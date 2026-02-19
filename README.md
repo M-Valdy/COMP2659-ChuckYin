@@ -6,20 +6,20 @@
 
 ### Checkpoint 2 Summary
 
-- [ ] Asset Creation: Make models in monochrome and 640x400; create sprites in 8, 16, and 32-bit bitmaps.
+- [X] Asset Creation: Make models in monochrome and 640x400; create sprites in 8, 16, and 32-bit bitmaps.
 - [ ] Raster Library Testing: Test your raster graphics library (plotting routines).
 
 Note: Animation is not required until Checkpoint 3.
 
-- [ ] Data Structures: Write structs for models (e.g., player, walls, NPCs).
+- [X] Data Structures: Write structs for models (e.g., player, walls, NPCs).
 
-- [ ] Each must be in its own .h and .c file of the same name.
+- [X] Each must be in its own .h and .c file of the same name.
 
-- [ ] Constraint: Avoid decimals/floats; aim for integers only.
+- [X] Constraint: Avoid decimals/floats; aim for integers only.
 
 - [ ] Events Module: Write functions for asynchronous, synchronous, and condition-based events.
 
-- [ ] Validation: Use printf to verify that model implementation and event handling are working.
+- [X] Validation: Use printf to verify that model implementation and event handling are working.
 
 - [ ] Documentation: Use the testing guide for test modules (available on D2L).
 
@@ -27,11 +27,11 @@ Note: Animation is not required until Checkpoint 3.
 
 These routines can optionally be done in C first, then in Assembly.
 
-- [ ] clear_screen
+- [X] clear_screen
 
-- [ ] clear_region
+- [X] clear_region
 
-- [ ] plot_pixel
+- [X] plot_pixel
 
 - [ ] plot_horizontal_line
 
@@ -67,9 +67,9 @@ These routines can optionally be done in C first, then in Assembly.
 
 ### Coding Standards & "Other"
 
-- [ ] Function Length: Keep functions between 25-30 lines.
+- [X] Function Length: Keep functions between 25-30 lines.
 
-- [ ] Formatting: Ensure code is readable and properly indented.
+- [X] Formatting: Ensure code is readable and properly indented.
 
 - [ ] Header Documentation: Each function must include a header describing:
 
@@ -83,10 +83,10 @@ These routines can optionally be done in C first, then in Assembly.
 
 - [ ] Source File Metadata: In .c files, write the purpose of data structures and functions.
 
-- [ ] Authorship: Include team member names and author(s) in the files.
+- [X] Authorship: Include team member names and author(s) in the files.
 
 ## TASK ASSIGNMENTS
 
-> - ***Gaurik's currently*** working on the raster graphics library.
-> - ***Meagan's currently*** working on adding basic functions for the first level.
-> - ***Paolo's currently*** creating the structs for objects from 2nd level
+> - ***Gaurik's currently*** working on the raster graphics library in C and Assembly.
+> - ***Meagan's currently*** working on adding basic functions for the first level, Asynchronous Events, and Renderer.
+> - ***Paolo's currently*** working on Synchronous Events and Event Handling.

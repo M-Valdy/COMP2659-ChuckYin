@@ -16,11 +16,14 @@
  * Purpose: Checks if a coordinate is within the 640x400 screen limits.
  * Input: x-coordinate (column), y-coordinate (row)
  * Return: 1 if in bounds, 0 if out of bounds.
+ * 
+ * @author Gaurik
  */
 int px_in_bounds(UINT16 row, UINT16 col) {
     return (col < SCREEN_WIDTH && row < SCREEN_HEIGHT);
 }
 
+// @author Gaurik
 void clear_screen(UINT32 *base){
 	/* using UINT32 will require the least iterations to cover the screen
 	640*400 = 256,000 pixels; 256000/32 = 8000 iterations */
@@ -33,6 +36,7 @@ void clear_screen(UINT32 *base){
 	}
 }
 
+// @author Gaurik
 void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width){
     /* I. get to the correct postition, same logic as plot pixel */
     UINT32 *current; 
@@ -64,6 +68,7 @@ void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 wi
     }
 }
 
+// @author Gaurik
 void plot_pixel(UINT8 *base, UINT16 row, UINT16 col){
 	if (px_in_bounds(row, col)) {
         /* Calculate (row * bytes_per_row) + (col / 8) */
