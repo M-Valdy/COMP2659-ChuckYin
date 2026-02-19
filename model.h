@@ -3,27 +3,15 @@
 #include "w-swim.h";
 #include "tree.h";
 #include "water.h";
-#include "fruits.h";
-#include "meats.h";
-#include "cashier.h";
-#include "breads.h";
-#include "st-door.h";
-#include "st-aisle.h";
+#include "road.h";
 
 typedef struct {
-    Chuck Chuck;
-    WomenWalking WomenWalking[5];
-    WomenSwimming WomenSwimming[3];
-    Tree Tree[10];
-    Water Water;
-    Meats Meats;
-    Breads Breads;
-    Fruits Fruits;
-    Cashier Cashier;
-    StoreDoor StoreDoor;
-    StoreAisle StoreAisle[3];
-    Timer Timer;
-    Vampire Vampire;
-    Bats Bats[3];
-    Puddle Puddle;
+    Chuck chuck;
+    WomenWalking womenWalking[15];
+    WomenSwimming womenSwimming[15];
+    Tree tree[10];
+    Water water[120]; // need 40 Water objects per stream (20 to cover the whole screen width, double it to make it 64 pixels high), 3 water streams total
+    Road road[120]; // need 40 road segments per road (20 to cover the whole screen width, double it to make it 64 pixels high), 3 roads total
 } Model;
+
+void Model_init(Model *model);

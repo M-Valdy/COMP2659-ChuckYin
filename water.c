@@ -40,7 +40,6 @@ const unsigned long water_bitmap[WATER_HEIGHT] =
 };
 
 // @author Meagan
-
 // Function to initialize water
 void initWater(Water* water, unsigned int x, unsigned int y) {
     water->x = x;

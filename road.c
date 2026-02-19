@@ -76,6 +76,13 @@ const unsigned long road_bitmap_lower[ROAD_HEIGHT] =
 };
 
 // @author Paolo
+// Function to initialize road
+void initRoad(Road* road, unsigned int x, unsigned int y) {
+    road->x = x;
+    road->y = y;
+}
+
+// @author Paolo
 void render_road(Road* road) {
     // TO DO
 }
