@@ -34,23 +34,23 @@ These routines can optionally be done in C first, then in Assembly.
 
 - [X] plot_pixel
 
-- [ ] plot_horizontal_line
+- [X] plot_horizontal_line
 
-- [ ] plot_vertical_line
+- [X] plot_vertical_line
 
-- [ ] plot_line (generic line between any two points)
+- [X] plot_line (generic line between any two points)
 
-- [ ] plot_rectangle
+- [X] plot_rectangle
 
-- [ ] plot_square
+- [X] plot_square
 
-- [ ] plot_triangle
+- [X] plot_triangle
 
-- [ ] plot_bitmap_8
+- [X] plot_bitmap_8
 
-- [ ] plot_bitmap_16
+- [X] plot_bitmap_16
 
-- [ ] plot_bitmap_32
+- [X] plot_bitmap_32
 
 - [ ] plot_character
 

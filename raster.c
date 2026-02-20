@@ -205,40 +205,26 @@ void plot_square(UINT32 *base, UINT16 row, UINT16 col, UINT16 side){
 */
 
 void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 trianglebase, UINT16 height, UINT8 direction){
-
-   /* plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col) */
     UINT32 *start_point;
 
     if (direction == 0) { /* the height goes downwards adn base goes right */
-        /* plot base */
-        plot_line(base, row, col, row, (col + (trianglebase - 1)));
-        /* plot perpendicular */
-        plot_line(base, row, col, (row + (height - 1)), col);
-        /* plot hypotenuse */
-        plot_line(base, (row + (height - 1)), col, row, (col + (trianglebase - 1)));
+        plot_line(base, row, col, row, (col + (trianglebase - 1))); /* plot base */
+        plot_line(base, row, col, (row + (height - 1)), col); /* plot perpendicular */       
+        plot_line(base, (row + (height - 1)), col, row, (col + (trianglebase - 1))); /* plot hypotenuse */
 
     } else if (direction == 1) { /* the height goes downwards and base goes left */
-        /* plot base */
-        plot_line(base, row, col, row, (col - (trianglebase - 1)));
-        /* plot perpendicular */
-        plot_line(base, row, col, (row + (height - 1)), col);
-        /* plot hypotenuse */
-        plot_line(base, (row + (height - 1)), col, row, (col - (trianglebase - 1)));
+        plot_line(base, row, col, row, (col - (trianglebase - 1))); /* plot base */
+        plot_line(base, row, col, (row + (height - 1)), col); /* plot perpendicular */
+        plot_line(base, (row + (height - 1)), col, row, (col - (trianglebase - 1))); /* plot hypotenuse */
 
     } else if (direction == 2) { /* the hieght goes upwards and the base goes right */
-        /* plot base */
         plot_line(base, row, col, row, (col + (trianglebase - 1)));
-        /* plot perpendicular */
         plot_line(base, row, col, (row - (height - 1)), col);
-        /* plot hypotenuse */
         plot_line(base, (row - (height - 1)), col, row, (col + (trianglebase - 1)));
 
     } else if (direction == 3) { /* the goes upwards and base goes left */
-        /* plot base */
         plot_line(base, row, col, row, (col - (trianglebase - 1)));
-        /* plot perpendicular */
         plot_line(base, row, col, (row - (height - 1)), col);
-        /* plot hypotenuse */
         plot_line(base, (row - (height - 1)), col, row, (col - (trianglebase - 1)));
     }
 }
