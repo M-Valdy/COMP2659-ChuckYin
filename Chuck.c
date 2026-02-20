@@ -1,7 +1,11 @@
 #include "Chuck.h"
 #include "water.h"
 
-// @author Paolo
+/*
+    @author Paolo
+    This is the bitmap that contains the dimensions of the Chuck sprite
+    which will be used for rendering and collision detection
+*/
 #define CHUCK_HEIGHT 32
 const unsigned long Chuck_bitmap[CHUCK_HEIGHT] =
 {
@@ -91,11 +95,6 @@ void stopWalking(Chuck* chuck) {
     chuck->isWalking = 0;
     chuck->deltaX = 0;
     chuck->deltaY = 0;
-}
-
-// @author Paolo
-void render_Chuck(Chuck* chuck) {
-    // TO DO
 }
 
 // @author Paolo
