@@ -37,8 +37,9 @@ extern int chuckBitmap[CHUCK_HORIZONTAL]; // this bitmap represents Chuck's spri
  OUTPUT: Chuck struct initialized with the provided position 
         and default states for walking, movement, and collision.
 
- Assumptions: The renderer is working with the same coordinate system as the one used to initialize Chuck's position, 
-        and that the initial position provided is within the bounds of the game screen.
+ ASSUMPTIONS: The renderer is working with the same coordinate system as the one used to 
+       initialize Chuck's position, and that the initial position provided is within 
+       the bounds of the game screen.
 
 */
 void initChuck(Chuck* chuck, unsigned int x, unsigned int y);
@@ -53,8 +54,9 @@ void initChuck(Chuck* chuck, unsigned int x, unsigned int y);
         int deltaY: the y direction of movement (1 for down, -1 for up)
 
  OUTPUT: Chuck struct with walking state set to 1 and movement deltas set
- Assumptions: This function assumes
-        - isWalking state is properly set and 
+
+ ASSUMPTIONS: This function assumes
+        - isWalking state is properly set to 0
         - movement deltas will be used in the updateChuck function to change 
         Chuck's position accordingly. 
 
@@ -71,6 +73,11 @@ void startWalking(Chuck* chuck, int deltaX, int deltaY);
 
  OUTPUT: Chuck struct with updated position state
 
+ ASSUMPTIONS: This function assumes
+       - isWalking state is properly set to either 0 or 1
+       - movement deltas are set correctly based on the direction of movement
+       - collision state and movement permissions are updated correctly by 
+       other functions before this function is called
 
 */
 void updateChuck(Chuck* chuck);
