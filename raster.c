@@ -43,6 +43,7 @@ void clear_screen(UINT32 *base){
 }
 
 void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width){
+    
 }
 
 void plot_pixel(UINT8 *base, UINT16 row, UINT16 col){
@@ -118,23 +119,27 @@ void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row,
     int err;
     int e2;
 
-    /* Initial pointers (useful if you optimize the loop later) */
+    /* Initial pointers */
     start_point = base + (start_row * LONGS_PER_ROW) + (start_col >> 5);
     end_point = base + (end_row * LONGS_PER_ROW) + (end_col >> 5);
 
-    /* 1. Specialized cases: Horizontal and Vertical */
+    /* Horizontal and Vertical */
     if (start_row == end_row) {
         if (start_col > end_col) {
-            temp = start_col; start_col = end_col; end_col = temp;
+            temp = start_col; 
+            start_col = end_col; 
+            end_col = temp;
         }
         plot_horizontal_line(base, start_row, start_col, (end_col - start_col));
     } else if (start_col == end_col) {
         if (start_row > end_row) {
-            temp = start_row; start_row = end_row; end_row = temp;
+            temp = start_row; 
+            start_row = end_row;
+            end_row = temp;
         }
         plot_vertical_line(base, start_row, start_col, (end_row - start_row));
     } else {
-        /* 2. General Case: Bresenham Algorithm 
+        /* Bresenham Algorithm 
         * Based on and adapted from https://gist.github.com/bert/1085538#file-circle-c-L1
         */
         
@@ -187,4 +192,134 @@ void plot_rectangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 
 
 void plot_square(UINT32 *base, UINT16 row, UINT16 col, UINT16 side){
     plot_rectangle(base, row, col, side, side);
+}
+
+/* INPUT: Address(UINT8*): to the start of the screen
+        Position(row,col): the coordinates of the pixel of the 90° angle of the triangle
+        Height: the lenth (number of rows) of the height in pixels of the triangle
+        Direction: Describes where the coordinate is relative to the rest of the triangle
+              0 - Coordinate is the top left point of the triangle
+              1 - Coordinate is the top right point of the triangle
+              2 - Coordinate is the bottom left point of the triangle
+              3 - Coordinate is the bottom right point of the triangle
+*/
+
+void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 trianglebase, UINT16 height, UINT8 direction){
+
+   /* plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col) */
+    UINT32 *start_point;
+
+    if (direction == 0) { /* the height goes downwards adn base goes right */
+        /* plot base */
+        plot_line(base, row, col, row, (col + (trianglebase - 1)));
+        /* plot perpendicular */
+        plot_line(base, row, col, (row + (height - 1)), col);
+        /* plot hypotenuse */
+        plot_line(base, (row + (height - 1)), col, row, (col + (trianglebase - 1)));
+
+    } else if (direction == 1) { /* the height goes downwards and base goes left */
+        /* plot base */
+        plot_line(base, row, col, row, (col - (trianglebase - 1)));
+        /* plot perpendicular */
+        plot_line(base, row, col, (row + (height - 1)), col);
+        /* plot hypotenuse */
+        plot_line(base, (row + (height - 1)), col, row, (col - (trianglebase - 1)));
+
+    } else if (direction == 2) { /* the hieght goes upwards and the base goes right */
+        /* plot base */
+        plot_line(base, row, col, row, (col + (trianglebase - 1)));
+        /* plot perpendicular */
+        plot_line(base, row, col, (row - (height - 1)), col);
+        /* plot hypotenuse */
+        plot_line(base, (row - (height - 1)), col, row, (col + (trianglebase - 1)));
+
+    } else if (direction == 3) { /* the goes upwards and base goes left */
+        /* plot base */
+        plot_line(base, row, col, row, (col - (trianglebase - 1)));
+        /* plot perpendicular */
+        plot_line(base, row, col, (row - (height - 1)), col);
+        /* plot hypotenuse */
+        plot_line(base, (row - (height - 1)), col, row, (col - (trianglebase - 1)));
+    }
+}
+
+void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height, const UINT8 *bitmap) {
+    UINT8 *current;
+    UINT8 *start_point;
+    UINT8 *end_point;
+
+    UINT16 i = 0; 
+    UINT16 end;
+    UINT16 shift;
+
+    if (row + height > 400) {
+        height = 400 - row;
+    }
+
+    end = row + (height - 1);
+    shift = (col & 7);
+    /* calculate the memory address of the first and last byte */
+    start_point = base + (row * BYTES_PER_ROW) + (col >> 3);
+    end_point = base + (end * BYTES_PER_ROW) + (col >> 3);
+
+    /* loop through the memory vertically */
+    for (current = start_point; current <= end_point; current += BYTES_PER_ROW) {
+        /* bitwise OR the bitmap byte into the screen memory */
+        *current |= (bitmap[i] >> shift);
+        i++;
+    }
+}
+
+void plot_bitmap_16(UINT16 *base, UINT16 row, UINT16 col, UINT16 height, const UINT16 *bitmap){
+    UINT16 *current;
+    UINT16 *start_point;
+    UINT16 *end_point;
+
+    UINT16 i = 0; 
+    UINT16 end;
+    UINT16 shift;
+    if (row + height > 400) {
+        height = 400 - row;
+    }
+
+    shift = (col & 15);
+    end = row + (height - 1);
+    /* calculate the memory address of the first and last byte */
+    start_point = base + (row * WORDS_PER_ROW) + (col >> 4);
+    end_point = base + (end * WORDS_PER_ROW) + (col >> 4);
+
+    /* loop through the memory vertically */
+    for (current = start_point; current <= end_point; current += WORDS_PER_ROW) {
+        /* bitwise OR the bitmap word into the screen memory */
+        *current |= (bitmap[i] >> shift);
+        i++;
+    }
+}
+
+void plot_bitmap_32(UINT32 *base, UINT16 row, UINT16 col, UINT16 height, const UINT32 *bitmap){
+    UINT32 *current;
+    UINT32 *start_point;
+    UINT32 *end_point;
+
+    UINT16 end;
+
+    UINT16 i = 0; 
+    UINT16 shift;
+
+    if (row + height > 400) {
+        height = 400 - row;
+    }
+    
+    end = row + (height - 1);
+    shift = (col & 31);
+    /* calculate the memory address of the first and last byte */
+    start_point = base + (row * LONGS_PER_ROW) + (col >> 5);
+    end_point = base + (end * LONGS_PER_ROW) + (col >> 5);
+
+    /* loop through the memory vertically */
+    for (current = start_point; current <= end_point; current += LONGS_PER_ROW) {
+        /* bitwise OR the bitmap word into the screen memory */
+        *current |= (bitmap[i] >> shift);
+        i++;
+    }   
 }

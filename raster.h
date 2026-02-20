@@ -138,7 +138,7 @@ void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 trianglebase, UI
 
  OUTPUT: None
 */
-void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height);
+void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height, const UINT8 *bitmap);
 
 
 /*----- Function: plot_bitmap_16 -----
@@ -151,7 +151,7 @@ void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height);
 
  OUTPUT: None
 */
-void plot_bitmap_16(UINT16 *base, UINT16 row, UINT16 col, UINT16 height);
+void plot_bitmap_16(UINT16 *base, UINT16 row, UINT16 col, UINT16 height, const UINT16 *bitmap);
 
 
 /*----- Function: plot_bitmap_32 -----
@@ -164,7 +164,7 @@ void plot_bitmap_16(UINT16 *base, UINT16 row, UINT16 col, UINT16 height);
 
  OUTPUT: None
 */
-void plot_bitmap_32(UINT32 *base, UINT16 row, UINT16 col, UINT16 height);
+void plot_bitmap_32(UINT32 *base, UINT16 row, UINT16 col, UINT16 height, const UINT32 *bitmap);
 
 
 /*----- Function: plot_character -----
