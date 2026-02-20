@@ -2,6 +2,7 @@
 #define RASTER_H
 
 #include "types.h"
+#include "font.h"
 
 /*----- Function: clear_screen -----
 v

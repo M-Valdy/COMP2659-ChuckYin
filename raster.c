@@ -5,6 +5,7 @@
 #define SCREEN_HEIGHT 400 /* the vertical size */
 
 #define BYTES_PER_ROW (SCREEN_WIDTH >> 3)
+#define WORDS_PER_ROW (BYTES_PER_ROW >> 1)
 #define LONGS_PER_ROW (BYTES_PER_ROW >> 2)
 
 /* the total pixels to be considered */
@@ -308,4 +309,47 @@ void plot_bitmap_32(UINT32 *base, UINT16 row, UINT16 col, UINT16 height, const U
         *current |= (bitmap[i] >> shift);
         i++;
     }   
+}
+
+void plot_character(UINT8 *base, UINT16 row, UINT16 col, char ch){
+    UINT8 *start_point;      /* starting position */
+    UINT8 *current;          /*  current position */
+    UINT32 i;                /* loop counter */
+    UINT16 shift;            /* bit shift amount for aligning pixels with screen bytes */
+    const UINT8 *character; /* pointer to the 8x8 bitmap data for the character */
+
+    /* Check if the character is printable */
+    if (IS_PRINTABLE(ch)){
+        /* Get the glyph bitmap for the character from the font array */
+        character = GLYPH_START(ch);
+        
+        /* Calculate the starting memory address */
+        start_point = base + (row * BYTES_PER_ROW) + (col >> 3);
+        current = start_point;
+        
+        /* Calculate bit shift */
+        shift = (col & 7);
+        
+        /* Loop through the 8 rows of the 8x8 character glyph */
+        for(i = 0; i < 8; i++) {
+            /* Use bitwise OR to avoid overwriting existing screen pixels */
+            *current |= (character[i] >> shift);
+            
+            /* If the character spans across two bytes (shift > 0),
+             * plot the remaining pixels in the next byte by shifting left */
+            if (shift > 0){
+                *(current + 1) |= (character[i] << (8 - shift));
+            }
+            
+            /* Move to the next row in screen memory */
+            current += BYTES_PER_ROW;
+        }
+    }
+}
+
+void plot_string(UINT8 *base, UINT16 row, UINT16 col, char *ch) {
+    UINT8 *start_point;      /* starting position */
+    UINT8 *current;          /*  current position */
+    
+    current = start_point;
 }
