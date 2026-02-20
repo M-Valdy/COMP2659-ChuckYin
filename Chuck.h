@@ -5,6 +5,10 @@ typedef struct {
     int isWalking;
     int deltaX, deltaY;
     int isColliding; // 1 = obstacle collision, 0 = no collision, 2 = death collision
+    int canMoveRight;
+    int canMoveLeft;
+    int canMoveUp;
+    int canMoveDown;
 } Chuck;
 
 extern int chuckBitmap[CHUCK_HORIZONTAL];

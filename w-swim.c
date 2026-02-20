@@ -85,23 +85,32 @@ void initWomenSwimming(WomenSwimming* womenSwimming, unsigned int x, unsigned in
     womenSwimming->deltaY = 0;
 }
 
-// @author Meagan
+// @author Meagan & Paolo
 void updateWomenSwimming(WomenSwimming* womenSwimming) {
-    while ((womenSwimming->deltaX != 0 || womenSwimming->deltaY != 0) 
+    /*while ((womenSwimming->deltaX != 0 || womenSwimming->deltaY != 0) 
     && px_in_bounds(womenSwimming->x, womenSwimming->y)) {
         womenSwimming->x += womenSwimming->deltaX;
         womenSwimming->y += womenSwimming->deltaY;
+    }*/ 
+    womenSwimming->frameCount++;
+    if (womenSwimming->frameCount == 70 && womenSwimming->isForward == 1) {
+        womenSwimming->isForward = 0; // Switch to backward bitmap after 70 frames
+    } else if (womenSwimming->frameCount == 70 && womenSwimming->isForward == 0) {
+        womenSwimming->isForward = 1; // Switch to forward bitmap after 70 frames
     }
+    
+    
 }
 
 // @author Meagan
 void collisionWomenSwimming(WomenSwimming* womenSwimming, Chuck* chuck) {
-    if (womenSwimming->x == chuck->x && womenSwimming->y == chuck->y) {
+    if (womenSwimming->x == chuck->x && womenSwimming->y == chuck->y && womenSwimming->isForward == 1) {
         // womenSwimming collides with Chuck, stop movement
         womenSwimming->deltaX = 0;
         womenSwimming->deltaY = 0;
         chuck->isWalking = 0; // Stop Chuck from walking
         chuck->isColliding = 2; // Set collision flag for Chuck
+        womenSwimming->isColliding = 1;
     }
 }
 

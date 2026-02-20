@@ -3,6 +3,9 @@
 typedef struct {
     unsigned int x,y;
     int deltaX, deltaY;
+    int isColliding;
+    int isForward; // 1 = looking forward, 0 = looking backward
+    int frameCount;
 } WomenSwimming;
 
 

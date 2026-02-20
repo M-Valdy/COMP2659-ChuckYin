@@ -1,4 +1,5 @@
-#include "Chuck.h";
+#include "Chuck.h"
+#include "water.h"
 
 // @author Paolo
 #define CHUCK_HEIGHT 32
@@ -47,6 +48,10 @@ void initChuck(Chuck* chuck, unsigned int x, unsigned int y) {
     chuck->isColliding = 0;
     chuck->deltaX = 0;
     chuck->deltaY = 0;
+    chuck->canMoveLeft = 1;
+    chuck->canMoveRight = 1;
+    chuck->canMoveUp = 1;
+    chuck->canMoveDown = 1;
 }
 
 // @author Meagan
@@ -57,10 +62,24 @@ void startWalking(Chuck* chuck, int deltaX, int deltaY) {
     chuck->deltaY = deltaY;
 }
 
-// @author Meagan
+// @author Meagan & Paolo
 // function for updating Chuck's position based on his walking state
 void updateChuck(Chuck* chuck) {
     if (chuck->isWalking) {
+        // check if he's allowed to move there first.
+        if (chuck->canMoveRight == 0 && chuck->deltaX > 0) {
+            chuck->deltaX = 0;  
+        }
+        if (chuck->canMoveLeft == 0 && chuck->deltaX < 0) {
+            chuck->deltaX = 0;
+        }
+        if (chuck->canMoveUp == 0 && chuck->deltaY < 0) {
+            chuck->deltaY = 0;
+        }
+        if (chuck->canMoveDown == 0 && chuck->deltaY > 0) {
+            chuck->deltaY = 0;
+        }
+
         chuck->x += chuck->deltaX;
         chuck->y += chuck->deltaY;
     }
@@ -77,5 +96,45 @@ void stopWalking(Chuck* chuck) {
 // @author Paolo
 void render_Chuck(Chuck* chuck) {
     // TO DO
+}
+
+// @author Paolo
+// if Chuck's right edge is touching the left edge of the water, then can't move right
+void checkRightCollision(Chuck* chuck, Water* water) {
+    if (chuck->x + 32 == water->x) { 
+        chuck->canMoveRight = 0;
+    } else {
+        chuck->canMoveRight = 1;
+    }
+}
+
+// @author Paolo 
+// if Chuck's left edge is touching the right edge of the water, then can't move right
+void checkLeftCollision(Chuck* chuck, Water* water) {
+    if (chuck->x == water->x + 32) { 
+        chuck->canMoveLeft = 0;
+    } else {
+        chuck->canMoveLeft = 1;
+    }
+}
+
+// @author Paolo
+// if Chuck's top edge is touching the bottom edge of the water, then can't move up   
+void checkUpCollision(Chuck* chuck, Water* water) {
+    if (chuck->y == water->y - 32) { 
+        chuck->canMoveUp = 0;
+    } else {
+        chuck->canMoveUp = 1;
+    }
+}
+
+// @author Paolo
+// if Chuck's bottom edge is touching the top edge of the water, then can't move down
+void checkDownCollision(Chuck* chuck, Water* water) {
+    if (chuck->y - CHUCK_HEIGHT == water->y) { 
+        chuck->canMoveDown = 0;
+    } else {
+        chuck->canMoveDown = 1;
+    }
 }
 

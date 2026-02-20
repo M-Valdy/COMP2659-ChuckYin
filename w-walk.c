@@ -47,14 +47,22 @@ void initWomenWalking(WomenWalking* womenWalking, unsigned int x, unsigned int y
     womenWalking->deltaY = 0;
 }
 
-// @author Meagan
+// @author Meagan & Paolo
 void updateWomenWalking(WomenWalking* womenWalking) {
     // Update the position of the walking woman based on her deltaX and deltaY
-    while ((womenWalking->deltaX != 0 || womenWalking->deltaY != 0) 
+    /*while ((womenWalking->deltaX != 0 || womenWalking->deltaY != 0) 
     && px_in_bounds(womenWalking->x, womenWalking->y)) {
         womenWalking->x += womenWalking->deltaX;
         womenWalking->y += womenWalking->deltaY;
+    }*/
+
+    if (womenWalking->x + 32 >= 640) {
+        womenWalking->deltaX = -1; // Move left
+    } else if (womenWalking->x <= 0) {
+        womenWalking->deltaX = 1; // Move right
     }
+
+    womenWalking->x += womenWalking->deltaX;
 }
 
 // @author Meagan
