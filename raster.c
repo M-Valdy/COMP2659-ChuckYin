@@ -350,6 +350,11 @@ void plot_character(UINT8 *base, UINT16 row, UINT16 col, char ch){
 void plot_string(UINT8 *base, UINT16 row, UINT16 col, char *ch) {
     UINT8 *start_point;      /* starting position */
     UINT8 *current;          /*  current position */
-    
-    current = start_point;
+    UINT16 i = 0;
+
+    while (ch[i] != '\0') {
+        plot_character(base, row, col, ch[i]);
+        i++;
+        col += 8;
+    }
 }
