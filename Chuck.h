@@ -1,3 +1,5 @@
+#ifndef CHUCK_H
+#define CHUCK_H
 /*
    This file defines the struct that contains all the information about Chuck's state,
    which includes his position, whether he's walking or not, how much he's moving in the x and y directions, 
@@ -84,3 +86,5 @@ void updateChuck(Chuck* chuck);
 
 */
 void stopWalking(Chuck* chuck);
+
+#endif
