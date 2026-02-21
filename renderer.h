@@ -29,19 +29,29 @@ void render_Chuck(const Chuck* chuck, UINT8 *base);
 
 /*----- Function: render_WomenWalking -----
     PURPOSE: Renders the women walking on the screen at their current positions.
+    
     INPUT: WomenWalking*: a pointer to the array of WomenWalking objects in the model
            Address(UINT8*): to the start of the screen
+
     OUTPUT: Women walking rendered on the screen at their current positions
 */
 void render_WomenWalking(const WomenWalking* womenWalking, UINT8 *base);
 
 /*----- Function: render_WomenSwimming -----
     PURPOSE: Renders the women swimming on the screen at their current positions.
+
     INPUT: WomenSwimming*: a pointer to the array of WomenSwimming objects in the model
            Address(UINT8*): to the start of the screen
+
     OUTPUT: Women swimming rendered on the screen at their current positions
 */
 void render_WomenSwimming(const WomenSwimming* womenSwimming, UINT8 *base);
 
+
+void render_tree(Tree* Tree);
+
+void render_water(Water* water);
+
+void render_road(Road* road);
 
 #endif

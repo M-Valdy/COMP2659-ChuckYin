@@ -91,7 +91,44 @@ void updateChuck(Chuck* chuck);
 
  OUTPUT: Chuck struct with walking state set to 0 and movement deltas reset to 0
 
+ ASSUMPTIONS: This function assumes
+        - isWalking state is properly set to 1 before this function is called
+        - movement deltas will be reset to 0 to stop Chuck's movement in the updateChuck function.
+
 */
 void stopWalking(Chuck* chuck);
+
+/*----- Function: checkXCollision -----
+
+ PURPOSE: Checks for collisions between Chuck and the water in the x direction and updates movement permissions accordingly.
+
+ INPUT: Chuck*: a pointer to the model containing the player character Chuck
+        Water*: a pointer to the water object in the model
+
+ OUTPUT: Chuck struct with updated movement permissions for left and right movement based on collision state with water
+
+ ASSUMPTIONS: This function assumes
+        - Chuck's position and dimensions are defined such that his edges can be checked for collision 
+        with the water's edges
+        - The water object has defined dimensions that can be used to check for collisions with Chuck
+*/
+void checkXCollision(Chuck* chuck, Water* water);
+
+
+/*----- Function: checkYCollision -----
+
+ PURPOSE: Checks for collisions between Chuck and the water in the y direction and updates movement permissions accordingly.
+
+ INPUT: Chuck*: a pointer to the model containing the player character Chuck
+        Water*: a pointer to the water object in the model
+
+ OUTPUT: Chuck struct with updated movement permissions for up and down movement based on collision state with water
+
+ ASSUMPTIONS: This function assumes
+        - Chuck's position and dimensions are defined such that his edges can be checked for collision 
+        with the water's edges
+        - The water object has defined dimensions that can be used to check for collisions with Chuck
+*/
+void checkYCollision(Chuck* chuck, Water* water);
 
 #endif

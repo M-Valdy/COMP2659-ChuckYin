@@ -1,5 +1,6 @@
-#include "w-walk.h";
-#include "raster.h";
+#include "w-walk.h"
+#include "raster.h"
+#include "Chuck.h"
 
 // @author Paolo
 #define WALKER_HEIGHT 32
@@ -71,12 +72,7 @@ void collisionWomenWalking(WomenWalking* womenWalking, Chuck* chuck) {
         // womenWalking collides with Chuck, stop movement
         womenWalking->deltaX = 0;
         womenWalking->deltaY = 0;
-        chuck->isWalking = 0; // Stop Chuck from walking
-        chuck->isColliding = 2; // Set collision flag for Chuck
+        stopWalking(chuck); // Stop Chuck from walking
+        chuck->isColliding = 2; // Set death collision flag for Chuck
     }
-}
-
-// @author Paolo
-void render_womenWalking(WomenWalking* womenWalking) {
-    // TO DO
 }
