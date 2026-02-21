@@ -337,9 +337,9 @@ void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height, const UIN
     UINT8 *current;
     UINT8 *start_point;
     UINT8 *end_point;
-    UINT16 i = 0; 
-    UINT16 end;
-    UINT16 shift;
+    UINT8 i; 
+    UINT8 end;
+    UINT8 shift;
 
     if (height == 0) return;
     if (row + height > 400) height = 400 - row; 
@@ -348,6 +348,7 @@ void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height, const UIN
     shift = (col & 7); 
     start_point = base + (row * BYTES_PER_ROW) + (col >> 3);
     end_point = base + (end * BYTES_PER_ROW) + (col >> 3);
+    i = 0;
 
     for (current = start_point; current <= end_point; current += BYTES_PER_ROW) {
         *current |= (bitmap[i] >> shift);
@@ -363,7 +364,7 @@ void plot_bitmap_16(UINT16 *base, UINT16 row, UINT16 col, UINT16 height, const U
     UINT16 *current;
     UINT16 *start_point;
     UINT16 *end_point;
-    UINT16 i = 0; 
+    UINT16 i; 
     UINT16 end;
     UINT16 shift;
 
@@ -375,6 +376,7 @@ void plot_bitmap_16(UINT16 *base, UINT16 row, UINT16 col, UINT16 height, const U
     start_point = base + (row * WORDS_PER_ROW) + (col >> 4);
     end_point = base + (end * WORDS_PER_ROW) + (col >> 4);
 
+    i = 0;
     for (current = start_point; current <= end_point; current += WORDS_PER_ROW) {
         *current |= (bitmap[i] >> shift);
         if (shift > 0 && ((col >> 4) < (WORDS_PER_ROW - 1))){
@@ -388,9 +390,9 @@ void plot_bitmap_32(UINT32 *base, UINT16 row, UINT16 col, UINT16 height, const U
     UINT32 *current;
     UINT32 *start_point;
     UINT32 *end_point;
-    UINT16 end;
-    UINT16 i = 0; 
-    UINT16 shift;
+    UINT32 end;
+    UINT32 i; 
+    UINT32 shift;
 
     if (height == 0) return;
 
