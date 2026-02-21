@@ -52,9 +52,9 @@ These routines can optionally be done in C first, then in Assembly.
 
 - [X] plot_bitmap_32
 
-- [ ] plot_character
+- [X] plot_character
 
-- [ ] plot_string
+- [X] plot_string
 
 ### Renderer
 
