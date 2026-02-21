@@ -48,10 +48,37 @@ void render_WomenWalking(const WomenWalking* womenWalking, UINT8 *base);
 void render_WomenSwimming(const WomenSwimming* womenSwimming, UINT8 *base);
 
 
+/*----- Function: render_tree -----
+    PURPOSE: Renders the trees on the screen at their current positions.
+
+    INPUT: Tree*: a pointer to the array of Tree objects in the model
+           Address(UINT8*): to the start of the screen
+
+    OUTPUT: Trees rendered on the screen at their current positions
+*/
 void render_tree(Tree* Tree);
 
+
+
+/*----- Function: render_water -----
+    PURPOSE: Renders the water on the screen at its current position.
+
+    INPUT: Water*: a pointer to the array of Water objects in the model
+           Address(UINT8*): to the start of the screen
+
+    OUTPUT: Water rendered on the screen at its current position
+*/
 void render_water(Water* water);
 
+
+/*----- Function: render_road -----
+    PURPOSE: Renders the road on the screen at its current position.
+
+    INPUT: Road*: a pointer to the array of Road objects in the model
+           Address(UINT8*): to the start of the screen
+
+    OUTPUT: Road rendered on the screen at its current position
+*/
 void render_road(Road* road);
 
 #endif

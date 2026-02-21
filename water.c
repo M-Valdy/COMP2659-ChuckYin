@@ -55,8 +55,3 @@ void isWaterColliding(Water* water, Chuck* chuck) {
         chuck->isColliding = 2;
     }
 }
-
-// @author Paolo
-void render_water(Water* water) {
-    // TO DO
-}   

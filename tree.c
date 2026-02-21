@@ -55,8 +55,3 @@ void isTreeColliding(Tree* tree, Chuck* chuck) {
         chuck->isColliding = 1;
     }
 }
-
-// @author Paolo
-void render_tree(Tree* tree) {
-    // TO DO
-}

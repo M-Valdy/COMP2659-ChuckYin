@@ -72,7 +72,7 @@ These routines can optionally be done in C first, then in Assembly.
 
 - [X] Formatting: Ensure code is readable and properly indented.
 
-- [ ] Header Documentation: Each function must include a header describing:
+- [X] Header Documentation: Each function must include a header describing:
 
     Its purpose from the caller's perspective.
 
@@ -82,7 +82,7 @@ These routines can optionally be done in C first, then in Assembly.
 
     Any assumptions, limitations, or known bugs.
 
-- [ ] Source File Metadata: In .c files, write the purpose of data structures and functions.
+- [X] Source File Metadata: In .c files, write the purpose of data structures and functions.
 
 - [X] Authorship: Include team member names and author(s) in the files.
 
