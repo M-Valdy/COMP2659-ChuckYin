@@ -51,7 +51,7 @@ static const UINT8 invader_8x8[8] = {
 	void *base = Physbase();
 	clear_screen(base);
 
-	plot_string(base, 50, 50, "Can we have sex now?");
+	plot_string(base, 50, 50, "My bad?");
 
 	plot_bitmap_8(base, 200, 200, 8, invader_8x8);
 	plot_bitmap_16(base, 100, 100, 16, invader_16x16);
