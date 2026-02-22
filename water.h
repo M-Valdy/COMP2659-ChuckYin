@@ -45,6 +45,6 @@ void initWater(Water* water, unsigned int x, unsigned int y);
         with the water's edges
         - The water object has defined dimensions that can be used to check for collisions with Chuck
 */
-void isWaterColliding(Water* water, Chuck* chuck);
+/* void isWaterColliding(Water* water, Chuck* chuck); */
 
 #endif

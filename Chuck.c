@@ -6,8 +6,8 @@
     This is the bitmap that contains the dimensions of the Chuck sprite
     which will be used for rendering and collision detection
 */
-#define CHUCK_HEIGHT 32
-const unsigned long Chuck_bitmap[CHUCK_HEIGHT] =
+/* #define CHUCK_HEIGHT 32 */
+static const UINT32 Chuck_bitmap[CHUCK_HEIGHT] =
 {
     0x00000000, 
     0x003FFC00, 
@@ -43,8 +43,8 @@ const unsigned long Chuck_bitmap[CHUCK_HEIGHT] =
     0x00000000
 };
 
-// @author Meagan
-// function for initializing Chuck's position and state
+/* @author Meagan
+function for initializing Chuck's position and state */
 void initChuck(Chuck* chuck, unsigned int x, unsigned int y) {
     chuck->x = x;
     chuck->y = y;
@@ -58,19 +58,19 @@ void initChuck(Chuck* chuck, unsigned int x, unsigned int y) {
     chuck->canMoveDown = 1;
 }
 
-// @author Meagan
-// function for starting Chuck's walking in a specified direction
+/* @author Meagan */
+/* function for starting Chuck's walking in a specified direction */
 void startWalking(Chuck* chuck, int deltaX, int deltaY) {
     chuck->isWalking = 1;
     chuck->deltaX = deltaX;
     chuck->deltaY = deltaY;
 }
 
-// @author Meagan & Paolo
-// function for updating Chuck's position based on his walking state
+/* @author Meagan & Paolo
+function for updating Chuck's position based on his walking state */
 void updateChuck(Chuck* chuck) {
     if (chuck->isWalking) {
-        // check if he's allowed to move there first.
+        /* check if he's allowed to move there first. */
         if (chuck->canMoveRight == 0 && chuck->deltaX > 0) {
             chuck->deltaX = 0;  
         }
@@ -89,17 +89,17 @@ void updateChuck(Chuck* chuck) {
     }
 }
 
-// @author Meagan
-// function for stopping Chuck's walking
+/* @author Meagan
+function for stopping Chuck's walking */
 void stopWalking(Chuck* chuck) {
     chuck->isWalking = 0;
     chuck->deltaX = 0;
     chuck->deltaY = 0;
 }
 
-// @author Paolo
+/* @author Paolo 
 // if Chuck's right edge is touching the left edge of the water, then can't move right
-// if Chuck's left edge is touching the right edge of the water, then can't move right
+// if Chuck's left edge is touching the right edge of the water, then can't move right */
 void checkXCollision(Chuck* chuck, Water* water) {
     if (chuck->x + 32 == water->x) { 
         chuck->canMoveRight = 0;
@@ -113,9 +113,9 @@ void checkXCollision(Chuck* chuck, Water* water) {
     }
 }
 
-// @author Paolo
+/* @author Paolo
 // if Chuck's top edge is touching the bottom edge of the water, then can't move up
-// if Chuck's bottom edge is touching the top edge of the water, then can't move down
+// if Chuck's bottom edge is touching the top edge of the water, then can't move down */
 void checkYCollision(Chuck* chuck, Water* water) {
     if (chuck->y == water->y - 32) { 
         chuck->canMoveUp = 0;

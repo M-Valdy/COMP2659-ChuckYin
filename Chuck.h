@@ -13,19 +13,23 @@
    in the comment above the function definition in Chuck.c)
 
 */
-#define CHUCK_HORIZONTAL 8
+#define CHUCK_HEIGHT 32
 
 typedef struct {
-    unsigned int x,y;
+    unsigned int x;
+    unsigned int y;
     int isWalking;
-    int deltaX, deltaY;
-    int isColliding; // 1 = obstacle collision, 0 = no collision, 2 = death collision
-    int canMoveRight, canMoveLeft;
-    int canMoveUp, canMoveDown;
+    int deltaX;
+    int deltaY;
+    int isColliding; /* 1 = obstacle collision, 0 = no collision, 2 = death collision */
+    int canMoveRight;
+    int canMoveLeft;
+    int canMoveUp;
+    int canMoveDown;
 } Chuck;
 
 
-extern int chuckBitmap[CHUCK_HORIZONTAL]; // this bitmap represents Chuck's sprite, its defined in Chuck.c
+/* static const UINT32 Chuck_bitmap[8]; /* this bitmap represents Chuck's sprite, its defined in Chuck.c */
 
 /*----- Function: initChuck -----
 
