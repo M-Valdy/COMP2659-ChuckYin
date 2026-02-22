@@ -32,7 +32,7 @@
  * Input: x-coordinate (column), y-coordinate (row)
  * Return: 1 if in bounds, 0 if out of bounds.
  */
-int px_in_bounds(UINT16 row, UINT16 col) {
+UINT16 px_in_bounds(UINT16 row, UINT16 col) {
     return (col < SCREEN_WIDTH && row < SCREEN_HEIGHT);
 }
 
