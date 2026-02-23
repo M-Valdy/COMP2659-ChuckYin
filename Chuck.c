@@ -6,7 +6,7 @@
     This is the bitmap that contains the dimensions of the Chuck sprite
     which will be used for rendering and collision detection
 */
-/* #define CHUCK_HEIGHT 32 */
+define CHUCK_HEIGHT 32 
 static const UINT32 Chuck_bitmap[CHUCK_HEIGHT] =
 {
     0x00000000, 
