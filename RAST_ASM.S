@@ -1,4 +1,3 @@
-	include	gemdos.i
 ;=====================CONSTANTS=====================================================================
 
 SCREEN_WIDTH	EQU	640	; #define SCREEN_WIDTH
@@ -34,53 +33,7 @@ PHYSBASE    EQU 2
 CNECOUT     EQU 2
 CONIN       EQU 1
 
-;=============================TESTING AND PRETNED MAIN=============================================
-tst_main:
-    jsr     physbase    ; Get address and store it in 'base'
-    jsr     clear_screen 
-    addq.l  #4,sp       ; Clean up stack
-
-	move.w	#200,-(sp) ; push col index onto stack
-	move.w	#320,-(sp)	; push row index onto stack	
-	jsr		plot_pixel
-	addq.l	#4,sp
-
-	move.w	#201,-(sp) ; push col index onto stack
-	move.w	#320,-(sp)	; push row index onto stack
-	jsr		plot_pixel
-	addq.l	#4,sp
-
-	move.w	#202,-(sp) ; push col index onto stack
-	move.w	#320,-(sp)	; push row index onto stack
-	jsr		plot_pixel
-	addq.l	#4,sp
-
-	move.w	#203,-(sp) ; push col index onto stack
-	move.w	#320,-(sp)	; push row index onto stack	
-	jsr		plot_pixel
-	addq.l	#4,sp
-
-	move.w	#204,-(sp) ; push col index onto stack
-	move.w	#320,-(sp)	; push row index onto stack	
-	jsr		plot_pixel
-	addq.l	#4,sp
-
-	move.w	#205,-(sp) ; push col index onto stack
-	move.w	#320,-(sp)	; push row index onto stack
-	jsr		plot_pixel
-	addq.l	#4,sp
-    jsr     exit
-	
-
 ;=========================FUNCTIONS AND HELPER FUNCTIONS===========================================
-; get the address of rhe screen,
-physbase:
-    move.w  #2,-(sp)    ; XBIOS Function 2: Physbase
-    trap    #14         ; Call XBIOS
-    addq.l  #2,sp       ; Clean up function number
-	move.l	d0,base		; store to base variable
-    rts
-
 ;--------------CHECK FOR PIXEL COORDINATES BEING WITHIN BOUNDS-------------------------------------
 ;  PURPOSE: Checks if a coordinate is within the 640x400 screen limits.
 ;  INPUT: x-coordinate (column), y-coordinate (row)
@@ -267,13 +220,13 @@ plot_horizontal_line:
 	bne		multiplot_horizontal_line ; !(if start_point == end_point)
 	
 	and.l	d1,d0	; leftmask & rightmaks 
-	or.l	a0,d0	; current |= (leftmask & rigthmask)
+	or.l	d0,(a0)	; current |= (leftmask & rigthmask)
 	bra	plot_horizontal_line_end
 
 multiplot_horizontal_line:
 	move.l	a0,a2	; current = start_point
 	
-	or.l	a0,d0	; start_point |= leftmask
+	or.l	d0,(a2)	; start_point |= leftmask
 
 fill_h_line_loop:
 	cmp.l	a2,a1
@@ -281,7 +234,7 @@ fill_h_line_loop:
 	move.l	#HOR_LONG_MASK,(a2)+
 
 fill_h_line_loop_done:
-	or.l	a1,d1	; end_point |= rightmask
+	or.l	d1,(a1)	; end_point |= rightmask
 
 plot_horizontal_line_end:
     movem.l (sp)+,d0-d3/a0-a2 
@@ -359,7 +312,7 @@ plot_vertical_line:
 vertical_line_loop:
     or.l    d0,(a2)         ; plot the bit
     cmp.l   a2,a1           
-    beq.s   v_line_done
+    beq.s   plot_vertical_line_end
     adda.w  #80,a2          ; skip a row
     bra.s   vertical_line_loop
 
@@ -392,23 +345,11 @@ plot_rectangle:
 
 	move.l	base,a0
 ;	/* top line */
-;    plot_line(base, row, col, row, (col + (width - 1)));
-	move.w 14(a6),d1	; get width for arithmatic
-	add.w	10(a6),d1	; col + width
-	subq	#1,d1	; col + width - 1
-
-	move.w	d1,-(sp) ; push end col
-	move.w	8(a6),-(sp) ;push end row
-	move.w	12(a6),-(sp) ; push start col
-	move.w	8(a6),-(sp) ;push start row
-	move.l	a0,-(sp) ; push base address
-	jsr		plot_line
-	adda.l	#12,sp	; clean up the stack, 1*4 + 4*2 = 12 bytes
-
+;    plot_horizontal_line(base, row, col, width);
+	
 ;    /* bottom line */
-;    plot_line(base, (row + (length - 1)), col, (row + (length - 1)), (col + (width - 1)));
-	jsr		plot_line
-	adda
+;    plot_horizontal_line(base, (row + (length - 1)), col, (row + (width - 1)), width);
+	
 ;    /* left line */
 ;    plot_line(base, row, col, (row + (length - 1)), col);
 ;    /* right line */
