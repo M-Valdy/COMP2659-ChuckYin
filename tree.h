@@ -1,4 +1,8 @@
-#include "Chuck.h";
+#ifndef TREE_H
+#define TREE_H
+
+#include "Chuck.h"
+
 /*
     This file defines the struct that contains all the information about the trees in the game,
     which includes their position and whether they're colliding with Chuck or not, as well as the functions that manipulate that state. 
@@ -6,10 +10,6 @@
     Team names: Meagan Valderrama, Paolo Deocareza, and Gaurik Khullar
     @authors Meagan Valderrama
 */
-
-#ifndef TREE_H
-#define TREE_H
-
 
 typedef struct {
     unsigned int x,y;

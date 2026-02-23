@@ -1,7 +1,7 @@
-#include "model.h"
-
 #ifndef EVENTS_H
 #define EVENTS_H
+
+#include "model.h"
 
 /*
     This file contains the function prototype for handling events in the game.

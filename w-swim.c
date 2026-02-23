@@ -1,10 +1,11 @@
 #include "w-swim.h"
 #include "raster.h"
 #include "Chuck.h"
+#include "types.h"
 
-// @author Paolo
+/* @author Paolo */
 #define SWIMMER_HEIGHT 32
-const unsigned long womenSwimming_forward_bitmap[SWIMMER_HEIGHT] =
+const UINT32 womenSwimming_forward_bitmap[SWIMMER_HEIGHT] =
 {
     0x00000000, 
     0x00000000, 
@@ -40,8 +41,8 @@ const unsigned long womenSwimming_forward_bitmap[SWIMMER_HEIGHT] =
     0x00000000
 };
 
-// @author Paolo
-const unsigned long womenSwimming_backward_bitmap[SWIMMER_HEIGHT] =
+/* @author Paolo */
+const UINT32 womenSwimming_backward_bitmap[SWIMMER_HEIGHT] =
 {
     0x00000000, 
     0x00000000, 
@@ -77,51 +78,47 @@ const unsigned long womenSwimming_backward_bitmap[SWIMMER_HEIGHT] =
     0x00000000
 };
 
-// @author Meagan
-// This is for making the pseudo-random numbers for isForward state
-static  UINT16 seed = 12345;
+/* @author Meagan
+ This is for making the pseudo-random numbers for isForward state */
+static UINT16 seed = 12345;
 
-// @author Meagan
+/* @author Meagan */
 void setIsForward(WomenSwimming* womenSwimming, int isForward) {
-    seed = (seed * 25173 + 13849) & 0x7FFF; // make a random number
-    seed = seed & 0x0001; // make it either 0 or 1
-    womenSwimming->isForward = seed; // set isForward to the random number
+    seed = (seed * 25173 + 13849) & 0x7FFF; /* make a random number */
+    seed = seed & 0x0001; /* make it either 0 or 1 */
+    womenSwimming->isForward = seed; /* set isForward to the random number */
 }
 
-// @author Meagan
-void initWomenSwimming(WomenSwimming* womenSwimming, unsigned int x, unsigned int y) {
+/* @author Meagan */
+void initWomenSwimming(WomenSwimming* womenSwimming, UINT16 x, UINT16 y) {
     womenSwimming->x = x;
     womenSwimming->y = y;
     womenSwimming->deltaX = 0;
     womenSwimming->deltaY = 0;
     womenSwimming->isColliding = 0;
-    setIsForward(womenSwimming, 0); // set isForward to a random value of either 0 or 1
+    setIsForward(womenSwimming, 0); /* set isForward to a random value of either 0 or 1 */
 }
 
-// @author Meagan & Paolo
+/* @author Paolo */
 void updateWomenSwimming(WomenSwimming* womenSwimming) {
-    /*while ((womenSwimming->deltaX != 0 || womenSwimming->deltaY != 0) 
-    && px_in_bounds(womenSwimming->x, womenSwimming->y)) {
-        womenSwimming->x += womenSwimming->deltaX;
-        womenSwimming->y += womenSwimming->deltaY;
-    }*/ 
     if (womenSwimming->frameCount == 70 && womenSwimming->isForward == 1) {
-        womenSwimming->isForward = 0; // Switch to backward bitmap after 70 frames
+        womenSwimming->isForward = 0; /* Switch to backward bitmap after 70 frames */
+        womenSwimming->frameCount = 0; /* Reset frame count after switching direction */
     } else if (womenSwimming->frameCount == 70 && womenSwimming->isForward == 0) {
-        womenSwimming->isForward = 1; // Switch to forward bitmap after 70 frames
+        womenSwimming->isForward = 1; /* Switch to forward bitmap after 70 frames */
     }
     womenSwimming->frameCount++;
     
 }
 
-// @author Meagan
+/* @author Meagan */
 void collisionWomenSwimming(WomenSwimming* womenSwimming, Chuck* chuck) {
     if (womenSwimming->x == chuck->x && womenSwimming->y == chuck->y && womenSwimming->isForward == 1) {
-        // womenSwimming collides with Chuck, stop movement
+        /* womenSwimming collides with Chuck, stop movement */
         womenSwimming->deltaX = 0;
         womenSwimming->deltaY = 0;
-        chuck->isWalking = 0; // Stop Chuck from walking
-        chuck->isColliding = 2; // Set collision flag for Chuck
+        chuck->isWalking = 0; /* Stop Chuck from walking */
+        chuck->isColliding = 2; /* Set collision flag for Chuck */
         womenSwimming->isColliding = 1;
     }
 }

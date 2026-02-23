@@ -1,8 +1,7 @@
-#include "Chuck.h"
-
 #ifndef W_SWIM_H
 #define W_SWIM_H
 
+#include "Chuck.h"
 /*
     This file defines the struct that contains all the information needed to represent
     the women swimming, which includes their position, movement deltas, collision state, 

@@ -1,7 +1,8 @@
-#include "Chuck.h";
-
 #ifndef W_WALK_H
 #define W_WALK_H
+
+#include "Chuck.h"
+
 /*
     This file defines the womenWalking struct as well as the fumction to initialize the struct,
     update the position of the womenWalking so they continuously walk across the screen, 

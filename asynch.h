@@ -1,4 +1,8 @@
+#ifndef ASYNCH_H
+#define ASYNCH_H
+
 #include "model.h"
+
 /*
     This file contains the function prototypes for asynchronous button handling in the game.
     It defines functions that handle input events for the W, A, S, and D keys.
@@ -61,3 +65,5 @@ void asynch_button_S(Model *model);
             Chuck's state can be updated based on the input event.
 */
 void asynch_button_D(Model *model);
+
+#endif

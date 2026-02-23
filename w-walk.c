@@ -1,10 +1,11 @@
 #include "w-walk.h"
 #include "raster.h"
 #include "Chuck.h"
+#include "types.h"
 
-// @author Paolo
+/* @author Paolo */
 #define WALKER_HEIGHT 32
-const unsigned long womenWalking_bitmap[WALKER_HEIGHT] =
+const UINT32 womenWalking_bitmap[WALKER_HEIGHT] =
 {
     0xFFFFFFFF, 
     0xFFE007FF, 
@@ -40,39 +41,32 @@ const unsigned long womenWalking_bitmap[WALKER_HEIGHT] =
     0xFFFFFFFF
 };
 
-// @author Meagan
-void initWomenWalking(WomenWalking* womenWalking, unsigned int x, unsigned int y) {
+/* @author Meagan */
+void initWomenWalking(WomenWalking* womenWalking, UINT16 x, UINT16 y) {
     womenWalking->x = x;
     womenWalking->y = y;
     womenWalking->deltaX = 0;
     womenWalking->deltaY = 0;
 }
 
-// @author Meagan & Paolo
+/* @author Paolo */
 void updateWomenWalking(WomenWalking* womenWalking) {
-    // Update the position of the walking woman based on her deltaX and deltaY
-    /*while ((womenWalking->deltaX != 0 || womenWalking->deltaY != 0) 
-    && px_in_bounds(womenWalking->x, womenWalking->y)) {
-        womenWalking->x += womenWalking->deltaX;
-        womenWalking->y += womenWalking->deltaY;
-    }*/
-
     if (womenWalking->x + 32 >= 640) {
-        womenWalking->deltaX = -1; // Move left
+        womenWalking->deltaX = -1; /* Move left */
     } else if (womenWalking->x <= 0) {
-        womenWalking->deltaX = 1; // Move right
+        womenWalking->deltaX = 1; /* Move right */
     }
 
     womenWalking->x += womenWalking->deltaX;
 }
 
-// @author Meagan
+/* @author Meagan */
 void collisionWomenWalking(WomenWalking* womenWalking, Chuck* chuck) {
     if (womenWalking->x == chuck->x && womenWalking->y == chuck->y) {
-        // womenWalking collides with Chuck, stop movement
+        /* womenWalking collides with Chuck, stop movement */
         womenWalking->deltaX = 0;
         womenWalking->deltaY = 0;
-        stopWalking(chuck); // Stop Chuck from walking
-        chuck->isColliding = 2; // Set death collision flag for Chuck
+        stopWalking(chuck); /* Stop Chuck from walking */
+        chuck->isColliding = 2; /* Set death collision flag for Chuck */
     }
 }

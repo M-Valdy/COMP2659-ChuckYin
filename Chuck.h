@@ -1,7 +1,6 @@
-#include "water.h"
-
 #ifndef CHUCK_H
 #define CHUCK_H
+
 /*
    This file defines the struct that contains all the information about Chuck's state,
    which includes his position, whether he's walking or not, how much he's moving in the x and y directions, 
@@ -13,7 +12,9 @@
    in the comment above the function definition in Chuck.c)
 
 */
+
 #define CHUCK_HEIGHT 32
+#include "water.h"
 
 typedef struct {
     unsigned int x;

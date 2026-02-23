@@ -1,12 +1,13 @@
 #include "Chuck.h"
 #include "water.h"
+#include "types.h"
 
 /*
     @author Paolo
     This is the bitmap that contains the dimensions of the Chuck sprite
     which will be used for rendering and collision detection
 */
-define CHUCK_HEIGHT 32 
+#define CHUCK_HEIGHT 32 
 static const UINT32 Chuck_bitmap[CHUCK_HEIGHT] =
 {
     0x00000000, 
@@ -58,12 +59,22 @@ void initChuck(Chuck* chuck, unsigned int x, unsigned int y) {
     chuck->canMoveDown = 1;
 }
 
-/* @author Meagan */
+/* @author Meagan & Paolo */
 /* function for starting Chuck's walking in a specified direction */
 void startWalking(Chuck* chuck, int deltaX, int deltaY) {
     chuck->isWalking = 1;
     chuck->deltaX = deltaX;
     chuck->deltaY = deltaY;
+    if (chuck->deltaX > 0) { /* moving right */
+        chuck->canMoveLeft = 1; /* can move left if currently moving right */
+    } else if (chuck->deltaX < 0) { /* moving left */
+        chuck->canMoveRight = 1; /* can move right if currently moving left */
+    }
+    if (chuck->deltaY > 0) { /* moving down */
+        chuck->canMoveUp = 1; /* can move up if currently moving down */
+    } else if (chuck->deltaY < 0) { /* moving up */
+        chuck->canMoveDown = 1; /* can move down if currently moving up */
+    }
 }
 
 /* @author Meagan & Paolo

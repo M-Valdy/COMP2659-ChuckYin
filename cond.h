@@ -1,7 +1,7 @@
-#include "model.h"
-
 #ifndef COND_H
 #define COND_H
+
+#include "model.h"
 
 /* @author Paolo Deocareza
 

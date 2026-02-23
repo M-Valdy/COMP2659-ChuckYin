@@ -1,12 +1,14 @@
-#include "Chuck.h";
-#include "w-walk.h";
-#include "w-swim.h";
-#include "tree.h";
-#include "water.h";
-#include "road.h";
-
 #ifndef MODEL_H
 #define MODEL_H
+
+#include "Chuck.h"
+#include "w-walk.h"
+#include "w-swim.h"
+#include "tree.h"
+#include "water.h"
+#include "road.h"
+
+
 
 
 /*
@@ -27,7 +29,7 @@ typedef struct {
     Chuck chuck;
     WomenWalking womenWalking[15];
     WomenSwimming womenSwimming[15];
-    Tree tree[10];
+    //Tree tree[10]; // trees dont add anything to the game, scrap it for now, can add it back in later if we have time
     Water water[120]; // need 40 Water objects per stream (20 to cover the whole screen width, double it to make it 64 pixels high), 3 water streams total
     Road road[120]; // need 40 road segments per road (20 to cover the whole screen width, double it to make it 64 pixels high), 3 roads total
 } Model;

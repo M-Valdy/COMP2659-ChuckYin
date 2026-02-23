@@ -1,9 +1,9 @@
+#ifndef RENDERER_H
+#define RENDERER_H
+
 #include "types.h"
 #include "model.h"
 #include "raster.h"
-
-#ifndef RENDERER_H
-#define RENDERER_H
 
 /*----- Function: render -----
 

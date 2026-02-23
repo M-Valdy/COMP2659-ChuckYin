@@ -4,7 +4,7 @@
 #include "cond.h"
 
 void event_handler(Model *model) {
-    int gameOver = 0; // Placeholder for game over condition
+    int gameOver = 0; /* Placeholder for game over condition */
 
     while (gameOver == 0) {
         asynch_button_W(model);
