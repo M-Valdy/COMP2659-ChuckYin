@@ -522,12 +522,38 @@ plot_square_done:
 plot_triangle:
     link    a6,#0
     movem.l d0-d4/a0,-(sp)
-    move.w  18(a6),d1   ; get the height
+    move.w  16(a6),d1   ; get the height
     tst.w   d1
     ble     plot_triangle_done
-    move.w  16(a6),d2   ; get the triangle base
+    move.w  14(a6),d2   ; get the triangle base
     ble     plot_triangle_done
-    
+    move.w  12(a6),d3   ; get the col
+    move.w  18(a6),d4   ; get the direction
+    cmpi.w  #0,d4       ; check if direction == 0
+    beq     plot_southeast_triangle
+    cmpi.w  #1,d4       ; check if direction == 1
+    beq     plot_southwest_triangle
+    cmpi.w  #2,d4       ; check if direction == 2
+    beq     plot_northeast_triangle
+    cmpi.w  #3,d4       ; check if direction == 3
+    beq     plot_northwest_triangle
+    bra     plot_triangle_done  ; else done
+
+plot_southeast_triangle:
+    ; TODO
+    bra plot_triangle_done
+
+plot_southwest_triangle:
+    ; TODO
+    bra plot_triangle_done
+
+plot_northeast_triangle:
+    ; TODO
+    bra plot_triangle_done
+
+plot_northwest_triangle:
+    ; TODO
+    bra northwest_triangle_done
 
 plot_triangle_done:
     movem.l (sp)+,d0-d4/a0
