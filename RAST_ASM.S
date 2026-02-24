@@ -519,6 +519,21 @@ plot_square_done:
 ;-------------------------------------------------------------------------------------------------
 ;-------------------------ROUTINE TO PLOT A TRIANGLE----------------------------------------------
 ; void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 trianglebase, UINT16 height, UINT8 direction)
+plot_triangle:
+    link    a6,#0
+    movem.l d0-d4/a0,-(sp)
+    move.w  18(a6),d1   ; get the height
+    tst.w   d1
+    ble     plot_triangle_done
+    move.w  16(a6),d2   ; get the triangle base
+    ble     plot_triangle_done
+    
+
+plot_triangle_done:
+    movem.l (sp)+,d0-d4/a0
+    unlk    a6
+    rts
+    
 
 ;-------------------------------------------------------------------------------------------------
 ;=========================GLOBAL VARIABLES========================================================
