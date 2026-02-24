@@ -523,7 +523,7 @@ plot_triangle:
     link    a6,#0
     movem.l d0-d4/a0,-(sp)
     move.w  16(a6),d1   ; get the height
-    tst.w   d1
+    tst.w   d1          ; check if height == 0
     ble     plot_triangle_done
     move.w  14(a6),d2   ; get the triangle base
     ble     plot_triangle_done
