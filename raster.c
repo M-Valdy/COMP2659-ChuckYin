@@ -49,55 +49,49 @@ void clear_screen(UINT32 *base){
 	}
 }
 
-void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width){
-    /* seeing this as a filled rectangle to be plotted but with "negative masks." */
-    /* 
-    * a negtive mask is just negated masks in plot_horiozontal_line funtion looped for the specified
-    * number of rows down like plot_veritcal_line function.
-    * the & and | operations are negated too. 
-    */
-   
-   UINT32 *start_point;  /* starting location */
-   UINT32 *end_point; /* ending location */
-   UINT32 *current; /* to track the current lonword, horizontal tracker */
-   UINT32 *count; /* vertical tracker */
-   UINT32 leftmask; /* mask to handle the left partial longword */
-   UINT32 rightmask; /* mask to handle the right partial longword */
+void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width) {
+    UINT32 *curr_row;
+    UINT32 leftmask;
+    UINT32 rightmask;
+    UINT16 c_end;
+    UINT16 span;
+    UINT16 r;
+    UINT16 i;
 
-   UINT16 r_end = row + (length - 1);  /* calcuate the vertical offset for the end longword */
-   UINT16 c_end = col + (width - 1); /* calcuate the horizontal offset for the end longword */
+    if (length == 0 || width == 0) return;
 
-   UINT16 offset =  ((c_end >> 5) - (col >> 5)); /* cant use width directly as it wont always be perfectly aligned longword(s)
-   so calcuate the numebr of 32 bit sections instead to get the offset for the end row */
-   UINT32 *row_start; /* to get row start for indiviusal rwos inside the loop*/
-   UINT32 *row_end; /* to get indivisual row ends inside the loops */
-   
-   if (length == 0 || width == 0) return; /* unless 2 dimesions are given, dont attempt to clear */
+    c_end = col + width - 1;
+    span = (c_end >> 5) - (col >> 5); /* Number of longwords gone over */
 
-   start_point = base + (row * LONGS_PER_ROW) + (col >> 5); /* two offset calcuations since the area is 2D */
-   end_point = base + (r_end * LONGS_PER_ROW) + (c_end >> 5); /* get the top_left and bottom-right coordinates */
+    /* Calculate masks */
+    leftmask = ~(HOR_LONG_MASK >> (col & 31));
+    rightmask = ~(HOR_LONG_MASK << (31 - (c_end & 31)));
 
-   leftmask = ~(HOR_LONG_MASK >> (col & 31)); /* right shift for the start */
-   rightmask = ~(HOR_LONG_MASK << (31 - (c_end & 31))); /*left shift for the end */
+    /* get the intial point */
+    curr_row = base + (row * LONGS_PER_ROW) + (col >> 5);
 
-   for (current = start_point; current <= end_point; current += LONGS_PER_ROW) {
-    row_start = current; /* the start point of the current row */
-    /* end point of the current row */
-    row_end = current + offset; 
+    /* loop "length" times downwards */
+    for (r = 0; r < length; r++) {
+        
+        if (span == 0) {
+            /* if the area fits inside a single 32-bit longword */
+            curr_row[0] &= (leftmask | rightmask); /* or both mask to get a single mask 
+            save area not intended for clearing */
+        } else {
+            /* handle the partial longword on the left */
+            curr_row[0] &= leftmask;
 
-    /* if both start and end are the same address, bitwise AND with both masks OR'd */
-    if (row_start == row_end) *current &= (leftmask | rightmask); /* |'ing preserves any protected bits from both masks */
-    else {
-        *row_start &= leftmask; /* handle the partial longword on the left end */
-        count = row_start + 1; /* get current to next longword */
-        /* loop until just before end address */
-        while (count < row_end){
-            *count = 0; /* set to all 0's without prejudice */
-            count++;
+            /* set full longwords in the middle to 0 */
+            for (i = 1; i < span; i++) {
+                curr_row[i] = 0;
+            }
+
+            /* handle the partial longword on the right */
+            curr_row[span] &= rightmask;
         }
-        *row_end &= rightmask; /* handle the partial longword on the right end */
+
+        curr_row += LONGS_PER_ROW;
     }
-   }
 }
 
 void plot_pixel(UINT8 *base, UINT16 row, UINT16 col){

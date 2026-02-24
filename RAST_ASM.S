@@ -91,6 +91,123 @@ clear_screen_loop:
 	rts
 
 ;-----------------ROUTINE FOR CLEARING A SPECIFIED RECTANGULAR REGION-----------------------------
+; void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);;
+;   UINT32 *row_ptr;
+;   UINT32 leftmask;
+;   UINT32 rightmask;
+;   UINT16 c_end;
+;   UINT16 span;
+;   UINT16 r;
+;   UINT16 i;
+clear_region:
+    link    a6,#-8  ; two local variables, longwords
+    movem.l a0-a2/d0-d5,-(sp)
+
+    ; if (length or width == 0 return )
+    move.w  16(a6),d0   ; length
+    ble     clear_region_done
+    move.w  18(a6),d0   ; width
+    ble     clear_region_done
+
+    ; c_end calculation  col + width - 1
+    move.w  18(a6),d1   ; get the width
+    add.w   14(a6),d1   ; width + col
+    subq    #1,d1       ; width + col - 1
+
+    ; span calculation span = (c_end >> 5) - (col >> 5)
+    move.w  d1,d2       ; get the c_end
+    lsr.w   #5,d2       ; c_end >> 5
+    move.w  14(a6),d0   ; get the col
+    
+    move.w  d0,d3       ; make a copy for mask calculation and row_ptr
+    
+    lsr.w   #5,d0       ; col >> 5
+    sub.w   d0,d2       ; d2 now holds span
+
+    ; left mask value calculations
+    move.w  d3,d0       ; get the col in d0
+    move.l  #HOR_LONG_MASK,d4 ; get the hor-mask
+    and.w   #31,d0      ; col & 31
+    lsr.l   d0,d4       ; HOR_MASK >> col & 31
+    not.l   d4          ; oppsoite for a plot
+    move.l  d4,-4(a6)   ; THE LEFT MASK
+   
+    ; right mask value calculations
+    move.w  d1,d0       ; get c_end
+    and.w   #31,d0      ; c_end & 31
+    
+    move.w  #31,d4 
+    sub.w   d0,d4       ; 31 - c_end & 31
+    move.l  #HOR_LONG_MASK,d0   ; the long mask
+    lsl.l   d4,d0       ; mask << 31 - col & 31
+    not.l   d0          ; opposite for a plot
+    move.l  d0,-8(a6)   ; THE RIGHT MASK
+
+    ; row_ptr calculation
+    move.l  8(a6),a1    ; load base pointer into a1
+    
+    ; get column offset in bytes
+    clr.l   d3          
+    move.w  14(a6),d3   ; get col
+    lsr.w   #5,d3       ; col >> 5
+    lsl.w   #2,d3       ; get byte offset (longwords * 4)
+
+    ; get row offset in bytes (row * 80)
+    clr.l   d4          
+    move.w  12(a6),d4   ; get row
+    lsl.w   #4,d4       ; row * 2^4
+    move.w  d4,d0       
+    lsl.w   #2,d4       ; (row * 2^4) * 2^2 = row * 2^6
+    add.w   d0,d4       ; (row * 2^6) + (row * 2^4) = row * 80 
+    
+    ; calculate final start address for row_ptr
+    adda.l  d4,a1       ; add row byte offset to base pointer
+    adda.l  d3,a1       ; THE ROW PTR
+
+    ; prime the loop counters
+    move.w  16(a6),d3   ; d3 = length
+    subq.w  #1,d3       ; for dbra
+
+clear_region_outer_loop:
+    move.l  a1,a0       ; copy row_ptr to working pointer
+    move.w  d2,d4       ; get span
+    
+    tst.w   d4          ; check if it fits in one lognword
+    bne     handle_multiple_long_clear
+
+    ; single longword clearing
+    move.l  -4(a6),d0   ; left mask
+    or.l    -8(a6),d0   ; OR'd with right mask
+    and.l   d0,(a0)     ; clear the bits
+    bra     clear_region_next_row
+
+handle_multiple_long_clear:
+    ; left edge
+    move.l  -4(a6),d0   
+    and.l   d0,(a0)+    ; clear and move to next longword
+    
+    ; clear all the middle
+    subq.w  #1,d4       ; subtract the left edge
+    subq.w  #1,d4       ; subtract 1, if there is a right edge bmi will fail
+    bmi     handle_no_middle  ; if span was 1, skip middle
+
+clear_region_middle_loop:
+    clr.l   (a0)+       
+    dbra    d4,clear_region_middle_loop
+
+handle_no_middle:
+    ; right edge
+    move.l  -8(a6),d0
+    and.l   d0,(a0)
+
+clear_region_next_row:
+    adda.w  #80,a1      ; move anchor to next row
+    dbra    d3,clear_region_outer_loop
+
+clear_region_done:
+    movem.l (sp)+,a0-a2/d0-d5
+    unlk    a6
+    rts
 
 ;-------------------------------------------------------------------------------------------------
 ;---------------ROUTINE FOR PLOTTING A SINGLE PXIEL ONTO SPECIFIED COORDINATES--------------------
@@ -101,8 +218,6 @@ clear_screen_loop:
 plot_pixel:
     link a6,#0
     movem.l d0-d2/a0,-(sp)
-
-    ; Removed: lea base,a0 (We will load the actual value later)
     
     subq.l  #2,sp ; reserves space for a return value
     move.w  10(a6),-(sp) ; push col number onto the stack
@@ -134,7 +249,7 @@ plot_pixel:
     
     add.l   d2,d1   ; (row*BYTES_PER_ROW) + (col >> 3)
 
-    move.l  base,a0 ; load ACTUAL screen address
+    move.l  base,a0 ; load address
     adda.l  d1,a0   ; add total offset to the address register
     
     ; d0 still holds the original col index
@@ -162,10 +277,12 @@ plot_horizontal_line:
     link    a6,#-10     ; 2 (long) masks, an offset value for the end address(word)
     movem.l d0-d3/a0-a2,-(sp) 
 
+    move.w  12(a6),d2   ; get the length
+    ble     plot_horizontal_line_end ; is length is 0, skip
     move.w  10(a6),d1   ; col value
     
     ; end calculations
-    move.w  12(a6),d2   ; get the length
+    
     subq.w  #1,d2       ; length - 1 (using .w for coordinates)
     add.w   d1,d2       ; col + length - 1 
     move.w  d2,-10(a6)  ; END OFFSET
@@ -241,19 +358,6 @@ plot_horizontal_line_end:
     unlk    a6
     rts
 
-;   8(a6): row
-;   10(a6: col
-;   12(a6): length
-;
-; LOCAL VARIABLES:
-;   -4(a6): leftmask
-;   -8(a6) : rightmask
-;   -10(a6): end
-;
-; Pointers:
-;   A0 : start_point 
-;   A1 : end_point
-;   A2 : current
 ;-------------------------------------------------------------------------------------------------
 ;----------------ROUTINE TO PLOT A VERTICAL LINE--------------------------------------------------
 ; void plot_vertical_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
@@ -261,9 +365,11 @@ plot_vertical_line:
     link    a6,#-6          ; two local variables, a longword and a word
     movem.l d0-d4/a0-a1,-(sp) 
 
+    move.w  12(a6),d3       ; get the length
+    ble     plot_horizontal_line_end ; if lenght is 0, skip
     ; end Calculations
     move.w  8(a6),d1        ; get the row offset 
-    move.w  12(a6),d3       ; get the length
+    
     move.l  d3,d4           ; copy length for the loop counter later
     subq.w  #1,d3           ; length - 1
     add.w   d1,d3           ; row + length - 1
@@ -284,7 +390,6 @@ plot_vertical_line:
     lsl.w   #2,d2           ; convert long to byte offset
     
     ; start point calculation
-    ; (Re-using row from d1)
     lsl.w   #4,d1           ; row * 2^4
     move.w  d1,d0          
     lsl.w   #2,d1           ; row * 2^2 * 2^4
@@ -320,18 +425,7 @@ plot_vertical_line_end:
     movem.l (sp)+,d0-d4/a0-a2
     unlk    a6
     rts
-;   8(a6): row
-;   10(a6: col
-;   12(a6): length
-;
-; LOCAL VARIABLES:
-;   -4(a6): leftmask
-;   -6(a6): end
-;
-; Pointers:
-;   A0 : start_point 
-;   A1 : end_point
-;   A2 : current
+
 ;-------------------------------------------------------------------------------------------------
 ;------------------------------ROUTINE TO PLOT A LINE BETWEEN ANY TWO GIVEN POINT-----------------
 ; void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col);
@@ -339,24 +433,94 @@ plot_vertical_line_end:
 ;-------------------------------------------------------------------------------------------------
 ;--------------------ROUTINE TO PLOT A RECTANGLE--------------------------------------------------
 ; void plot_rectangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
+; void plot_rectangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
 plot_rectangle:
-	link	a6,#0
-	movem.l	a0/d0-d2,-(sp)
+    link    a6,#0
+    movem.l d0-d1,-(sp)
 
-	move.l	base,a0
-;	/* top line */
-;    plot_horizontal_line(base, row, col, width);
-	
-;    /* bottom line */
-;    plot_horizontal_line(base, (row + (length - 1)), col, (row + (width - 1)), width);
-	
-;    /* left line */
-;    plot_line(base, row, col, (row + (length - 1)), col);
-;    /* right line */
-;    plot_line(base, row, (col + (width - 1)), (row + (length - 1)), (col + (width - 1)));
-	movem.l	(sp)+,a0/d0-d2
-	unlk	a6
+    move.w  18(a6),d1   ; get the width
+    ble     plot_rectangle_done
+    move.w  16(a6),d0   ; get the length
+    ble     plot_rectangle_done
 
+; reuseable calculations
+; row + length - 1 in d0
+    
+    add.w   12(a6),d0   ; row + length
+    subq    #1,d0       ; row + length -1
+; col + width - 1 in d1
+    
+    add.w   14(a6),d1   ;   col + width 
+    subq    #1,d1       ; col + width - 1
+
+;   /* top line */
+;   plot_horizontal_line(base, row, col, width);
+    move.w  18(a6),-(sp)    ; push width
+    move.w  14(a6),-(sp)    ; push col
+    move.w  12(a6),-(sp)    ; push row
+    move.l  8(a6),-(sp)     ; push base address
+    jsr     plot_horizontal_line
+    adda.l  #10,sp          ; clean up: 4 + 2+2+2 = 10 
+
+;   /* bottom line */
+;   plot_horizontal_line(base, (row + length - 1), col, width);
+    move.w  18(a6),-(sp)    ; push width
+    move.w  14(a6),-(sp)    ; push col
+    move.w  d0,-(sp)        ; push row + length - 1
+    move.l  8(a6),-(sp)     ; push base address
+    jsr     plot_horizontal_line
+    adda.l  #10,sp          
+
+;   /* left line */
+;   plot_vertical_line(base, row, col, length);
+    move.w  16(a6),-(sp)    ; push length
+    move.w  14(a6),-(sp)    ; push col
+    move.w  12(a6),-(sp)    ; push row
+    move.l  8(a6),-(sp)     ; push base address
+    jsr     plot_vertical_line
+    adda.l  #10,sp          
+
+;   /* right line */
+;   plot_vertical_line(base, row, (col + width - 1), length);
+    move.w  16(a6),-(sp)    ; push length 
+    move.w  d1,-(sp)        ; push col + width - 1 
+    move.w  12(a6),-(sp)    ; push row
+    move.l  8(a6),-(sp)     ; push base address
+    jsr     plot_vertical_line
+    adda.l  #10,sp          
+
+plot_rectangle_done:
+    movem.l (sp)+,d0-d1
+    unlk    a6
+    rts
+;-------------------------------------------------------------------------------------------------
+;--------------------ROUTINE TO PLOT A SQUARE-----------------------------------------------------
+; void plot_square(UINT32 *base, UINT16 row, UINT16 col, UINT16 side);
+plot_square:
+    link    a6,#0
+
+    move.w  16(a6),d0       ; side
+    ble     plot_square_done
+
+    move.w  d0,-(sp)        ; push side for width 
+    move.w  d0,-(sp)        ; push side for length 
+    move.w  14(a6),-(sp)    ; push col
+    move.w  12(a6),-(sp)    ; push row
+    move.l  8(a6),-(sp)     ; push base address
+    
+    jsr     plot_rectangle 
+    
+    ; 4 + 2+2+2+2 = 12
+    adda.l  #12,sp          
+    
+plot_square_done:
+    unlk    a6
+    rts
+;-------------------------------------------------------------------------------------------------
+;-------------------------ROUTINE TO PLOT A TRIANGLE----------------------------------------------
+; void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 trianglebase, UINT16 height, UINT8 direction)
+
+;-------------------------------------------------------------------------------------------------
 ;=========================GLOBAL VARIABLES========================================================
 base: ds.l	1
 ;-------------------------ROUTINE TO EXIT THE PROGRAM--------------------------------------------
