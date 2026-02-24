@@ -2,12 +2,17 @@
 #define W_WALK_H
 
 #include "Chuck.h"
+#include "types.h"
 
 /*
     This file defines the womenWalking struct as well as the fumction to initialize the struct,
     update the position of the womenWalking so they continuously walk across the screen, 
     and check for collision between the womenWalking and Chuck.
 */
+
+#define WALKER_HEIGHT 32
+extern const UINT32 womenWalking_bitmap[WALKER_HEIGHT];
+
 typedef struct {
     unsigned int x,y;
     int deltaX, deltaY;

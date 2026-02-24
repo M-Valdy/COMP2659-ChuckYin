@@ -1,6 +1,8 @@
 #ifndef WATER_H
 #define WATER_H
 
+#include "types.h"
+
 /*
     This file defines the struct that contains all the information about the water in the game,
     which includes its position, as well as the functions that manipulate that state. 
@@ -8,6 +10,10 @@
     Team names: Meagan Valderrama, Paolo Deocareza, and Gaurik Khullar
     @authors Meagan Valderrama
 */
+
+#define WATER_HEIGHT 32
+extern const UINT32 water_bitmap[WATER_HEIGHT];
+
 typedef struct {
     unsigned int x,y;
 } Water;

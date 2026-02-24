@@ -1,10 +1,7 @@
 #include "w-walk.h"
 #include "raster.h"
-#include "Chuck.h"
-#include "types.h"
 
 /* @author Paolo */
-#define WALKER_HEIGHT 32
 const UINT32 womenWalking_bitmap[WALKER_HEIGHT] =
 {
     0xFFFFFFFF, 
@@ -45,19 +42,19 @@ const UINT32 womenWalking_bitmap[WALKER_HEIGHT] =
 void initWomenWalking(WomenWalking* womenWalking, UINT16 x, UINT16 y) {
     womenWalking->x = x;
     womenWalking->y = y;
-    womenWalking->deltaX = 0;
+    womenWalking->deltaX = 1;
     womenWalking->deltaY = 0;
 }
 
 /* @author Paolo */
 void updateWomenWalking(WomenWalking* womenWalking) {
+    womenWalking->x += womenWalking->deltaX;
     if (womenWalking->x + 32 >= 640) {
         womenWalking->deltaX = -1; /* Move left */
     } else if (womenWalking->x <= 0) {
         womenWalking->deltaX = 1; /* Move right */
     }
-
-    womenWalking->x += womenWalking->deltaX;
+    
 }
 
 /* @author Meagan */

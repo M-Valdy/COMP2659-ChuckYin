@@ -8,7 +8,7 @@
 ### Checkpoint 2 Summary
 
 - [X] Asset Creation: Make models in monochrome and 640x400; create sprites in 8, 16, and 32-bit bitmaps.
-- [ ] Raster Library Testing: Test your raster graphics library (plotting routines).
+- [X] Raster Library Testing: Test your raster graphics library (plotting routines).
 
 Note: Animation is not required until Checkpoint 3.
 
@@ -18,11 +18,11 @@ Note: Animation is not required until Checkpoint 3.
 
 - [X] Constraint: Avoid decimals/floats; aim for integers only.
 
-- [ ] Events Module: Write functions for asynchronous, synchronous, and condition-based events.
+- [X] Events Module: Write functions for asynchronous, synchronous, and condition-based events.
 
 - [X] Validation: Use printf to verify that model implementation and event handling are working.
 
-- [ ] Documentation: Use the testing guide for test modules (available on D2L).
+- [X] Documentation: Use the testing guide for test modules (available on D2L).
 
 ### Raster Graphics Library
 
@@ -58,7 +58,7 @@ These routines can optionally be done in C first, then in Assembly.
 
 ### Renderer
 
-- [ ] Rendering Library: Develop a library that uses the raster graphics library to render the model's current state to the screen.
+- [X] Rendering Library: Develop a library that uses the raster graphics library to render the model's current state to the screen.
 
 **Requirement: Must be able to render at least a single frame.**
 
@@ -90,4 +90,4 @@ These routines can optionally be done in C first, then in Assembly.
 
 > - ***Gaurik's currently*** working on the raster graphics library in C and Assembly.
 > - ***Meagan's currently*** working on adding basic functions for the first level, Asynchronous Events, and Renderer.
-> - ***Paolo's currently*** working on Synchronous Events and Event Handling.
+> - ***Paolo's currently*** working on Model Test Driver and Raster Graphics Library in Assembly.

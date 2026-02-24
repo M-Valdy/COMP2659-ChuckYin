@@ -3,7 +3,6 @@
 #include "types.h"
 
 /* @author Paolo */
-#define TREE_HEIGHT 32
 const UINT32 tree_bitmap[TREE_HEIGHT] =
 {
     0x0003C000, 

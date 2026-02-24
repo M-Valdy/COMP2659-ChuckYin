@@ -8,9 +8,6 @@
 #include "water.h"
 #include "road.h"
 
-
-
-
 /*
 
     This file defines the struct that contains all the structures that represent the state 
@@ -26,12 +23,13 @@
 
 
 typedef struct {
+    int gameOver;
+    int crossCount;
     Chuck chuck;
     WomenWalking womenWalking[15];
     WomenSwimming womenSwimming[15];
-    //Tree tree[10]; // trees dont add anything to the game, scrap it for now, can add it back in later if we have time
-    Water water[120]; // need 40 Water objects per stream (20 to cover the whole screen width, double it to make it 64 pixels high), 3 water streams total
-    Road road[120]; // need 40 road segments per road (20 to cover the whole screen width, double it to make it 64 pixels high), 3 roads total
+    Water water[120]; /* need 40 Water objects per stream (20 to cover the whole screen width, double it to make it 64 pixels high), 3 water streams total */ 
+    Road road[120]; /* need 40 road segments per road (20 to cover the whole screen width, double it to make it 64 pixels high), 3 roads total */ 
 } Model;
 
 
@@ -45,5 +43,27 @@ typedef struct {
 
 */
 void Model_init(Model *model);
+
+/*----- Function: init_land -----
+
+ PURPOSE: Initializes water and road objects in their appropriate coordinates
+
+ INPUT: Model*: a pointer to the model containing all game objects
+
+ OUTPUT: All water and road objects ready to be rendered
+
+*/
+void init_land(Model *model);
+
+/*----- Function: init_women -----
+
+ PURPOSE: Initializes swimmers and walking women in their appropriate coordinates
+
+ INPUT: Model*: a pointer to the model containing all game objects
+
+ OUTPUT: All swimmers and walking women objects ready to be rendered
+
+*/
+void init_women(Model *model);
 
 #endif

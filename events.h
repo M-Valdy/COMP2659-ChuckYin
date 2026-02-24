@@ -2,6 +2,9 @@
 #define EVENTS_H
 
 #include "model.h"
+#include "asynch.h"
+#include "synch.h"
+#include "cond.h"
 
 /*
     This file contains the function prototype for handling events in the game.

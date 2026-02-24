@@ -2,6 +2,7 @@
 #define W_SWIM_H
 
 #include "Chuck.h"
+#include "types.h"
 /*
     This file defines the struct that contains all the information needed to represent
     the women swimming, which includes their position, movement deltas, collision state, 
@@ -13,11 +14,16 @@
     @authors Meagan Valderrama, Paolo Deocareza (the author of each specific function is 
     in the comment above the function definition in w-swim.c)
 */
+
+#define SWIMMER_HEIGHT 32
+extern const UINT32 womenSwimming_forward_bitmap[SWIMMER_HEIGHT];
+extern const UINT32 womenSwimming_backward_bitmap[SWIMMER_HEIGHT];
+
 typedef struct {
     unsigned int x,y;
     int deltaX, deltaY;
     int isColliding;
-    int isForward; // 1 = looking forward, 0 = looking backward
+    int isForward; /*1 = looking forward, 0 = looking backward*/ 
     int frameCount;
 } WomenSwimming;
 

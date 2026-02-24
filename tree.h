@@ -11,6 +11,9 @@
     @authors Meagan Valderrama
 */
 
+#define TREE_HEIGHT 32
+extern const UINT32 tree_bitmap[TREE_HEIGHT];
+
 typedef struct {
     unsigned int x,y;
     int isColliding;

@@ -1,10 +1,8 @@
 #include "w-swim.h"
 #include "raster.h"
-#include "Chuck.h"
-#include "types.h"
+
 
 /* @author Paolo */
-#define SWIMMER_HEIGHT 32
 const UINT32 womenSwimming_forward_bitmap[SWIMMER_HEIGHT] =
 {
     0x00000000, 

@@ -10,11 +10,13 @@
    Team names: Meagan Valderrama, Paolo Deocareza, and Gaurik Khullar
    @authors Meagan Valderrama, Paolo Deocareza (the author of each specific function is 
    in the comment above the function definition in Chuck.c)
-
 */
 
-#define CHUCK_HEIGHT 32
+#include "types.h"
 #include "water.h"
+
+#define CHUCK_HEIGHT 32
+extern const UINT32 Chuck_bitmap[CHUCK_HEIGHT];
 
 typedef struct {
     unsigned int x;
@@ -28,9 +30,6 @@ typedef struct {
     int canMoveUp;
     int canMoveDown;
 } Chuck;
-
-
-/* static const UINT32 Chuck_bitmap[8]; /* this bitmap represents Chuck's sprite, its defined in Chuck.c */
 
 /*----- Function: initChuck -----
 

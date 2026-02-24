@@ -1,8 +1,6 @@
 #include "road.h"
-#include "types.h"
 
 /* @author Paolo */
-#define ROAD_HEIGHT 32
 const UINT32 road_bitmap_upper[ROAD_HEIGHT] =
 {
     0xFFFFFFFF, 
@@ -78,12 +76,8 @@ const UINT32 road_bitmap_lower[ROAD_HEIGHT] =
 
 /* @author Paolo
  Function to initialize road */
-void initRoad(Road* road, unsigned int x, unsigned int y) {
+void initRoad(Road* road, UINT16 x, UINT16 y, int z) {
     road->x = x;
     road->y = y;
-}
-
-/* @author Paolo */
-void render_road(Road* road) {
-    // TO DO
+    road->isLower = z;
 }

@@ -1,9 +1,7 @@
 #include "water.h"
 #include "Chuck.h"
-#include "types.h"
 
 /* @author Paolo */
-#define WATER_HEIGHT 32
 const UINT32 water_bitmap[WATER_HEIGHT] =
 {
     0x00000000, 
