@@ -429,6 +429,110 @@ plot_vertical_line_end:
 ;-------------------------------------------------------------------------------------------------
 ;------------------------------ROUTINE TO PLOT A LINE BETWEEN ANY TWO GIVEN POINT-----------------
 ; void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col);
+; dx -12, dy -10, sx -8, sy -6, err -4, err2  -2
+plot_line:
+    link    a6,#-12     ; 6 ints is 12 bytes, so 12 bytes for local variables
+    movem.l d3-d7/a1,-(sp) ; d3 start row, d4 start col, d5 end row, d6 end col, d7 for locals
+
+set_regs:
+    movea.l 8(a6),a1    ; load base address into a1
+    move.w  12(a6),d3   ; start row
+    move.w  14(a6),d4   ; start col
+    move.w  16(a6),d5   ; end row
+    move.w  18(a6),d6   ; end col 
+
+calculate_diff:
+;    dx = (int)(end_col > start_col ? end_col - start_col : start_col - end_col);
+;    dy = -(int)(end_row > start_row ? end_row - start_row : start_row - end_row);
+    cmp.w   d4,d6       ; if (end_col > start_col)
+    bhi     dx_true
+    move.w  d4,d7       ; false statement
+    sub.w   d6,d7       ; start_col - end_col
+    move.w  d7,-12(a6)  ; store dx
+    bra     dy_calc
+dx_true:
+    move.w  d6,d7       ; true statement
+    sub.w   d4,d7       ; end_col - start_col
+    move.w  d7,-12(a6)  ; store dx
+dy_calc:
+    cmp.w   d3,d5
+    bhi     dy_true
+    move.w  d3,d7       ; false statement
+    sub.w   d5,d7       ; start_row - end_row
+    neg.w   d7          ; negate for the negative value
+    move.w  d7,-10(a6)  ; store dy
+    bra     step_direction
+dy_true:
+    move.w  d5,d7       ; true statement
+    sub.w   d3,d7       ; end_row - start_row
+    neg.w   d7          ; negate for the negative value
+    move.w  d7,-10(a6)  ; store dy
+
+step_direction:
+;    sx = start_col < end_col ? 1 : -1;
+;    sy = start_row < end_row ? 1 : -1;
+    moveq   #1,d7       ; default step direction is 1 for sx
+    move.w  d7,-8(a6)  ; store default sx value
+    cmp.w   d4,d6       ; if endcol > start col, step is 1
+    bhi     sx_done
+    moveq   #-1,d7      ; else -1
+    move.w  d7,-8(a6)  ; store sx value
+sx_done:
+    moveq   #1,d7  ; default step direction is 1 for sy
+    move.w  d7,-6(a6)   ; store default sy value
+    cmp.w   d3,d5        ; if endrow > start row, step is 1
+    bhi     err_val
+    moveq   #-1,d7      ; else -1
+    move.w  d7,-6(a6)   ; store sy value
+
+err_val:
+;    err = dx + dy;  /* error value e_xy */
+    move.w    -12(a6),d7
+    add.w     -10(a6),d7
+    move.w    d7,-4(a6)
+
+plotting_loop:
+;   plot_pixel(base, start_row, start_col);
+    move.w  d4,-(sp)    ; push start_col, 2 bytes
+    move.w  d3,-(sp)    ; push start_row, 2 bytes
+    move.l  a1,-(sp)    ; push base address, 4 bytes
+    jsr     plot_pixel
+    adda.l  #8,sp       ; clean up the stack by 8 bytes
+;   if (start_col == end_col && start_row == end_row)
+    cmp.w   d4,d6
+    bne     not_equal
+    cmp.w   d3,d5
+    bne     not_equal
+    bra     plot_line_done
+not_equal:
+;   err2 = 2 * err;
+    move.w  -4(a6),d7
+    add.w   d7,d7
+    move.w  d7,-2(a6)
+first_if:
+;   if (err2 >= dy) { err += dy; start_col += sx; }
+    move.w  -2(a6),d7
+    cmp.w   d7,-10(a6)     ; if (dy > err2)
+    bgt     second_if
+    move.w  -10(a6),d7     ; move dy back into d7
+    add.w   d7,-4(a6)      ; err += dy
+    move.w  -8(a6),d7      ; move sx into d7
+    add.w   d7,d4          ; start_col += sx
+second_if:
+;   if (err2 <= dx) { err += dx; start_row += sy; }
+    move.w  -2(a6),d7
+    cmp.w   d7,-12(a6)     ; if (dx < err2)
+    blt     plotting_loop
+    move.w  -12(a6),d7     ; move dx back into d7
+    add.w   d7,-4(a6)      ; err += dx
+    move.w  -6(a6),d7      ; move sy into d7
+    add.w   d7,d3          ; start_row += sy
+    bra     plotting_loop
+
+plot_line_done:
+    movem.l (sp)+,d3-d7/a1
+    unlk    a6
+    rts
 
 ;-------------------------------------------------------------------------------------------------
 ;--------------------ROUTINE TO PLOT A RECTANGLE--------------------------------------------------
