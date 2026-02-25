@@ -512,7 +512,8 @@ not_equal:
 first_if:
 ;   if (err2 >= dy) { err += dy; start_col += sx; }
     move.w  -2(a6),d7
-    cmp.w   d7,-10(a6)     ; if (dy > err2)
+    move.w  -10(a6),d6     ; get dy for comparison
+    cmp.w   d7,d6     ; if (dy > err2)
     bgt     second_if
     move.w  -10(a6),d7     ; move dy back into d7
     add.w   d7,-4(a6)      ; err += dy
@@ -521,7 +522,8 @@ first_if:
 second_if:
 ;   if (err2 <= dx) { err += dx; start_row += sy; }
     move.w  -2(a6),d7
-    cmp.w   d7,-12(a6)     ; if (dx < err2)
+    move.w  -12(a6),d6     ; get dx for comparison
+    cmp.w   d7,d6     ; if (dx < err2)
     blt     plotting_loop
     move.w  -12(a6),d7     ; move dx back into d7
     add.w   d7,-4(a6)      ; err += dx
