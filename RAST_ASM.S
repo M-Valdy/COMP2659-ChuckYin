@@ -537,14 +537,15 @@ plot_line_done:
 ;-------------------------------------------------------------------------------------------------
 ;--------------------ROUTINE TO PLOT A RECTANGLE--------------------------------------------------
 ; void plot_rectangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
-; void plot_rectangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
 plot_rectangle:
     link    a6,#0
     movem.l d0-d1,-(sp)
 
     move.w  18(a6),d1   ; get the width
+    tst.w   d1          ; check if width == 0
     ble     plot_rectangle_done
     move.w  16(a6),d0   ; get the length
+    tst.w   d0          ; check if length == 0
     ble     plot_rectangle_done
 
 ; reuseable calculations
