@@ -928,6 +928,56 @@ plot_bitmap_16_done:
 ; void plot_bitmap_32(UINT32 *base, UINT16 row, UINT16 col, UINT16 height, const UINT32 *bitmap)
 
 
+
+;-------------------------------------------------------------------------------------------------
+;------------------------------ROUTINE TO PLOT A CHARACTER----------------------------------------
+; void plot_character(UINT8 *base, UINT16 row, UINT16 col, char ch)
+
+
+
+;-------------------------------------------------------------------------------------------------
+;------------------------------ROUTINE TO PLOT A STRING-------------------------------------------
+; void plot_string(UINT8 *base, UINT16 row, UINT16 col, char *ch)
+plot_string:
+    link    a6,#-4       ; UINT8 -1(a6) *start_point; UINT8 -2(a6) *current; UINT16 -4(a6) i = 0;
+    movem.l d0-d3/a0-a1,-(sp)
+
+    clr.w   -4(a6)       ; i = 0
+    movea.l  8(a6),a0    ; load base address into a0
+    move.w  12(a6),d0    ; load row into d0
+    move.w  14(a6),d1    ; load col into d1
+    movea.l 16(a6),a1    ; load pointer to string into a1
+    
+    move.w  -4(a6),d2      ; get i
+while_string_loop:
+;   if (ch[i] == '\0') break;
+    ;move.w  -4(a6),d2      ; get i
+    move.b  (a1,d2.w),d3   ; load character at index i
+    cmp.b   #0,d3          ; check if character is null terminator
+    beq     plot_string_done  ; if null terminator, exit loop
+
+;   push arguments for plot_character(base, row, col, ch[i])
+    clr.w   -(sp)         ; align stack for the character argument
+    move.b  d3,(sp)       ; push character ch[i] (into low byte of word)
+    move.w  d1,-(sp)      ; push col
+    move.w  d0,-(sp)      ; push row
+    move.l  a0,-(sp)      ; push base address
+
+    jsr     plot_character ; call plot_character routine
+    adda.l  #10,sp         ; clean up the stack by 10 bytes
+
+    addq.w  #1,d2          ; i++
+    ;move.w  d2,-4(a6)      ; save updated i back to -4(a6)
+
+;   col+= 8 for the next character
+    addq.w  #8,d1          ; col += 8
+    bra     while_string_loop    
+
+plot_string_done:
+    movem.l (sp)+,d0-d3/a0-a1
+    unlk    a6
+    rts
+
 ;-------------------------------------------------------------------------------------------------
 ;=========================GLOBAL VARIABLES========================================================
 base: ds.l	1
