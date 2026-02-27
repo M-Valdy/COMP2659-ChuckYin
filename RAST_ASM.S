@@ -926,7 +926,109 @@ plot_bitmap_16_done:
 ;-------------------------------------------------------------------------------------------------
 ;-------------------------ROUTINE TO PLOT A BITMAP_32----------------------------------------------
 ; void plot_bitmap_32(UINT32 *base, UINT16 row, UINT16 col, UINT16 height, const UINT32 *bitmap)
+; UINT32 *current @ -4(a6); UINT32 *start_point @ -8(a6); UINT32 *end_point @ -12(a6); UINT32 end @ -16(a6); UINT32 i @ -20(a6); UINT32 shift @ -24(a6);
+; base @ 8(a6); row @ 12(a6); col @ 14(a6); height @ 16(a6); bitmap address @ 18(a6)
+plot_bitmap_32:
+    link    a6,#-24      ; 6 32-bit unsigned ints is 24 bytes, so 24 bytes for local variables
+    movem.l d0-d4/a0-a2,-(sp)
 
+;   if (height == 0) return;
+    tst.w  16(a6)               ; check if height == 0
+    beq    plot_bitmap_32_done  ; if height == 0, done
+
+;   if (row + height > 400) height = 400 - row;
+    move.w  12(a6),d0               ; row
+    add.w   16(a6),d0               ; row + height
+    cmpi.w  #400,d0               ; branch if row + height < 400
+    blt     locals_init
+    move.w  #400,d0               ; height = 400
+    sub.w   12(a6),d0               ; height = 400 - row
+
+locals_init:
+    clr.l   -20(a6)         ; i = 0
+
+;   end = row + (height - 1);
+    moveq    #0,d1          ; clear d1 for the calculation
+    move.w   12(a6),d1      ; d1 (end) = row
+    add.w    d0,d1          ; d1 (end) = row + height
+    subq.w   #1,d1          ; d1 (end) = row + height - 1
+    move.l   d1,-16(a6)     ; store end value (row + height - 1) at -16(a6)
+
+;   shift = (col & 31);
+    moveq   #0,d2          ; clear d2 for the calculation
+    move.w  14(a6),d2      ; get col
+    and.w   #31,d2         ; col & 31
+    move.l  d2,-24(a6)     ; store shift value at -24(a6)
+
+;   start_point = base + (row * LONGS_PER_ROW) + (col >> 5);
+    moveq   #0,d3                  ; clear d3 for the calculation
+    move.w  14(a6),d3              ; get col
+    lsr.w   #5,d3                  ; col >> 5
+    move.w  12(a6),d0              ; get row
+    mulu.w  #LONGS_PER_ROW,d0      ; row * LONGS_PER_ROW
+    add.l   d3,d0                  ; row * LONGS_PER_ROW + (col >> 5)
+    move.l  8(a6),a0               ; load base address into a0
+    lsl.l   #2,d0                  ; multiply by 4 to get byte offset (row * LONGS_PER_ROW + (col >> 5)) * 4
+    adda.l  d0,a0                  ; base + row * LONGS_PER_ROW + (col >> 5)
+    move.l  a0,-8(a6)              ; store start_point at -8(a6)
+
+;   end_point = base + (end * LONGS_PER_ROW) + (col >> 5);
+    moveq   #0,d3                ; clear d3 for the calculation
+    moveq   #0,d0                ; clear d0 for the calculation
+    move.l  -16(a6),d0           ; get end value
+    move.w  14(a6),d3            ; get col
+    lsr.w   #5,d3                ; col >> 5
+    mulu.w  #LONGS_PER_ROW,d0    ; end * LONGS_PER_ROW
+    add.l   d3,d0                ; end * LONGS_PER_ROW + (col >> 5)
+    move.l  8(a6),a1             ; load base address into a1
+    lsl.l   #2,d0                ; multiply by 4 to get byte offset (end * LONGS_PER_ROW + (col >> 5)) * 4
+    adda.l  d0,a1                ; base + end * LONGS_PER_ROW + (col >> 5)
+    move.l  a1,-12(a6)           ; store end_point at -12(a6)
+
+    movea.l a0,-4(a6)            ; current = start_point, store at -4(a6)
+    move.l  -20(a6),d0           ; get i value (0) into d0 for the loop
+    move.l  18(a6),a2            ; a2 = bitmap pointer
+loop_start:
+;   for (current = start_point; current <= end_point; current += LONGS_PER_ROW)
+    cmpa.l  a1,a0                
+    bhi     plot_bitmap_32_done  ; if current > end_point, done
+
+;   *current |= (bitmap[i] >> shift);
+    move.l  d0,d1                ; d1 = i
+    lsl.l   #2,d1                ; d1 = i * 4
+    move.l  (a2,d1.l),d2         ; d2 = bitmap[i]
+    move.l  -24(a6),d3           ; get shift value
+    lsr.l   d3,d2                ; bitmap[i] >> shift
+    or.l    d2,(a0)              ; *current |= (bitmap[i] >> shift)
+
+loop_if:
+;   if (shift > 0 && ((col >> 5) < (LONGS_PER_ROW - 1)))
+    move.l  -24(a6),d3           ; get shift value
+    cmp.l   #0,d3                
+    bls     loop_back            ; if shift <= 0, skip the conditional logic
+
+    move.w  14(a6),d4            ; get col
+    lsr.w   #5,d4                ; col >> 5
+    move.w  #LONGS_PER_ROW,d1    ; d1 = LONGS_PER_ROW
+    subq.w  #1,d1                ; d1 = LONGS_PER_ROW - 1
+    cmp.w   d1,d4                ; (col >> 5) < (LONGS_PER_ROW - 1)
+    bge     loop_back            ; if (col >> 5) >= (LONGS_PER_ROW - 1)
+
+;   *(current + 1) |= (bitmap[i] << (32 - shift));
+    move.l  #32,d4               ; d4 = 32
+    sub.l   d3,d4                ; d4 = 32 - shift
+    lsl.l   d4,d2                ; bitmap[i] << (32 - shift)
+    or.l    d2,4(a0)             ; *(current + 1) |= (bitmap[i] << (32 - shift))
+
+loop_back:
+    addq.l  #1,d0                     ; i++
+    adda.l  #(LONGS_PER_ROW*4),a0     ; current += LONGS_PER_ROW
+    bra     loop_start
+
+plot_bitmap_32_done:
+    movem.l (sp)+,d0-d4/a0-a2
+    unlk    a6
+    rts
 
 
 ;-------------------------------------------------------------------------------------------------
