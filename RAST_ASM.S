@@ -1034,7 +1034,85 @@ plot_bitmap_32_done:
 ;-------------------------------------------------------------------------------------------------
 ;------------------------------ROUTINE TO PLOT A CHARACTER----------------------------------------
 ; void plot_character(UINT8 *base, UINT16 row, UINT16 col, char ch)
+; UINT32 i @-4(a6); UINT16 shift @-6(a6); const UINT8 *character @-10(a6); UINT8 *start_point @-14(a6); UINT8 *current @-18(a6);   
+; base @ 8(a6); row @ 12(a6); col @ 14(a6); ch @ 16(a6)
 plot_character:
+    link    a6,#18
+    movem.l d0-d4/a0-a1,-(sp)
+
+plot_character_init:
+    clr.l   -4(a6)          ; i = 0
+    movea.l  8(a6),a0     ; load base address into a0
+    move.w  12(a6),d0     ; load row into d0
+    move.w  14(a6),d1     ; load col into d1
+    move.b  16(a6),d2     ; load char into d2
+
+
+
+if_can_print:
+;    if (IS_PRINTABLE(ch))
+;    #define IS_PRINTABLE(i) ((i) >= ' ' && (i) <= '~')
+;    #define GLYPH_START(i) (font + (((i) - ' ') << 3))
+    cmp.b   #' ',d2      ; check if ch >= ' '
+    blo     plot_character_done  ; if ch < ' ', done
+    cmp.b   #'~',d2      ; check if ch <= '~'
+    bhi     plot_character_done  ; if ch > '~', done
+;    character = GLYPH_START(ch);
+    move.w  d2,d3       ; move ch to d3 for the calculation
+    sub.b   #' ',d3     ; ch - ' '
+    lsl.w   #3,d3       ; (ch - ' ') << 3, multiply by 8 to get byte offset for the character in the font
+    move.l  font,a1     ; load font base address into a1......................................................?
+    adda.l  d3,a1       ; character = font + ((ch - ' ') << 3)
+    move.l  a1,-10(a6)  ; store character address at -10(a6)
+;   start_point = base + (row * BYTES_PER_ROW) + (col >> 3);
+    move.w  14(a6),d3            ; move col to d3    
+    lsr.w   #3,d3                ; col >> 3
+    move.w  12(a6),d4            ; get row
+    mulu.w  #BYTES_PER_ROW,d4    ; row * BYTES_PER_ROW
+    add.w   d3,d4                ; row * BYTES_PER_ROW + (col >> 3)
+    move.l  8(a6),a0             ; load base address into a0
+    adda.l  d4,a0                ; base + row * BYTES_PER_ROW + (col >> 3)... no multiplying since bytes
+    move.l  a0,-14(a6)           ; store start_point at -14(a6)
+;   current = start_point;
+    move.l  -14(a6),a1           ; load start_point into a1... so I can use a1 later
+    move.l  a1,-18(a6)           ; store current at -18(a6)
+;   shift = (col & 7);
+    move.w  d1,d3       ; load col to d3
+    and.w   #7,d3       ; shift = col & 7
+    move.w  d3,-6(a6)   ; store shift at -6(a6)
+
+
+
+;   uhhh dont forget shift = d3, i = d0, d4 can be anything, a1 = current, a0 = character*, d2 = loaded with character[i]
+    move.l  -4(a6),d0   ; get i value (0) into d0 for the loop
+    movea.l -10(a6),a0
+loop_to_eight:
+    cmp.l   #7,d0
+    beq     loop_to_eight_end
+;   *current |= (character[i] >> shift);
+    move.b  (a0,d0.l),d2        ; d2 = character[i]
+    lsr.l   d2,d3               ; shift character[i]
+    or.b    (a1),d3
+
+
+if_shift_not_zero:
+    tst.w   d3          
+    beq     loop_to_eight_end  ; if shift == 0, skip the conditional logic
+;   *(current + 1) |= (character[i] << (8 - shift));
+    move.w  #8,d4         ; d4 = 8
+    sub.w   d3,d4         ; d4 = 8 - shift
+    move.b  (a0,d0.l),d2   
+    lsl.l   d4,d2         ; d2 = character[i] << (8 - shift)............................. check later
+    or.b    d2,1(a1)      ; *current |= (character[i] << (8 - shift))
+
+
+
+loop_to_eight_end:
+    add.l   #BYTES_PER_ROW,a1  ; current += BYTES_PER_ROW
+    addq.l  #1,d0              ; i++
+plot_character_done:
+    movem.l (sp)+,d0-d4/a0-a1
+    unlk    a6
     rts
 
 ;-------------------------------------------------------------------------------------------------
