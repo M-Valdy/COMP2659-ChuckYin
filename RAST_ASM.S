@@ -1071,6 +1071,7 @@ plot_bitmap_32_done:
 ; void plot_character(UINT8 *base, UINT16 row, UINT16 col, char ch)
 ; UINT32 i @-4(a6); UINT16 shift @-6(a6); const UINT8 *character @-10(a6); UINT8 *start_point @-14(a6); UINT8 *current @-18(a6);   
 ; base @ 8(a6); row @ 12(a6); col @ 14(a6); ch @ 16(a6)
+    xref font
 plot_character:
     link    a6,#-18
     movem.l d0-d4/a0-a1,-(sp)
@@ -1096,7 +1097,7 @@ if_can_print:
     move.w  d2,d3       ; move ch to d3 for the calculation
     sub.b   #' ',d3     ; ch - ' '
     lsl.w   #3,d3       ; (ch - ' ') << 3, multiply by 8 to get byte offset for the character in the font
-    move.l  font,a1     ; load font base address into a1......................................................?
+    lea     font,a1     ; load font base address into a1......................................................?
     adda.l  d3,a1       ; character = font + ((ch - ' ') << 3)
     move.l  a1,-10(a6)  ; store character address at -10(a6)
 ;   start_point = base + (row * BYTES_PER_ROW) + (col >> 3);
