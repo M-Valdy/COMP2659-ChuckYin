@@ -25,205 +25,6 @@
 #define VER_BYTE_MASK ((UINT8)0x80) /* 1 followed by all 0's mask to handle the byte(s), for VERTICAL LINES*/
 #define VER_WORD_MASK ((UINT16)0x8000) /* 1 followed by all 0's mask to handle the word(s), for VERTICAL */
 #define VER_LONG_MASK ((UINT32)0x80000000) /* 1 followed by all 0's mask to handle the long(s), for VERTICAL */
-
-/*
- * Helper Function: px_in_bounds
- * Purpose: Checks if a coordinate is within the 640x400 screen limits.
- * Input: x-coordinate (column), y-coordinate (row)
- * Return: 1 if in bounds, 0 if out of bounds.
- */
-UINT16 px_in_bounds(UINT16 row, UINT16 col) {
-    return (col < SCREEN_WIDTH && row < SCREEN_HEIGHT);
-}
-
-void clear_screen(UINT32 *base){
-	/* using UINT32 will require the least iterations to cover the screen
-	640*400 = 256,000 pixels; 256000/32 = 8000 iterations */
-	UINT32 *current = base;
-	UINT16 section_count = PIXEL_COUNT >> 5;
-	UINT16 i;
-    for (i = 0; i < section_count; i++){
-		*current = 0; /* set the current section to all zeros */
-		/* current is a longword and a single increment will move to the next longword */
-		current++;
-	}
-}
-
-void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width) {
-    UINT32 *curr_row;
-    UINT32 leftmask;
-    UINT32 rightmask;
-    UINT16 c_end;
-    UINT16 span;
-    UINT16 r;
-    UINT16 i;
-
-    if (length == 0 || width == 0) return;
-
-    c_end = col + width - 1;
-    span = (c_end >> 5) - (col >> 5); /* Number of longwords gone over */
-
-    /* Calculate masks */
-    leftmask = ~(HOR_LONG_MASK >> (col & 31));
-    rightmask = ~(HOR_LONG_MASK << (31 - (c_end & 31)));
-
-    /* get the intial point */
-    curr_row = base + (row * LONGS_PER_ROW) + (col >> 5);
-
-    /* loop "length" times downwards */
-    for (r = 0; r < length; r++) {
-        
-        if (span == 0) {
-            /* if the area fits inside a single 32-bit longword */
-            curr_row[0] &= (leftmask | rightmask); /* or both mask to get a single mask 
-            save area not intended for clearing */
-        } else {
-            /* handle the partial longword on the left */
-            curr_row[0] &= leftmask;
-
-            /* set full longwords in the middle to 0 */
-            for (i = 1; i < span; i++) {
-                curr_row[i] = 0;
-            }
-
-            /* handle the partial longword on the right */
-            curr_row[span] &= rightmask;
-        }
-
-        curr_row += LONGS_PER_ROW;
-    }
-}
-
-void plot_pixel(UINT8 *base, UINT16 row, UINT16 col){
-	if (px_in_bounds(row, col)) {
-        /* Calculate (row * bytes_per_row) + (col / 8) */
-        UINT8 *current = (base + (row * BYTES_PER_ROW) + (col >> 3));
-
-        /* Bitwise OR to flip/maintain the bit */
-        *current |= (1 << (7 - (col & 7)));
-    }
-}
-
-void plot_horizontal_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length){
-
-    UINT32 *start_point;  /* starting location */
-    UINT32 *end_point; /* ending location */
-    UINT32 *current; /* to track the current lonword */
-
-    UINT32 leftmask; /* mask to handle the left partial longword */
-    UINT32 rightmask; /* mask to handle the right partial longword */
-    
-    UINT32 end = (col + (length - 1)); /* for easier calculations */
-    
-    if (length == 0) return; /* dont attempt if length is 0 */
-
-    start_point = (base + (row * LONGS_PER_ROW) + (col >> 5));
-    end_point = (base + (row * LONGS_PER_ROW) + (end >> 5));
-    
-    leftmask = HOR_LONG_MASK >> (col & 31); /* rightshifting for the start is more effictient */
-    rightmask = HOR_LONG_MASK << (31 - (end & 31)); /* leftshifting for the end is more effictient */
-    current = start_point; 
-
-    if (start_point == end_point){ /* if the start and end addreses are the same */
-        *current |= (leftmask & rightmask); /* &'ing the masks tohether creates a "stencil" */
-    } else {
-        *start_point |= leftmask; /* handle the left fringe */
-        current = start_point + 1; /* move one longword forward */
-        while(current < end_point){ /* loop till current address matches end point */
-            *current = HOR_LONG_MASK; /* set all 1's without prejudice */
-            current++; /* move to next longword */
-        }
-        *end_point |= rightmask; /* handle the right fringe */
-    }
-}
-
-void plot_vertical_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length){
-    UINT32 *start_point;  /* starting location */
-    UINT32 *end_point; /* ending location */
-    UINT32 *current; /* to track the current lonword */
-    
-    UINT32 bitmask; /* a specific mask for alignment anywhere in the longword */
-
-    UINT32 end = (row + (length - 1)); /* for easier calculations */
-
-    if (length == 0) return; /* dont attempt if length is zero */
-
-    start_point = (base + (row * LONGS_PER_ROW) + (col >> 5));
-    end_point = (base + (end * LONGS_PER_ROW) + (col >> 5));
-
-    bitmask = VER_LONG_MASK >> (col & 31); /* creates a unique mask based on col input */
-    for(current = start_point; current <= end_point; current += LONGS_PER_ROW){ /* loop vertically jumping 20 longwords at a time*/
-        *current |= bitmask; /* use bitwise OR to prevent overwriting things */
-    }
-}
-
-void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col){
-    
-    /* Bresenham Algoirthm stuff */
-    int dx;
-    int dy;
-    int sx;
-    int sy;
-    int err;
-    int e2;
-
-    /* Bresenham Algorithm 
-    * Based on and adapted from https://gist.github.com/bert/1085538#file-circle-c-L1
-    */
-        
-    /* Calculate absolute differences safely for UINT16 */
-    dx = (int)(end_col > start_col ? end_col - start_col : start_col - end_col);
-    dy = -(int)(end_row > start_row ? end_row - start_row : start_row - end_row);
-
-    /* Determine step direction */
-    sx = (start_col < end_col) ? 1 : -1;
-    sy = (start_row < end_row) ? 1 : -1;
-
-    err = dx + dy; /* error value e_xy */
-
-    for (;;) {  /* loop */
-        /* Plot current pixel using your base pointer and coordinates */
-        plot_pixel(base, start_row, start_col);
-
-        if (start_col == end_col && start_row == end_row) {
-            break;
-        }
-
-        e2 = 2 * err;
-
-        if (e2 >= dy) { 
-            err += dy; 
-            start_col += sx; 
-        } /* e_xy+e_x > 0 */
-            
-        if (e2 <= dx) { 
-            err += dx; 
-            start_row += sy; 
-        } /* e_xy+e_y < 0 */
-    }
-    
-}
-
-void plot_rectangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width){
-    /* Length: the length (number of rows) in pixels of the rectangle
-    * Width: the width (number of columns) in pixels of the rectangle */ 
-   
-    if (length == 0 || width == 0) return; /* unless 2 dimesions are given, dont attempt to plot */
-
-    /* top line */
-    plot_horizontal_line(base, row, col, width);
-    /* bottom line */
-    plot_horizontal_line(base, (row + length - 1), col, width);
-    /* left line */
-    plot_vertical_line(base, row, col, length);
-    /* right line */
-    plot_vertical_line(base, row, (col + width - 1), length);
-}
-
-void plot_square(UINT32 *base, UINT16 row, UINT16 col, UINT16 side){
-    plot_rectangle(base, row, col, side, side);
-}
-
 void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 trianglebase, UINT16 height, UINT8 direction){
     UINT32 *start_point;
     if (trianglebase == 0 || height == 0) return; /* unless valid inputs given, dont attempt to plot */
@@ -303,7 +104,7 @@ void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 trianglebase, UI
  *  }
  * }
 */
-void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height, const UINT8 *bitmap) {
+void plot_8_bitmap(UINT8 *base, UINT16 row, UINT16 col, UINT16 height, const UINT8 *bitmap) {
     UINT8 *current;
     UINT8 *start_point;
     UINT8 *end_point;
@@ -330,7 +131,7 @@ void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height, const UIN
     }
 }
 
-void plot_bitmap_16(UINT16 *base, UINT16 row, UINT16 col, UINT16 height, const UINT16 *bitmap){
+void plot_16_bitmap(UINT16 *base, UINT16 row, UINT16 col, UINT16 height, const UINT16 *bitmap){
     UINT16 *current;
     UINT16 *start_point;
     UINT16 *end_point;
@@ -356,7 +157,7 @@ void plot_bitmap_16(UINT16 *base, UINT16 row, UINT16 col, UINT16 height, const U
     }
 }
 
-void plot_bitmap_32(UINT32 *base, UINT16 row, UINT16 col, UINT16 height, const UINT32 *bitmap){
+void plot_32_bitmap(UINT32 *base, UINT16 row, UINT16 col, UINT16 height, const UINT32 *bitmap){
     UINT32 *current;
     UINT32 *start_point;
     UINT32 *end_point;

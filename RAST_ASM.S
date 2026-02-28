@@ -1,3 +1,16 @@
+    XDEF _clear_screen
+    XDEF _clear_region
+    XDEF _plot_pixel
+    XDEF _plot_horizontal_line
+    XDEF _plot_vertical_line
+    XDEF _plot_line
+    XDEF _plot_rectangle
+    XDEF _plot_square
+    ;XDEF _plot_triangle
+    ;XDEF _plot_8_bitmap
+    ;XDEF _plot_16_bitmap
+    ;XDEF _plot_32_bitmap
+    ;XREF font
 ;=====================CONSTANTS=====================================================================
 
 SCREEN_WIDTH	EQU	640	; #define SCREEN_WIDTH
@@ -40,7 +53,7 @@ CONIN       EQU 1
 ;  RETURN: TRUE(-1) if in bounds, FALSE(-2) if out of bounds.
 ;  
 ; int px_in_bounds(UINT16 row, UINT16 col);
-px_in_bounds:
+_px_in_bounds:
 	link	a6,#0	; no local variables
 	move.l	d0,-(sp)	; to preserve d0	
 	; the column index is stored at 8(a6)
@@ -70,7 +83,7 @@ px_in_bounds_end:
 ; OUTPUT: NONE
 
 ;void clear_screen(UINT32 *base);
-clear_screen:
+_clear_screen:
 	link	a6,#0	; no local variables
 	movem.l	d0/a0,-(sp)
 
@@ -99,7 +112,7 @@ clear_screen_loop:
 ;   UINT16 span;
 ;   UINT16 r;
 ;   UINT16 i;
-clear_region:
+_clear_region:
     link    a6,#-8  ; two local variables, longwords
     movem.l a0-a2/d0-d5,-(sp)
 
@@ -215,7 +228,7 @@ clear_region_done:
 ; PURPOSE: Plots a single pixel onto the screen
 ; INPUT: Address of the starting byte of the board
 ; OUTPUT: NONE
-plot_pixel:
+_plot_pixel:
     link a6,#0
     movem.l d0-d2/a0,-(sp)
     
@@ -223,11 +236,11 @@ plot_pixel:
     move.w  14(a6),-(sp) ; push col number onto the stack
     move.w  12(a6),-(sp) ; push row number onto the stack
     
-    jsr     px_in_bounds
-    addq.l  #4,sp   ; clean up the stack, 2 words
+    jsr     _px_in_bounds
     
     move.w (sp)+,d0 ; get the return value
-    
+    addq.l  #4,sp   ; clean up the stack, 2 words
+
     cmpi.w  #FALSE,d0 ; handle bounds errors
     beq     plot_pixel_end
 
@@ -273,7 +286,7 @@ plot_pixel_end:
 ; PURPOSE: PLOT A SINGLE HORIZONTAL LINE AT THE GIVEN COORDINATES AND OF A GIVEN LENGTH
 ; INPUT: COORDINATES X (COL) AND Y (ROW), LENGTH OF THE LINE TO BE PLOTTED
 ; OUTPUT: NONE
-plot_horizontal_line:
+_plot_horizontal_line:
     link    a6,#-10     ; 2 (long) masks, an offset value for the end address(word)
     movem.l d0-d3/a0-a2,-(sp) 
 
@@ -365,7 +378,7 @@ plot_horizontal_line_end:
 ; PURPOSE: PLOT A SINGLE VERTICAL LINE AT THE GIVEN COORDINATES AND OF A GIVEN LENGTH
 ; INPUT: COORDINATES X (COL) AND Y (ROW), LENGTH OF THE LINE TO BE PLOTTED
 ; OUTPUT: NONE
-plot_vertical_line:
+_plot_vertical_line:
     link    a6,#-6          ; two local variables, a longword and a word
     movem.l d0-d4/a0-a2,-(sp) 
 
@@ -434,7 +447,7 @@ plot_vertical_line_end:
 ;------------------------------ROUTINE TO PLOT A LINE BETWEEN ANY TWO GIVEN POINT-----------------
 ; void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col);
 ; dx -12, dy -10, sx -8, sy -6, err -4, err2  -2
-plot_line:
+_plot_line:
     link    a6,#-12     ; 6 ints is 12 bytes, so 12 bytes for local variables
     movem.l d3-d7/a1,-(sp) ; d3 start row, d4 start col, d5 end row, d6 end col, d7 for locals
 
@@ -445,7 +458,7 @@ set_regs:
     move.w  16(a6),d5   ; end row
     move.w  18(a6),d6   ; end col 
 
-calculate_diff:
+calculate_difference:
 ;    dx = (int)(end_col > start_col ? end_col - start_col : start_col - end_col);
 ;    dy = -(int)(end_row > start_row ? end_row - start_row : start_row - end_row);
     cmp.w   d4,d6       ; if (end_col > start_col)
@@ -500,14 +513,15 @@ plotting_loop:
     move.w  d4,-(sp)    ; push start_col, 2 bytes
     move.w  d3,-(sp)    ; push start_row, 2 bytes
     move.l  a1,-(sp)    ; push base address, 4 bytes
-    jsr     plot_pixel
+    jsr     _plot_pixel
     adda.l  #8,sp       ; clean up the stack by 8 bytes
+
 ;   if (start_col == end_col && start_row == end_row)
     cmp.w   d4,d6
     bne     not_equal
     cmp.w   d3,d5
-    bne     not_equal
-    bra     plot_line_done
+    beq     plot_line_done  ; loop condition update, if start_col == end_col && start_row == end_row 
+
 not_equal:
 ;   err2 = 2 * err;
     move.w  -4(a6),d7
@@ -516,34 +530,31 @@ not_equal:
 first_if:
 ;   if (err2 >= dy) { err += dy; start_col += sx; }
     move.w  -2(a6),d7
-    move.w  -10(a6),d6     ; get dy for comparison
-    cmp.w   d7,d6     ; if (dy > err2)
+    move.w  -10(a6),d0      ; 
+    cmp.w   d7,d0           ; if (dy > err2)
     bgt     second_if
-    move.w  -10(a6),d7     ; move dy back into d7
-    add.w   d7,-4(a6)      ; err += dy
-    move.w  -8(a6),d7      ; move sx into d7
-    add.w   d7,d4          ; start_col += sx
+    add.w   d0,-4(a6)       ; err += dy
+    move.w  -8(a6),d7       ; move sx into d7
+    add.w   d7,d4           ; start_col += sx
 second_if:
 ;   if (err2 <= dx) { err += dx; start_row += sy; }
     move.w  -2(a6),d7
-    move.w  -12(a6),d6     ; get dx for comparison
-    cmp.w   d7,d6     ; if (dx < err2)
+    move.w  -12(a6),d0      ; Use d0 instead of d6, you overwrote end_col
+    cmp.w   d7,d0           ; if (dx < err2)
     blt     plotting_loop
-    move.w  -12(a6),d7     ; move dx back into d7
-    add.w   d7,-4(a6)      ; err += dx
-    move.w  -6(a6),d7      ; move sy into d7
-    add.w   d7,d3          ; start_row += sy
+    add.w   d0,-4(a6)       ; err += dx
+    move.w  -6(a6),d7       ; move sy into d7
+    add.w   d7,d3           ; start_row += sy
     bra     plotting_loop
 
 plot_line_done:
     movem.l (sp)+,d3-d7/a1
     unlk    a6
     rts
-
 ;-------------------------------------------------------------------------------------------------
 ;--------------------ROUTINE TO PLOT A RECTANGLE--------------------------------------------------
 ; void plot_rectangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
-plot_rectangle:
+_plot_rectangle:
     link    a6,#0
     movem.l d0-d1,-(sp)
 
@@ -570,7 +581,7 @@ plot_rectangle:
     move.w  14(a6),-(sp)    ; push col
     move.w  12(a6),-(sp)    ; push row
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_horizontal_line
+    jsr     _plot_horizontal_line
     adda.l  #10,sp          ; clean up: 4 + 2+2+2 = 10 
 
 ;   /* bottom line */
@@ -579,7 +590,7 @@ plot_rectangle:
     move.w  14(a6),-(sp)    ; push col
     move.w  d0,-(sp)        ; push row + length - 1
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_horizontal_line
+    jsr     _plot_horizontal_line
     adda.l  #10,sp          
 
 ;   /* left line */
@@ -588,7 +599,7 @@ plot_rectangle:
     move.w  14(a6),-(sp)    ; push col
     move.w  12(a6),-(sp)    ; push row
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_vertical_line
+    jsr     _plot_vertical_line
     adda.l  #10,sp          
 
 ;   /* right line */
@@ -597,7 +608,7 @@ plot_rectangle:
     move.w  d1,-(sp)        ; push col + width - 1 
     move.w  12(a6),-(sp)    ; push row
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_vertical_line
+    jsr     _plot_vertical_line
     adda.l  #10,sp          
 
 plot_rectangle_done:
@@ -607,7 +618,7 @@ plot_rectangle_done:
 ;-------------------------------------------------------------------------------------------------
 ;--------------------ROUTINE TO PLOT A SQUARE-----------------------------------------------------
 ; void plot_square(UINT32 *base, UINT16 row, UINT16 col, UINT16 side);
-plot_square:
+_plot_square:
     link    a6,#0
 
     move.w  16(a6),d0       ; side
@@ -619,7 +630,7 @@ plot_square:
     move.w  12(a6),-(sp)    ; push row
     move.l  8(a6),-(sp)     ; push base address
     
-    jsr     plot_rectangle 
+    jsr     _plot_rectangle 
     
     ; 4 + 2+2+2+2 = 12
     adda.l  #12,sp          
@@ -630,7 +641,7 @@ plot_square_done:
 ;-------------------------------------------------------------------------------------------------
 ;-------------------------ROUTINE TO PLOT A TRIANGLE----------------------------------------------
 ; void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 trianglebase, UINT16 height, UINT8 direction)
-plot_triangle:
+_plot_triangle:
     link    a6,#0
     movem.l d0-d4/a0,-(sp)
     move.w  16(a6),d1   ; get the height
@@ -659,7 +670,7 @@ plot_southeast_triangle:
     move.w  12(a6),-(sp)    ; push col
     move.w  10(a6),-(sp)    ; push row again
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_line       ; the line being plotted is the base
+    jsr     _plot_line       ; the line being plotted is the base
     add.l   #12,sp
 
     ; plot_line(base, row, col, (row + (height - 1)), col)
@@ -670,7 +681,7 @@ plot_southeast_triangle:
     move.w  12(a6),-(sp)    ; push col
     move.w  10(a6),-(sp)    ; push row
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_line       ; plot the perpendicular line
+    jsr     _plot_line       ; plot the perpendicular line
     add.l   #12,sp
 
     ; plot_line(base, (row + (height - 1)), col, row, (col + (trianglebase - 1)))
@@ -679,7 +690,7 @@ plot_southeast_triangle:
     move.w  d2,-(sp)    ; push col again
     move.w  d1,-(sp)    ; push row + height - 1
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_line       ; plot the hypotenuse
+    jsr     _plot_line       ; plot the hypotenuse
     add.l   #12,sp
 
     bra plot_triangle_done
@@ -694,7 +705,7 @@ plot_southwest_triangle:
     move.w  12(a6),-(sp)    ; push col
     move.w  10(a6),-(sp)    ; push row again
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_line       ; the line being plotted is the base
+    jsr     _plot_line       ; the line being plotted is the base
     add.l   #12,sp
 
     ; plot_line(base, row, col, (row + (height - 1)), col)
@@ -705,7 +716,7 @@ plot_southwest_triangle:
     move.w  12(a6),-(sp)    ; push col
     move.w  10(a6),-(sp)    ; push row
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_line       ; plot the perpendicular line
+    jsr     _plot_line       ; plot the perpendicular line
     add.l   #12,sp
 
     ; plot_line(base, (row + (height - 1)), col, row, (col - (trianglebase - 1)))
@@ -714,7 +725,7 @@ plot_southwest_triangle:
     move.w  12(a6),-(sp)    ; push col
     move.w  d1,-(sp)    ; push row + height - 1
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_line       ; plot the hypotenuse
+    jsr     _plot_line       ; plot the hypotenuse
     add.l   #12,sp
 
     bra plot_triangle_done
@@ -729,7 +740,7 @@ plot_northeast_triangle:
     move.w  12(a6),-(sp)    ; push col
     move.w  10(a6),-(sp)    ; push row again
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_line       ; the line being plotted is the base
+    jsr     _plot_line       ; the line being plotted is the base
     add.l   #12,sp
 
     ; plot_line(base, row, col, (row - (height - 1)), col)
@@ -739,7 +750,7 @@ plot_northeast_triangle:
     move.w  d3,-(sp)        ; push col again
     move.w  d1,-(sp)        ; push row - (height - 1)
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_line       ; plot the perpendicular line
+    jsr     _plot_line       ; plot the perpendicular line
     add.l   #12,sp
 
     ; plot_line(base, (row - (height - 1)), col, row, (col + (trianglebase - 1)))
@@ -748,7 +759,7 @@ plot_northeast_triangle:
     move.w  12(a6),-(sp)    ; push col
     move.w  d1,-(sp)        ; push row - (height - 1)
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_line       ; plot the hypotenuse line
+    jsr     _plot_line       ; plot the hypotenuse line
     add.l   #12,sp
     bra plot_triangle_done
 
@@ -762,7 +773,7 @@ plot_northwest_triangle:
     move.w  12(a6),-(sp)    ; push col
     move.w  10(a6),-(sp)    ; push row again
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_line       ; the line being plotted is the base
+    jsr     _plot_line       ; the line being plotted is the base
     add.l   #12,sp
 
     ; plot_line(base, row, col, (row - (height - 1)), col)
@@ -775,7 +786,7 @@ plot_northwest_triangle:
     move.w  12(a6),-(sp)    ; push col
     move.w  10(a6),-(sp)    ; push row
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_line       ; plot the perpendicular line
+    jsr     _plot_line       ; plot the perpendicular line
     add.l   #12,sp
 
     ; plot_line(base, (row - (height - 1)), col, row, (col - (trianglebase - 1)))
@@ -784,7 +795,7 @@ plot_northwest_triangle:
     move.w  12(a6),-(sp)    ; push col
     move.w  d3,-(sp)        ; push row - height - 1
     move.l  8(a6),-(sp)     ; push base address
-    jsr     plot_line       ; plot the hypotenuse line
+    jsr     _plot_line       ; plot the hypotenuse line
     add.l   #12,sp
 
 plot_triangle_done:
@@ -795,7 +806,7 @@ plot_triangle_done:
 ;-------------------------------------------------------------------------------------------------
 ;-------------------------ROUTINE TO PLOT A BITMAP_8----------------------------------------------
 ; void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height, const UINT8 *bitmap)
-plot_bitmap_8:
+_plot_8_bitmap:
     link   a6,#-20
     movem.l d0-d3/a0-a4,-(sp)
     move.w  16(a6),d1   ; get the height
@@ -880,7 +891,7 @@ plot_bitmap_8_done:
 ;-------------------------------------------------------------------------------------------------
 ;-------------------------ROUTINE TO PLOT A BITMAP_16----------------------------------------------
 ; void plot_bitmap_16(UINT16 *base, UINT16 row, UINT16 col, UINT16 height, const UINT16 *bitmap)
-plot_bitmap_16:
+_plot_16_bitmap:
     link   a6,#-20
     movem.l d0-d3/a0-a4,-(sp)
     move.w  16(a6),d1   ; get the height
@@ -967,7 +978,7 @@ plot_bitmap_16_done:
 ; void plot_bitmap_32(UINT32 *base, UINT16 row, UINT16 col, UINT16 height, const UINT32 *bitmap)
 ; UINT32 *current @ -4(a6); UINT32 *start_point @ -8(a6); UINT32 *end_point @ -12(a6); UINT32 end @ -16(a6); UINT32 i @ -20(a6); UINT32 shift @ -24(a6);
 ; base @ 8(a6); row @ 12(a6); col @ 14(a6); height @ 16(a6); bitmap address @ 18(a6)
-plot_bitmap_32:
+_plot_32_bitmap:
     link    a6,#-24      ; 6 32-bit unsigned ints is 24 bytes, so 24 bytes for local variables
     movem.l d0-d4/a0-a2,-(sp)
 
@@ -1075,8 +1086,7 @@ plot_bitmap_32_done:
 ; void plot_character(UINT8 *base, UINT16 row, UINT16 col, char ch)
 ; UINT32 i @-4(a6); UINT16 shift @-6(a6); const UINT8 *character @-10(a6); UINT8 *start_point @-14(a6); UINT8 *current @-18(a6);   
 ; base @ 8(a6); row @ 12(a6); col @ 14(a6); ch @ 16(a6)
-    xref font
-plot_character:
+_plot_character:
     link    a6,#-18
     movem.l d0-d4/a0-a1,-(sp)
 
@@ -1101,7 +1111,7 @@ if_can_print:
     move.w  d2,d3       ; move ch to d3 for the calculation
     sub.b   #' ',d3     ; ch - ' '
     lsl.w   #3,d3       ; (ch - ' ') << 3, multiply by 8 to get byte offset for the character in the font
-    lea     font,a1     ; load font base address into a1......................................................?
+    ;lea     font,a1     ; load font base address into a1......................................................?
     adda.l  d3,a1       ; character = font + ((ch - ' ') << 3)
     move.l  a1,-10(a6)  ; store character address at -10(a6)
 ;   start_point = base + (row * BYTES_PER_ROW) + (col >> 3);
@@ -1159,7 +1169,7 @@ plot_character_done:
 ;-------------------------------------------------------------------------------------------------
 ;------------------------------ROUTINE TO PLOT A STRING-------------------------------------------
 ; void plot_string(UINT8 *base, UINT16 row, UINT16 col, char *ch)
-plot_string:
+_plot_string:
     link    a6,#-4       ; UINT8 -1(a6) *start_point; UINT8 -2(a6) *current; UINT16 -4(a6) i = 0;
     movem.l d0-d3/a0-a1,-(sp)
 
@@ -1184,7 +1194,7 @@ while_string_loop:
     move.w  d0,-(sp)      ; push row
     move.l  a0,-(sp)      ; push base address
 
-    jsr     plot_character ; call plot_character routine
+    jsr     _plot_character ; call plot_character routine
     adda.l  #10,sp         ; clean up the stack by 10 bytes
 
     addq.w  #1,d2          ; i++
