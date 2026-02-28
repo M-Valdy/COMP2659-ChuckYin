@@ -80,32 +80,7 @@
  *  }
  * }
 */
-void plot_8_bitmap(UINT8 *base, UINT16 row, UINT16 col, UINT16 height, const UINT8 *bitmap) {
-    UINT8 *current;
-    UINT8 *start_point;
-    UINT8 *end_point;
-    UINT8 i; 
-    UINT8 end;
-    UINT8 shift;
 
-    if (height == 0) return;
-    if (row + height > 400) height = 400 - row; 
-    
-    end = row + (height - 1);
-    shift = (col & 7); 
-    start_point = base + (row * BYTES_PER_ROW) + (col >> 3);
-    end_point = base + (end * BYTES_PER_ROW) + (col >> 3);
-    i = 0;
-
-    for (current = start_point; current <= end_point; current += BYTES_PER_ROW) {
-        *current |= (bitmap[i] >> shift);
-
-        if (shift > 0 && ((col >> 3) < (BYTES_PER_ROW - 1))){
-            *(current + 1) |= (bitmap[i] << (8 - shift));
-        }
-        i++;
-    }
-}
 
 void plot_16_bitmap(UINT16 *base, UINT16 row, UINT16 col, UINT16 height, const UINT16 *bitmap){
     UINT16 *current;

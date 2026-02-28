@@ -7,7 +7,7 @@
     XDEF _plot_rectangle
     XDEF _plot_square
     XDEF _plot_triangle
-    ;XDEF _plot_8_bitmap
+    XDEF _plot_8_bitmap
     ;XDEF _plot_16_bitmap
     ;XDEF _plot_32_bitmap
     ;XREF font
@@ -818,85 +818,82 @@ plot_triangle_end:
 ;-------------------------------------------------------------------------------------------------
 ;-------------------------ROUTINE TO PLOT A BITMAP_8----------------------------------------------
 ; void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height, const UINT8 *bitmap)
+; base @ 8(a6), row @ 12(a6), col @ 14(a6), height @ 16(a6), bitmap @ 18(a6)
 _plot_8_bitmap:
-    link   a6,#-20
-    movem.l d0-d3/a0-a4,-(sp)
-    move.w  16(a6),d1   ; get the height
-    tst.w   d1          ; check if height == 0
-    beq     plot_bitmap_8_done
-    add.w   12(a6),d1   ; row + height
-    cmpi.w  #400,d1   ; check if row + height > 400
-    bgt     bitmap_8_too_large
-    bra     bitmap_8_init
-
-bitmap_8_too_large:
-    move.w  #400,d1
-    sub.w   12(a6),d1   ; height = 400 - row
-    move.w  d1,16(a6)   ; store height
-    bra    bitmap_8_init
-
-bitmap_8_init:
-    move.w  16(a6),d2   ; get the height
-    subq.w  #1,d2   ; height - 1
-    move.w  d2,-6(a6)   ; store height - 1
-    add.w   12(a6),d2   ; row + height - 1
-    move.w  d2,-6(a6)   ; end = row + height - 1
-
-    move.w  14(a6),d3   ; get the col
-    and.w   #7,d3       ; col & 7
-    move.w  d3,-2(a6)   ; shift = (col & 7)
-
-    move.w  14(a6),d3   ; move col to d3    
-    lsr.w   #3,d3       ; col >> 3
-    move.w  12(a6),d0   ; get row
-    mulu.w  #BYTES_PER_ROW,d0       ; row * BYTES_PER_ROW
-    add.w   d3,d0       ; row * BYTES_PER_ROW + (col >> 3)
-    move.l  8(a6),a0     ; load base address
-    adda.l  d0,a0      ; base + row * BYTES_PER_ROW + (col >> 3)
-    move.l  a0,-10(a6)   ; start_point = base + (row * BYTES_PER_ROW) + (col >> 3)
+    link    a6,#-4              ; -2(a6) is shift, -4(a6) is height
+    movem.l d0-d7/a0-a1,-(sp)
     
-    move.w  -6(a6),d1   ; get end value (row + height - 1
-    mulu.w  #BYTES_PER_ROW,d1   ; (end * BYTES_PER_ROW)
-    add.w   d3,d1       ; (end * BYTES_PER_ROW) + (col >> 3)
-    move.l  8(a6),a1     ; load base address
-    adda.l  d1,a1      ; base + end * BYTES_PER_ROW + (col >> 3)
-    move.l  a1,-8(a6)   ; end_point = base + (end * BYTES_PER_ROW) + (col >> 3)
+    ; if (height == 0) return;
+    move.w  16(a6),d2           ; get the height
+    ble     plot_8_bitmap_done
+    
+    ; if (row + height > 400) height = 400 - row; 
+    move.w  12(a6),d1           ; get the row
+    move.w  d1,d0
+    add.w   d2,d0               ; row + height
+    cmpi.w  #400,d0
+    ble     bitmap_8_size_done
+    move.w  #400,d2
+    sub.w   d1,d2               ; height = 400 - row
 
-    move.l  a0,-12(a6)   ; current = start_point
-    move.l  -12(a6),a3
+bitmap_8_size_done:
+    move.w  d2,-4(a6)           ; height in -4(a6)
 
-    move.l 18(a6),a4   ; load bitmap address into a4 (20(a6) is the bitmap address)
+    ; shift = (col & 7); 
+    move.w  14(a6),d3           ; get the col
+    andi.w  #7,d3               ; col & 7
+    move.w  d3,-2(a6)           ; shift in -2(a6)
 
-bitmap_8_loop:
-    cmpa.l  a1,a3    ; if current <= end_point
-    bhi     plot_bitmap_8_done  ; if current > end_point, done
+    ; start_point = base + (row * 80) + (col >> 3);
+    lsl.w   #4,d1               ; row * 16
+    move.w  d1,d0
+    lsl.w   #2,d1               ; row * 64
+    add.w   d0,d1               ; row * 80
+    
+    move.w  14(a6),d0           ; get col
+    lsr.w   #3,d0               ; col >> 3
+    add.w   d0,d1               
+    
+    move.l  8(a6),a0            ; load base address from stack
+    adda.w  d1,a0               ; start_point = base + (row * 80) + (col >> 3) in a-
+    
+    move.l  18(a6),a1           ; get bitmap address in a1
+    
+    move.w  -4(a6),d2           ; height from -4(a6)
+    subq.w  #1,d2               ; for dbra
+    
+    move.w  -2(a6),d6           ; d6 = shift
+    move.w  #8,d7
+    sub.w   d6,d7               ; d7 = 8 - shift
 
-    move.l  (a4)+,d2     ; load bitmap address
-    move.w  -2(a6),d0   ; get shift value
-    lsr.l   d0,d2       ; bitmap >> shift for the byte offset
-    or.l    d2,(a3)   ; *current |= (bitmap[i] >> shift)
+plot_bitmap_8_loop:
+    moveq   #0,d0
+    move.b  (a1)+,d0            ; get bitmap byte adn i++
+    move.w  d0,d1               ; copy for overflow
+    
+    lsr.w   d6,d0               ; shift bits right
+    or.b    d0,(a0)             ; plot corss byte bits
+    
+    ; if (shift > 0 && ((col >> 3) < (BYTES_PER_ROW - 1))){
+    ;        *(current + 1) |= (bitmap[i] << (8 - shift));
+    ;    }
+    tst.w   d6
+    beq     bitmap_8_next_row
+    
+    move.w  14(a6),d3           
+    lsr.w   #3,d3
+    cmpi.w  #79,d3
+    bge     bitmap_8_next_row
+    
+    lsl.w   d7,d1               ; shift remainder left
+    or.b    d1,1(a0)            ; plot into next screen byte
 
-    tst.w   -2(a6)       ; check if shift is 0
-    bge     bitmap8_increment
-    move.w   #BYTES_PER_ROW,d0
-    subq.w  #1,d0       ; BYTES_PER_ROW - 1
-    cmp.w   d0,d3       ; if (col >> 3) < BYTES_PER_ROW - 1
-    bge     bitmap8_increment
-    move.w  -2(a6),d0
-    move.w  #8,d1
-    sub.w   d0,d1       ; 8 - shift
-    lsl.l   d1,d2       ; bitmap[i] << (8 - shift)
-    or.b    d2,(a3)   ; *(current + 1) |= (bitmap[i] << (8 - shift))
-    move.l  a3,-12(a6)   ; move new result to current for the next loop
-    bra     bitmap8_increment
+bitmap_8_next_row:
+    adda.w  #80,a0              ; move down one row
+    dbra    d2,plot_bitmap_8_loop
 
-bitmap8_increment:
-    adda.l  #BYTES_PER_ROW,a3   ; current += BYTES_PER_ROW
-    move.l  a3,-12(a6)   ; move new result to current for the next loop
-    bra     bitmap_8_loop
-
-plot_bitmap_8_done:
-    movem.l (sp)+,d0-d3/a0-a4
+plot_8_bitmap_done:
+    movem.l (sp)+,d0-d7/a0-a1
     unlk    a6
     rts
 
