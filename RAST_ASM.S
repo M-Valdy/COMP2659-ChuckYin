@@ -6,7 +6,7 @@
     XDEF _plot_line
     XDEF _plot_rectangle
     XDEF _plot_square
-    ;XDEF _plot_triangle
+    XDEF _plot_triangle
     ;XDEF _plot_8_bitmap
     ;XDEF _plot_16_bitmap
     ;XDEF _plot_32_bitmap
@@ -640,169 +640,181 @@ plot_square_done:
     rts
 ;-------------------------------------------------------------------------------------------------
 ;-------------------------ROUTINE TO PLOT A TRIANGLE----------------------------------------------
-; void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 trianglebase, UINT16 height, UINT8 direction)
+;void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 trianglebase, UINT16 height, UINT8 direction){
+; base at 8(a6), row at 12(a6), col at 14(a6), trianglebase at 16(a6), height at 18(a6), direction at 20(a6)
 _plot_triangle:
     link    a6,#0
     movem.l d0-d4/a0,-(sp)
-    move.w  16(a6),d1   ; get the height
-    tst.w   d1          ; check if height == 0
-    ble     plot_triangle_done
-    move.w  14(a6),d2   ; get the triangle base
-    ble     plot_triangle_done
-    move.w  12(a6),d3   ; get the col
-    move.w  18(a6),d4   ; get the direction
-    cmpi.w  #0,d4       ; check if direction == 0
-    beq     plot_southeast_triangle
-    cmpi.w  #1,d4       ; check if direction == 1
-    beq     plot_southwest_triangle
-    cmpi.w  #2,d4       ; check if direction == 2
-    beq     plot_northeast_triangle
-    cmpi.w  #3,d4       ; check if direction == 3
-    beq     plot_northwest_triangle
-    bra     plot_triangle_done  ; else done
 
-plot_southeast_triangle:
-    ; plot_line(base, row, col, row, (col + (trianglebase - 1))); 
-    subq.w  #1,d2       ; trianglebase = trianglebase - 1
-    add.w   12(a6),d2   ; col + trianglebase - 1
-    move.w  d2,-(sp)    ; push col + trianglebase - 1
-    move.w  10(a6),-(sp)    ; push row
-    move.w  12(a6),-(sp)    ; push col
-    move.w  10(a6),-(sp)    ; push row again
-    move.l  8(a6),-(sp)     ; push base address
-    jsr     _plot_line       ; the line being plotted is the base
-    add.l   #12,sp
+;    if (trianglebase == 0 || height == 0) return; /* unless valid inputs given, dont attempt to plot */
+    move.w  18(a6),d0   ; get height
+    ble     plot_triangle_end  ; if height is 0, skip
+    move.w  16(a6),d1   ; get triangle base
+    ble     plot_triangle_end ; if triangle base is 0, skip
 
-    ; plot_line(base, row, col, (row + (height - 1)), col)
-    move.w  12(a6),-(sp)    ; push col
-    subq.w  #1,d1       ; height = height - 1
-    add.w   10(a6),d1       ; row + height - 1
-    move.w  d1,-(sp)        ; push row + height - 1
-    move.w  12(a6),-(sp)    ; push col
-    move.w  10(a6),-(sp)    ; push row
-    move.l  8(a6),-(sp)     ; push base address
-    jsr     _plot_line       ; plot the perpendicular line
-    add.l   #12,sp
+    move.w  20(a6),d2   ; get direction
+    cmpi.w  #0,d2
+    beq     plot_top_left_triangle
+    cmpi.w  #1,d2
+    beq     plot_top_right_triangle
+    cmpi.w  #2,d2
+    beq     plot_bottom_left_triangle
+    cmpi.w  #3,d2
+    beq     plot_bottom_right_triangle
+    bra     plot_triangle_end
 
-    ; plot_line(base, (row + (height - 1)), col, row, (col + (trianglebase - 1)))
-    move.w  d2,-(sp)    ; push col
-    move.w  10(a6),-(sp)    ; push row
-    move.w  d2,-(sp)    ; push col again
-    move.w  d1,-(sp)    ; push row + height - 1
-    move.l  8(a6),-(sp)     ; push base address
-    jsr     _plot_line       ; plot the hypotenuse
-    add.l   #12,sp
+;    if (direction == 0) { /* top-left coordinate, the height goes downwards and base goes right */
+plot_top_left_triangle:
+;        plot_horizontal_line(base, row, col, trianglebase);
+    move.w  16(a6),-(sp)    ; trianglebase
+    move.w  14(a6),-(sp)    ; col
+    move.w  12(a6),-(sp)    ; row
+    move.l  8(a6),-(sp)     ; base
+    jsr     _plot_horizontal_line
+    adda.l  #10,sp
 
-    bra plot_triangle_done
+;        plot_vertical_line(base, row, col, height);
+    move.w  18(a6),-(sp)    ; height
+    move.w  14(a6),-(sp)    ; col
+    move.w  12(a6),-(sp)    ; row
+    move.l  8(a6),-(sp)     ; base
+    jsr     _plot_vertical_line
+    adda.l  #10,sp
 
-plot_southwest_triangle:
-    ; plot_line(base, row, col, row, (col - (trianglebase - 1)))
-    move.w  14(a6),d2   ; get the triangle base
-    subq.w  #1,d2       ; trianglebase - 1
-    sub.w   d2,d3       ; col - (trianglebase - 1)
-    move.w  d3,-(sp)    ; push col - (trianglebase - 1)
-    move.w  10(a6),-(sp)    ; push row
-    move.w  12(a6),-(sp)    ; push col
-    move.w  10(a6),-(sp)    ; push row again
-    move.l  8(a6),-(sp)     ; push base address
-    jsr     _plot_line       ; the line being plotted is the base
-    add.l   #12,sp
+;        plot_line(base, (row + (height - 1)), col, row, (col + (trianglebase - 1)));
+    move.w  14(a6),d1       ; col
+    move.w  16(a6),d0       ; trianglebase
+    add.w   d1,d0
+    subq.w  #1,d0           ; col + trianglebase - 1
+    move.w  d0,-(sp)        ; end_col
+    move.w  12(a6),-(sp)    ; end_row (row)
+    move.w  14(a6),-(sp)    ; start_col (col)
+    move.w  12(a6),d0       ; row
+    add.w   18(a6),d0       ; row + height
+    subq.w  #1,d0           ; row + height - 1
+    move.w  d0,-(sp)        ; start_row
+    move.l  8(a6),-(sp)     ; base
+    jsr     _plot_line
+    adda.l  #12,sp
+    bra     plot_triangle_end
 
-    ; plot_line(base, row, col, (row + (height - 1)), col)
-    move.w  12(a6),-(sp)    ; push col
-    subq.w  #1,d1       ; height - 1
-    add.w   10(a6),d1       ; row + height - 1
-    move.w  d1,-(sp)        ; push row + height - 1
-    move.w  12(a6),-(sp)    ; push col
-    move.w  10(a6),-(sp)    ; push row
-    move.l  8(a6),-(sp)     ; push base address
-    jsr     _plot_line       ; plot the perpendicular line
-    add.l   #12,sp
+;    } else if (direction == 1) { /* top-right coordinate, height goes down, base goes left */
+plot_top_right_triangle:
+;        plot_horizontal_line(base, row, (col - (trianglebase - 1)), trianglebase);
+    move.w  16(a6),-(sp)    ; trianglebase
+    move.w  14(a6),d0       ; col
+    sub.w   16(a6),d0       ; col - trianglebase
+    addq.w  #1,d0           ; col - (trianglebase - 1)
+    move.w  d0,-(sp)        ; start_col
+    move.w  12(a6),-(sp)    ; row
+    move.l  8(a6),-(sp)     ; base
+    jsr     _plot_horizontal_line
+    adda.l  #10,sp
 
-    ; plot_line(base, (row + (height - 1)), col, row, (col - (trianglebase - 1)))
-    move.w  d3,-(sp)    ; push col - (trianglebase - 1)
-    move.w  10(a6),-(sp)    ; push row
-    move.w  12(a6),-(sp)    ; push col
-    move.w  d1,-(sp)    ; push row + height - 1
-    move.l  8(a6),-(sp)     ; push base address
-    jsr     _plot_line       ; plot the hypotenuse
-    add.l   #12,sp
+;        plot_vertical_line(base, row, col, height);
+    move.w  18(a6),-(sp)    ; height
+    move.w  14(a6),-(sp)    ; col
+    move.w  12(a6),-(sp)    ; row
+    move.l  8(a6),-(sp)     ; base
+    jsr     _plot_vertical_line
+    adda.l  #10,sp
 
-    bra plot_triangle_done
+;        plot_line(base, (row + (height - 1)), col, row, (col - (trianglebase - 1)));
+    move.w  14(a6),d0       ; col
+    sub.w   16(a6),d0       ; col - trianglebase
+    addq.w  #1,d0           ; col - (trianglebase - 1)
+    move.w  d0,-(sp)        ; end_col
+    move.w  12(a6),-(sp)    ; end_row
+    move.w  14(a6),-(sp)    ; start_col
+    move.w  12(a6),d0       ; row
+    add.w   18(a6),d0       ; row + height
+    subq.w  #1,d0           ; row + height - 1
+    move.w  d0,-(sp)        ; start_row
+    move.l  8(a6),-(sp)     ; base
+    jsr     _plot_line
+    adda.l  #12,sp
+    bra     plot_triangle_end
 
-plot_northeast_triangle:
-    ; plot_line(base, row, col, row, (col + (trianglebase - 1)))
-    move.w  14(a6),d2   ; get the triangle base
-    subq.w  #1,d2       ; trianglebase - 1
-    add.w   12(a6),d2   ; col + trianglebase - 1
-    move.w  d2,-(sp)    ; push col + trianglebase - 1
-    move.w  10(a6),-(sp)    ; push row
-    move.w  12(a6),-(sp)    ; push col
-    move.w  10(a6),-(sp)    ; push row again
-    move.l  8(a6),-(sp)     ; push base address
-    jsr     _plot_line       ; the line being plotted is the base
-    add.l   #12,sp
+;    } else if (direction == 2) { /* bottom-left coordinate, height goes up, base goes right */
+plot_bottom_left_triangle:
+;        plot_horizontal_line(base, row, col, trianglebase);
+    move.w  16(a6),-(sp)
+    move.w  14(a6),-(sp)
+    move.w  12(a6),-(sp)
+    move.l  8(a6),-(sp)
+    jsr     _plot_horizontal_line
+    adda.l  #10,sp
 
-    ; plot_line(base, row, col, (row - (height - 1)), col)
-    move.w  d3,-(sp)        ; push col (same as before)
-    subq.w  #1,d1           ; height = height - 1
-    sub.w   d1,10(a6)       ; row - height + 1
-    move.w  d3,-(sp)        ; push col again
-    move.w  d1,-(sp)        ; push row - (height - 1)
-    move.l  8(a6),-(sp)     ; push base address
-    jsr     _plot_line       ; plot the perpendicular line
-    add.l   #12,sp
+;        plot_vertical_line(base, (row - (height - 1)), col, height);
+    move.w  18(a6),-(sp)    ; height
+    move.w  14(a6),-(sp)    ; col
+    move.w  12(a6),d0       ; row
+    sub.w   18(a6),d0       ; row - height
+    addq.w  #1,d0           ; row - (height - 1)
+    move.w  d0,-(sp)        ; start_row
+    move.l  8(a6),-(sp)     ; base
+    jsr     _plot_vertical_line
+    adda.l  #10,sp
 
-    ; plot_line(base, (row - (height - 1)), col, row, (col + (trianglebase - 1)))
-    move.w  d2,-(sp)    ; push col + trianglebase - 1
-    move.w  10(a6),-(sp)    ; push row
-    move.w  12(a6),-(sp)    ; push col
-    move.w  d1,-(sp)        ; push row - (height - 1)
-    move.l  8(a6),-(sp)     ; push base address
-    jsr     _plot_line       ; plot the hypotenuse line
-    add.l   #12,sp
-    bra plot_triangle_done
+;        plot_line(base, (row - (height - 1)), col, row, (col + (trianglebase - 1)));
+    move.w  14(a6),d0       ; col
+    add.w   16(a6),d0       ; col + trianglebase
+    subq.w  #1,d0           ; col + (trianglebase - 1)
+    move.w  d0,-(sp)        ; end_col
+    move.w  12(a6),-(sp)    ; end_row
+    move.w  14(a6),-(sp)    ; start_col
+    move.w  12(a6),d0       ; row
+    sub.w   18(a6),d0       ; row - height
+    addq.w  #1,d0           ; row - (height - 1)
+    move.w  d0,-(sp)        ; start_row
+    move.l  8(a6),-(sp)     ; base
+    jsr     _plot_line
+    adda.l  #12,sp
+    bra     plot_triangle_end
 
-plot_northwest_triangle:
-    ; plot_line(base, row, col, row, (col - (trianglebase - 1)))
-    move.w  14(a6),d2   ; get the triangle base
-    subq.w  #1,d2       ; trianglebase - 1
-    sub.w   12(a6),d2   ; col - trianglebase + 1
-    move.w  d2,-(sp)    ; push col - trianglebase + 1
-    move.w  10(a6),-(sp)    ; push row
-    move.w  12(a6),-(sp)    ; push col
-    move.w  10(a6),-(sp)    ; push row again
-    move.l  8(a6),-(sp)     ; push base address
-    jsr     _plot_line       ; the line being plotted is the base
-    add.l   #12,sp
+;    } else if (direction == 3) { /* bottom-right coordinate, height goes up, base goes left */
+plot_bottom_right_triangle:
+;        plot_horizontal_line(base, row, (col - (trianglebase - 1)), trianglebase);
+    move.w  16(a6),-(sp)
+    move.w  14(a6),d0
+    sub.w   16(a6),d0
+    addq.w  #1,d0
+    move.w  d0,-(sp)
+    move.w  12(a6),-(sp)
+    move.l  8(a6),-(sp)
+    jsr     _plot_horizontal_line
+    adda.l  #10,sp
 
-    ; plot_line(base, row, col, (row - (height - 1)), col)
-    move.w  12(a6),-(sp)    ; push col
-    move.w  16(a6),d1        ; get the height
-    subq.w  #1,d1       ; height - 1
-    move.w  10(a6),d3   ; get row for arithmatic
-    sub.w   d1,d3       ; row - height - 1
-    move.w  d3,-(sp)    ; push row - height - 1
-    move.w  12(a6),-(sp)    ; push col
-    move.w  10(a6),-(sp)    ; push row
-    move.l  8(a6),-(sp)     ; push base address
-    jsr     _plot_line       ; plot the perpendicular line
-    add.l   #12,sp
+;        plot_vertical_line(base, (row - (height - 1)), col, height);
+    move.w  18(a6),-(sp)
+    move.w  14(a6),-(sp)
+    move.w  12(a6),d0
+    sub.w   18(a6),d0
+    addq.w  #1,d0
+    move.w  d0,-(sp)
+    move.l  8(a6),-(sp)
+    jsr     _plot_vertical_line
+    adda.l  #10,sp
 
-    ; plot_line(base, (row - (height - 1)), col, row, (col - (trianglebase - 1)))
-    move.w  d2,-(sp)        ; push col - trianglebase - 1
-    move.w  10(a6),-(sp)        ; push row
-    move.w  12(a6),-(sp)    ; push col
-    move.w  d3,-(sp)        ; push row - height - 1
-    move.l  8(a6),-(sp)     ; push base address
-    jsr     _plot_line       ; plot the hypotenuse line
-    add.l   #12,sp
+;        plot_line(base, (row - (height - 1)), col, row, (col - (trianglebase - 1)));
+    move.w  14(a6),d0
+    sub.w   16(a6),d0
+    addq.w  #1,d0
+    move.w  d0,-(sp)        ; end_col
+    move.w  12(a6),-(sp)    ; end_row
+    move.w  14(a6),-(sp)    ; start_col
+    move.w  12(a6),d0
+    sub.w   18(a6),d0
+    addq.w  #1,d0
+    move.w  d0,-(sp)        ; start_row
+    move.l  8(a6),-(sp)
+    jsr     _plot_line
+    adda.l  #12,sp
 
-plot_triangle_done:
+plot_triangle_end:
     movem.l (sp)+,d0-d4/a0
     unlk    a6
     rts
-    
 ;-------------------------------------------------------------------------------------------------
 ;-------------------------ROUTINE TO PLOT A BITMAP_8----------------------------------------------
 ; void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height, const UINT8 *bitmap)
