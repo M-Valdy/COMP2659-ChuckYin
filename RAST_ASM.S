@@ -17,54 +17,31 @@
     XDEF _plot_32_bitmap
     XDEF _plot_character
     XDEF _plot_string
-    ;XDEF _plot_string
 ;=====================CONSTANTS=====================================================================
 
-SCREEN_WIDTH	EQU	640	; #define SCREEN_WIDTH
-SCREEN_HEIGHT	EQU	400 ; #define SCREEN_HEIGHT
+SCREEN_WIDTH	EQU	640	
+SCREEN_HEIGHT	EQU	400
 
 MAX_COL  EQU  (SCREEN_WIDTH-1)
 MAX_ROW  EQU  (SCREEN_HEIGHT-1)
 
-BYTES_PER_ROW	EQU (SCREEN_WIDTH>>3)	; #define BYTES_PER_ROW (SCREEN_WIDTH >> 3)
-WORDS_PER_ROW	EQU (BYTES_PER_ROW>>1)	; #define WORDS_PER_ROW (BYTES_PER_ROW >> 1)
-LONGS_PER_ROW	EQU (BYTES_PER_ROW>>2) ; #define LONGS_PER_ROW (BYTES_PER_ROW >> 2)
+BYTES_PER_ROW	EQU (SCREEN_WIDTH>>3)
+WORDS_PER_ROW	EQU (BYTES_PER_ROW>>1)	
+LONGS_PER_ROW	EQU (BYTES_PER_ROW>>2) 
 
-; the total pixels to be considered
-PIXEL_COUNT	EQU	(SCREEN_WIDTH*SCREEN_HEIGHT)	; #define PIXEL_COUNT (SCREEN_WIDTH * SCREEN_HEIGHT) 
+PIXEL_COUNT	EQU	(SCREEN_WIDTH*SCREEN_HEIGHT)
 
-; masks
-HOR_BYTE_MASK	EQU	$FF	; #define HOR_BYTE_MASK ((UINT8)0xFF)
-HOR_WORD_MASK	EQU	$FFFF	; #define HOR_WORD_MASK ((UINT16)0xFFFF)
-HOR_LONG_MASK	EQU	$FFFFFFFF ; #define HOR_LONG_MASK ((UINT32)0xFFFFFFFF)
+HOR_LONG_MASK	EQU	$FFFFFFFF
 
-VER_BYTE_MASK	EQU $80	; #define VER_BYTE_MASK ((UINT8)0x80)
-VER_WORD_MASK	EQU $8000 ; #define VER_WORD_MASK ((UINT16)0x8000)
-VER_LONG_MASK	EQU $80000000	; #define VER_LONG_MASK ((UINT32)0x80000000)
+VER_LONG_MASK	EQU $80000000
 
-; for "boolean operations", using negative values to prevent mixups
 TRUE	EQU	-1	
 FALSE	EQU	-2	
-
-; XBIOS Function constants
-PHYSBASE    EQU 2
-
-; GEMDOS Function constants
-CNECOUT     EQU 2
-CONIN       EQU 1
-
 ;=========================FUNCTIONS AND HELPER FUNCTIONS===========================================
 ;--------------CHECK FOR PIXEL COORDINATES BEING WITHIN BOUNDS-------------------------------------
-;  PURPOSE: Checks if a coordinate is within the 640x400 screen limits.
-;  INPUT: x-coordinate (column), y-coordinate (row)
-;  RETURN: TRUE(-1) if in bounds, FALSE(-2) if out of bounds.
-;  
-; int px_in_bounds(UINT16 row, UINT16 col);
 _px_in_bounds:
-	link	a6,#0	; no local variables
-	move.l	d0,-(sp)	; to preserve d0	
-	; the column index is stored at 8(a6)
-	; the row index is stored in the next word, 10(a6)	
+	link	a6,#0	
+	move.l	d0,-(sp)	
 	move.w	8(a6),d0
 	cmpi.w	#MAX_COL,d0
 	bhi		out_of_bounds
@@ -73,35 +50,31 @@ _px_in_bounds:
 	cmpi.w	#MAX_ROW,d0
 	bhi		out_of_bounds
 
-	move.w	#TRUE,12(a6) ; push true flag onto the stack
+	move.w	#TRUE,12(a6)
 	bra	px_in_bounds_end 
 
 out_of_bounds:
-	move.w	#FALSE,12(a6) ; push false flag onto stack
+	move.w	#FALSE,12(a6) 
+
 px_in_bounds_end:
-	move.l	(sp)+,d0	; return orginal values to the register(s)
+	move.l	(sp)+,d0
 	unlk	a6
 	
 	rts
 ;-------------------------------------------------------------------------------------------------
 ;----------------------ROUTINE FOR CLEARING THE SCREEN--------------------------------------------
-; PURPOSE: Clears the entire screen.
-; INPUT: Address(UINT32*): to the start of the screen
-; OUTPUT: NONE
-
-;void clear_screen(UINT32 *base);
 _clear_screen:
-	link	a6,#0	; no local variables
+	link	a6,#0	
 	movem.l	d0/a0,-(sp)
 
-	move.l	8(a6),a0 ; load address of base
+	move.l	8(a6),a0 
 	
-	move.l	#PIXEL_COUNT,d0 ; load pixel count
-	lsr.l	#5,d0	; get the number of longwords on the screen
+	move.l	#PIXEL_COUNT,d0 
+	lsr.l	#5,d0
 	subq.l	#1,d0
 
 clear_screen_loop:
-	move.l	#0,(a0)	; set the entire longword to zero
+	move.l	#0,(a0)
 	adda.l	#4,a0
 	dbra	d0,clear_screen_loop
 
@@ -109,18 +82,10 @@ clear_screen_loop:
 	unlk	a6
 	
 	rts
-
+;-------------------------------------------------------------------------------------------------
 ;-----------------ROUTINE FOR CLEARING A SPECIFIED RECTANGULAR REGION-----------------------------
-; void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);;
-;   UINT32 *row_ptr;
-;   UINT32 leftmask;
-;   UINT32 rightmask;
-;   UINT16 c_end;
-;   UINT16 span;
-;   UINT16 r;
-;   UINT16 i;
 _clear_region:
-    link    a6,#-8  ; two local variables, longwords
+    link    a6,#-8  
     movem.l a0-a2/d0-d5,-(sp)
 
     ; if (length or width == 0 return )
@@ -130,86 +95,84 @@ _clear_region:
     ble     clear_region_done
 
     ; c_end calculation  col + width - 1
-    move.w  18(a6),d1   ; get the width
-    add.w   14(a6),d1   ; width + col
-    subq    #1,d1       ; width + col - 1
+    move.w  18(a6),d1   
+    add.w   14(a6),d1   
+    subq    #1,d1
 
     ; span calculation span = (c_end >> 5) - (col >> 5)
-    move.w  d1,d2       ; get the c_end
-    lsr.w   #5,d2       ; c_end >> 5
-    move.w  14(a6),d0   ; get the col
+    move.w  d1,d2       
+    lsr.w   #5,d2       
+    move.w  14(a6),d0  
     
-    move.w  d0,d3       ; make a copy for mask calculation and row_ptr
+    move.w  d0,d3
     
-    lsr.w   #5,d0       ; col >> 5
-    sub.w   d0,d2       ; d2 now holds span
+    lsr.w   #5,d0
+    sub.w   d0,d2
 
     ; left mask value calculations
-    move.w  d3,d0       ; get the col in d0
-    move.l  #HOR_LONG_MASK,d4 ; get the hor-mask
-    and.w   #31,d0      ; col & 31
-    lsr.l   d0,d4       ; HOR_MASK >> col & 31
-    not.l   d4          ; oppsoite for a plot
+    move.w  d3,d0      
+    move.l  #HOR_LONG_MASK,d4 
+    and.w   #31,d0
+    lsr.l   d0,d4      
+    not.l   d4 
     move.l  d4,-4(a6)   ; THE LEFT MASK
    
     ; right mask value calculations
-    move.w  d1,d0       ; get c_end
-    and.w   #31,d0      ; c_end & 31
+    move.w  d1,d0 
+    and.w   #31,d0
     
     move.w  #31,d4 
-    sub.w   d0,d4       ; 31 - c_end & 31
-    move.l  #HOR_LONG_MASK,d0   ; the long mask
-    lsl.l   d4,d0       ; mask << 31 - col & 31
-    not.l   d0          ; opposite for a plot
+    sub.w   d0,d4  
+    move.l  #HOR_LONG_MASK,d0 
+    lsl.l   d4,d0
+    not.l   d0
     move.l  d0,-8(a6)   ; THE RIGHT MASK
 
     ; row_ptr calculation
-    move.l  8(a6),a1    ; load base pointer into a1
+    move.l  8(a6),a1 
     
-    ; get column offset in bytes
     clr.l   d3          
-    move.w  14(a6),d3   ; get col
-    lsr.w   #5,d3       ; col >> 5
-    lsl.w   #2,d3       ; get byte offset (longwords * 4)
+    move.w  14(a6),d3  
+    lsr.w   #5,d3 
+    lsl.w   #2,d3
 
-    ; get row offset in bytes (row * 80)
     clr.l   d4          
-    move.w  12(a6),d4   ; get row
-    lsl.w   #4,d4       ; row * 2^4
+    move.w  12(a6),d4  
+    lsl.w   #4,d4 
     move.w  d4,d0       
-    lsl.w   #2,d4       ; (row * 2^4) * 2^2 = row * 2^6
-    add.w   d0,d4       ; (row * 2^6) + (row * 2^4) = row * 80 
+    lsl.w   #2,d4  
+    add.w   d0,d4
     
     ; calculate final start address for row_ptr
-    adda.l  d4,a1       ; add row byte offset to base pointer
-    adda.l  d3,a1       ; THE ROW PTR
+    adda.l  d4,a1
+    adda.l  d3,a1
 
     ; prime the loop counters
-    move.w  16(a6),d3   ; d3 = length
-    subq.w  #1,d3       ; for dbra
+    move.w  16(a6),d3 
+    subq.w  #1,d3   ; for dbra
 
 clear_region_outer_loop:
-    move.l  a1,a0       ; copy row_ptr to working pointer
-    move.w  d2,d4       ; get span
+    move.l  a1,a0
+    move.w  d2,d4
     
-    tst.w   d4          ; check if it fits in one lognword
+    tst.w   d4
     bne     handle_multiple_long_clear
 
     ; single longword clearing
-    move.l  -4(a6),d0   ; left mask
-    or.l    -8(a6),d0   ; OR'd with right mask
-    and.l   d0,(a0)     ; clear the bits
+    move.l  -4(a6),d0 
+    or.l    -8(a6),d0  
+    and.l   d0,(a0)     
     bra     clear_region_next_row
 
 handle_multiple_long_clear:
     ; left edge
     move.l  -4(a6),d0   
-    and.l   d0,(a0)+    ; clear and move to next longword
+    and.l   d0,(a0)+ 
     
     ; clear all the middle
-    subq.w  #1,d4       ; subtract the left edge
-    subq.w  #1,d4       ; subtract 1, if there is a right edge bmi will fail
-    bmi     handle_no_middle  ; if span was 1, skip middle
+    subq.w  #1,d4   
+    subq.w  #1,d4    
+    bmi     handle_no_middle
 
 clear_region_middle_loop:
     clr.l   (a0)+       
@@ -221,149 +184,131 @@ handle_no_middle:
     and.l   d0,(a0)
 
 clear_region_next_row:
-    adda.w  #80,a1      ; move anchor to next row
+    adda.w  #80,a1
     dbra    d3,clear_region_outer_loop
 
 clear_region_done:
     movem.l (sp)+,a0-a2/d0-d5
     unlk    a6
     rts
-
 ;-------------------------------------------------------------------------------------------------
 ;---------------ROUTINE FOR PLOTTING A SINGLE PXIEL ONTO SPECIFIED COORDINATES--------------------
-; void plot_pixel(UINT8 *base, UINT16 row, UINT16 col);
-; PURPOSE: Plots a single pixel onto the screen
-; INPUT: Address of the starting byte of the board
-; OUTPUT: NONE
 _plot_pixel:
     link a6,#0
     movem.l d0-d2/a0,-(sp)
     
     subq.l  #2,sp ; reserves space for a return value
-    move.w  14(a6),-(sp) ; push col number onto the stack
-    move.w  12(a6),-(sp) ; push row number onto the stack
+    move.w  14(a6),-(sp) 
+    move.w  12(a6),-(sp)
     
     jsr     _px_in_bounds
     
-    move.w (sp)+,d0 ; get the return value
-    addq.l  #4,sp   ; clean up the stack, 2 words
+    move.w (sp)+,d0 
+    addq.l  #4,sp
 
-    cmpi.w  #FALSE,d0 ; handle bounds errors
+    cmpi.w  #FALSE,d0
     beq     plot_pixel_end
 
     ; main logic if in bounds 
-    ; base + (row*BYTES_PER_ROW) + (col >> 3)
-
-    move.w  12(a6),d1 ; store row index for arithmatic (8(a6) is row)
-    ; mulu.w  #BYTES_PER_ROW,d1 ; row*BYTES_PER_ROW can be optimsed using bitshifts
-    ; BYTES_PER_ROW for this is 80, 64+16, 2^6+2^4 thus two lsl commands could be potentially faster
-    lsl.w   #4,d1         ; row * 2^4
+    move.w  12(a6),d1 
+    lsl.w   #4,d1    
     move.w  d1,d0         
-    lsl.w   #2,d1         ; (row * 2^4) * 2^2 = row * 2^6
-    add.w   d0,d1         ; (row * 2^6) + (row * 2^4) = row * 80
+    lsl.w   #2,d1     
+    add.w   d0,d1
+    
+    move.w  14(a6),d2    
+    move.w  d2,d0      
+    lsr.w   #3,d2
+    
+    add.l   d2,d1 
 
+    move.l  8(a6),a0 
+    adda.l  d1,a0
     
-    move.w  14(a6),d2    ; store col index for arithmatic
-    move.w  d2,d0        ; copy col for bit math later
-    lsr.w   #3,d2        ; col >> 3
+    move.w  #7,d1 
+    moveq   #1,d2
     
-    add.l   d2,d1   ; (row*BYTES_PER_ROW) + (col >> 3)
+    and.w   #7,d0 
+    sub.w   d0,d1 
+    lsl.b   d1,d2
 
-    move.l  8(a6),a0 ; load address
-    adda.l  d1,a0   ; add total offset to the address register
+    or.b    d2,(a0)
     
-    ; d0 still holds the original col index
-    move.w  #7,d1 ; 7 for the arithmatic
-    moveq   #1,d2 ; bitshift base
-    
-    and.w   #7,d0 ; col & 7
-    sub.w   d0,d1   ; 7 - (col & 7)
-    lsl.b   d1,d2 ; bitshifted 1 (shifted specifically for the target byte)
-
-    or.b    d2,(a0) ; *current |= (1 << (7 - (col & 7)));
-    
-
 plot_pixel_end:
-    movem.l (sp)+,d0-d2/a0  ; return original values to the register(s)
+    movem.l (sp)+,d0-d2/a0
     unlk    a6
     rts
 ;-------------------------------------------------------------------------------------------------
 ;---------------------ROUTINE FOR PLOTTING A HORIZONTAL LINE--------------------------------------
-;void plot_horizontal_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
-; PURPOSE: PLOT A SINGLE HORIZONTAL LINE AT THE GIVEN COORDINATES AND OF A GIVEN LENGTH
-; INPUT: COORDINATES X (COL) AND Y (ROW), LENGTH OF THE LINE TO BE PLOTTED
-; OUTPUT: NONE
 _plot_horizontal_line:
-    link    a6,#-10     ; 2 (long) masks, an offset value for the end address(word)
+    link    a6,#-10 
     movem.l d0-d3/a0-a2,-(sp) 
 
-    move.w  16(a6),d2   ; get the length
-    ble     plot_horizontal_line_end ; is length is 0, skip
-    move.w  14(a6),d1   ; col value
+    move.w  16(a6),d2 
+    ble     plot_horizontal_line_end 
+    move.w  14(a6),d1 
     
     ; end calculations
-    
-    subq.w  #1,d2       ; length - 1 (using .w for coordinates)
-    add.w   d1,d2       ; col + length - 1 
-    move.w  d2,-10(a6)  ; END OFFSET
+    subq.w  #1,d2       
+    add.w   d1,d2      
+    move.w  d2,-10(a6) 
 
-    ; cleft mask value claculations
-    move.l  d1,d3       ; copy col
-    andi.l  #31,d3      ; col & 31
+    ; left mask value claculations
+    move.l  d1,d3      
+    andi.l  #31,d3   
     move.l  #HOR_LONG_MASK,d0
-    lsr.l   d3,d0       ; leftmask = HOR_LONG_MASK >> (col & 31)
-    move.l  d0,-4(a6)   ; left mask stored at -4(a6)
+    lsr.l   d3,d0
+    move.l  d0,-4(a6) ; LEFTMASK
     
     ; rightmask value calculations
-    move.w  -10(a6),d3  ; end offset value
-    andi.w  #31,d3      ; end & 31
+    move.w  -10(a6),d3  
+    andi.w  #31,d3 
     move.w  #31,d2
-    sub.w   d3,d2       ; (31 - (end & 31))
+    sub.w   d3,d2 
     move.l  #HOR_LONG_MASK,d0
     lsl.l   d2,d0
     move.l  d0,-8(a6)   ; RIGHTMASK
 
     ; Row offset calculations
-    move.w  12(a6),d1    ; load row index
-    lsl.w   #4,d1       ; row * 2^4
+    move.w  12(a6),d1    
+    lsl.w   #4,d1  
     move.w  d1,d0         
-    lsl.w   #2,d1       ; row * 2^6
-    add.w   d0,d1       ; (row * 2^4) + (row * 2^6) = row * 80
+    lsl.w   #2,d1 
+    add.w   d0,d1
 
     ; start point calcualtion
-    move.w  14(a6),d2   ; store col index
-    lsr.w   #5,d2       ; col >> 5 (get longword offset)
-    lsl.w   #2,d2       ; convert long to byte
+    move.w  14(a6),d2 
+    lsr.w   #5,d2 
+    lsl.w   #2,d2
     
     move.l  8(a6),a0     
-    adda.w  d1,a0       ; add row offset
-    adda.w  d2,a0       ; THE START ADDRESS in a0
+    adda.w  d1,a0
+    adda.w  d2,a0
 
     ; end point calcultions
-    move.w  -10(a6),d2  ; store end index
-    lsr.w   #5,d2       ; end >> 5
-    lsl.w   #2,d2       ; convert to byte offset
+    move.w  -10(a6),d2 
+    lsr.w   #5,d2
+    lsl.w   #2,d2
 
     move.l  8(a6),a1     
-    adda.w  d1,a1       ; Re-use row offset in d1
-    adda.w  d2,a1       ; THE END ADDRESS in a1
+    adda.w  d1,a1
+    adda.w  d2,a1
 
     ; main plotting logic
-    ; get the masks in d0 and d1
     move.l  -4(a6),d0   ; the leftmask
     move.l  -8(a6),d1   ; rightmask
 
-    cmp.l   a0,a1   ; if start_point == end_point
-    bne     multiplot_horizontal_line ; !(if start_point == end_point)
+    cmp.l   a0,a1
+    bne     multiplot_horizontal_line
     
-    and.l   d1,d0   ; leftmask & rightmaks 
-    or.l    d0,(a0) ; current |= (leftmask & rigthmask)
+    and.l   d1,d0   ; leftmask & rightmask 
+    or.l    d0,(a0) 
     bra plot_horizontal_line_end
 
 multiplot_horizontal_line:
-    move.l  a0,a2   ; current = start_point
+    move.l  a0,a2
     
-    or.l    d0,(a2)+ ; start_point |= leftmask
+    or.l    d0,(a2)+
 
 fill_h_line_loop:
     cmp.l   a2,a1
@@ -372,78 +317,73 @@ fill_h_line_loop:
     bra     fill_h_line_loop
 
 fill_h_line_loop_done:
-    or.l    d1,(a1) ; end_point |= rightmask
+    or.l    d1,(a1)
 
 plot_horizontal_line_end:
     movem.l (sp)+,d0-d3/a0-a2 
     unlk    a6
     rts
-
 ;-------------------------------------------------------------------------------------------------
 ;---------------------ROUTINE FOR PLOTTING A VERTICAL LINE--------------------------------------
-;void plot_vertical_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
-; PURPOSE: PLOT A SINGLE VERTICAL LINE AT THE GIVEN COORDINATES AND OF A GIVEN LENGTH
-; INPUT: COORDINATES X (COL) AND Y (ROW), LENGTH OF THE LINE TO BE PLOTTED
-; OUTPUT: NONE
 _plot_vertical_line:
-    link    a6,#-6          ; two local variables, a longword and a word
+    link    a6,#-6 
     movem.l d0-d4/a0-a2,-(sp) 
 
-    move.w  16(a6),d3       ; get the length
-    ble     plot_vertical_line_end ; if length is 0, skip
+    move.w  16(a6),d3 
+    ble     plot_vertical_line_end 
     
     ; end Calculations
-    move.w  12(a6),d1        ; get the row offset 
+    move.w  12(a6),d1      
     
-    move.w  d3,d4           ; copy length for the loop counter later
-    subq.w  #1,d3           ; length - 1
-    add.w   d1,d3           ; row + length - 1
-    move.w  d3,-6(a6)       ; THE END OFFSET
+    move.w  d3,d4 
+    subq.w  #1,d3   
+    add.w   d1,d3  
+    move.w  d3,-6(a6)
 
     ; col offset calculation for reuse
-    move.w  14(a6),d2       ; get the col index
+    move.w  14(a6),d2
     
     ; determine the BIT MASK for the vertical line
     move.l  #VER_LONG_MASK,d0
     move.l  d2,d3
-    andi.l  #31,d3          ; col & 31
+    andi.l  #31,d3
     lsr.l   d3,d0
-    move.l  d0,-4(a6)       ; the specific mask
+    move.l  d0,-4(a6)
 
     ; calculate the column byte offset
-    lsr.w   #5,d2           ; col >> 5 (get longword index)
-    lsl.w   #2,d2           ; convert long to byte offset
+    lsr.w   #5,d2
+    lsl.w   #2,d2
     
     ; start point calculation
-    lsl.w   #4,d1           ; row * 2^4
+    lsl.w   #4,d1
     move.w  d1,d0           
-    lsl.w   #2,d1           ; row * 2^2 * 2^4
-    add.w   d0,d1           ; (row * 2^4) + (row * 2^6) = row * 80
+    lsl.w   #2,d1
+    add.w   d0,d1
     
-    move.l  8(a6),a0        ; load actual screen address
-    adda.w  d1,a0           ; add row offset
-    adda.w  d2,a0           ; THE START ADDRESS in a0
+    move.l  8(a6),a0
+    adda.w  d1,a0
+    adda.w  d2,a0
 
     ; end point calculations
-    move.w  -6(a6),d1       ; get END OFFSET
-    lsl.w   #4,d1           ; End Y * 2^4
+    move.w  -6(a6),d1
+    lsl.w   #4,d1    
     move.w  d1,d0           
-    lsl.w   #2,d1           ; End Y * 2^2 * 2^4
-    add.w   d0,d1           ; End Y * 80
+    lsl.w   #2,d1  
+    add.w   d0,d1  
     
     move.l  8(a6),a1         
-    adda.w  d1,a1           ; add row offset
-    adda.w  d2,a1           ; THE END ADDRESS in a1
+    adda.w  d1,a1  
+    adda.w  d2,a1 
 
     ; main plotting logic
-    move.l  -4(a6),d0       ; get the BIT MASK
-    move.l  a0,a2           ; current = start_point
+    move.l  -4(a6),d0
+    move.l  a0,a2    
 
 vertical_line_loop:
-    or.l    d0,(a2)         ; plot the bit
+    or.l    d0,(a2)  
     cmp.l   a2,a1           
     beq.s   plot_vertical_line_end
-    adda.w  #80,a2          ; skip a row
+    adda.w  #80,a2   
     bra      vertical_line_loop
 
 plot_vertical_line_end:
@@ -452,106 +392,98 @@ plot_vertical_line_end:
     rts
 ;-------------------------------------------------------------------------------------------------
 ;------------------------------ROUTINE TO PLOT A LINE BETWEEN ANY TWO GIVEN POINT-----------------
-; void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col);
-; dx -12, dy -10, sx -8, sy -6, err -4, err2  -2
 _plot_line:
-    link    a6,#-12     ; 6 ints is 12 bytes, so 12 bytes for local variables
-    movem.l d3-d7/a1,-(sp) ; d3 start row, d4 start col, d5 end row, d6 end col, d7 for locals
+    link    a6,#-12 
+    movem.l d3-d7/a1,-(sp) 
 
 set_regs:
-    move.l  8(a6),a1    ; load base address into a1
-    move.w  12(a6),d3   ; start row
-    move.w  14(a6),d4   ; start col
-    move.w  16(a6),d5   ; end row
-    move.w  18(a6),d6   ; end col 
+    move.l  8(a6),a1  
+    move.w  12(a6),d3 
+    move.w  14(a6),d4 
+    move.w  16(a6),d5 
+    move.w  18(a6),d6 
 
 calculate_difference:
-;    dx = (int)(end_col > start_col ? end_col - start_col : start_col - end_col);
-;    dy = -(int)(end_row > start_row ? end_row - start_row : start_row - end_row);
-    cmp.w   d4,d6       ; if (end_col > start_col)
+    cmp.w   d4,d6 
     bhi     dx_true
-    move.w  d4,d7       ; false statement
-    sub.w   d6,d7       ; start_col - end_col
-    move.w  d7,-12(a6)  ; store dx
+    move.w  d4,d7 
+    sub.w   d6,d7 
+    move.w  d7,-12(a6)
     bra     dy_calc
 dx_true:
-    move.w  d6,d7       ; true statement
-    sub.w   d4,d7       ; end_col - start_col
-    move.w  d7,-12(a6)  ; store dx
+    move.w  d6,d7     
+    sub.w   d4,d7     
+    move.w  d7,-12(a6)
 dy_calc:
     cmp.w   d3,d5
     bhi     dy_true
-    move.w  d3,d7       ; false statement
-    sub.w   d5,d7       ; start_row - end_row
-    neg.w   d7          ; negate for the negative value
-    move.w  d7,-10(a6)  ; store dy
+    move.w  d3,d7 
+    sub.w   d5,d7 
+    neg.w   d7
+    move.w  d7,-10(a6) 
     bra     step_direction
 dy_true:
-    move.w  d5,d7       ; true statement
-    sub.w   d3,d7       ; end_row - start_row
-    neg.w   d7          ; negate for the negative value
-    move.w  d7,-10(a6)  ; store dy
+    move.w  d5,d7 
+    sub.w   d3,d7 
+    neg.w   d7    
+    move.w  d7,-10(a6)
 
 step_direction:
-;    sx = start_col < end_col ? 1 : -1;
-;    sy = start_row < end_row ? 1 : -1;
-    moveq   #1,d7       ; default step direction is 1 for sx
-    move.w  d7,-8(a6)  ; store default sx value
-    cmp.w   d4,d6       ; if endcol > start col, step is 1
+    moveq   #1,d7
+    move.w  d7,-8(a6)
+    cmp.w   d4,d6
     bhi     sx_done
-    moveq   #-1,d7      ; else -1
-    move.w  d7,-8(a6)  ; store sx value
+    moveq   #-1,d7
+    move.w  d7,-8(a6)
 sx_done:
-    moveq   #1,d7  ; default step direction is 1 for sy
-    move.w  d7,-6(a6)   ; store default sy value
-    cmp.w   d3,d5        ; if endrow > start row, step is 1
+    moveq   #1,d7
+    move.w  d7,-6(a6)
+    cmp.w   d3,d5
     bhi     err_val
-    moveq   #-1,d7      ; else -1
-    move.w  d7,-6(a6)   ; store sy value
+    moveq   #-1,d7
+    move.w  d7,-6(a6)
 
 err_val:
-;    err = dx + dy;  /* error value e_xy */
     move.w    -12(a6),d7
     add.w     -10(a6),d7
     move.w    d7,-4(a6)
 
 plotting_loop:
-;   plot_pixel(base, start_row, start_col);
-    move.w  d4,-(sp)    ; push start_col, 2 bytes
-    move.w  d3,-(sp)    ; push start_row, 2 bytes
-    move.l  a1,-(sp)    ; push base address, 4 bytes
+    move.w  d4,-(sp)
+    move.w  d3,-(sp)
+    move.l  a1,-(sp)
     jsr     _plot_pixel
-    adda.l  #8,sp       ; clean up the stack by 8 bytes
+    adda.l  #8,sp
 
 ;   if (start_col == end_col && start_row == end_row)
     cmp.w   d4,d6
     bne     not_equal
     cmp.w   d3,d5
-    beq     plot_line_done  ; loop condition update, if start_col == end_col && start_row == end_row 
+    beq     plot_line_done 
 
 not_equal:
-;   err2 = 2 * err;
+
     move.w  -4(a6),d7
     add.w   d7,d7
     move.w  d7,-2(a6)
 first_if:
 ;   if (err2 >= dy) { err += dy; start_col += sx; }
     move.w  -2(a6),d7
-    move.w  -10(a6),d0      ; 
-    cmp.w   d7,d0           ; if (dy > err2)
+    move.w  -10(a6),d0  
+    cmp.w   d7,d0      
     bgt     second_if
-    add.w   d0,-4(a6)       ; err += dy
-    move.w  -8(a6),d7       ; move sx into d7
-    add.w   d7,d4           ; start_col += sx
+    add.w   d0,-4(a6)  
+    move.w  -8(a6),d7  
+    add.w   d7,d4 
 second_if:
 ;   if (err2 <= dx) { err += dx; start_row += sy; }
     move.w  -2(a6),d7
-    move.w  -12(a6),d0      ; Use d0 instead of d6, you overwrote end_col
-    cmp.w   d7,d0           ; if (dx < err2)
+    move.w  -12(a6),d0 
+    cmp.w   d7,d0 
     blt     plotting_loop
-    add.w   d0,-4(a6)       ; err += dx
-    move.w  -6(a6),d7       ; move sy into d7
-    add.w   d7,d3           ; start_row += sy
+    add.w   d0,-4(a6) 
+    move.w  -6(a6),d7
+    add.w   d7,d3 
     bra     plotting_loop
 
 plot_line_done:
@@ -560,61 +492,53 @@ plot_line_done:
     rts
 ;-------------------------------------------------------------------------------------------------
 ;--------------------ROUTINE TO PLOT A RECTANGLE--------------------------------------------------
-; void plot_rectangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
 _plot_rectangle:
     link    a6,#0
     movem.l d0-d1,-(sp)
 
-    move.w  18(a6),d1   ; get the width
+    move.w  18(a6),d1  
     tst.w   d1          ; check if width == 0
     ble     plot_rectangle_done
-    move.w  16(a6),d0   ; get the length
+    move.w  16(a6),d0  
     tst.w   d0          ; check if length == 0
     ble     plot_rectangle_done
 
-; reuseable calculations
-; row + length - 1 in d0
+    add.w   12(a6),d0  
+    subq    #1,d0 
+
     
-    add.w   12(a6),d0   ; row + length
-    subq    #1,d0       ; row + length -1
-; col + width - 1 in d1
-    
-    add.w   14(a6),d1   ;   col + width 
-    subq    #1,d1       ; col + width - 1
+    add.w   14(a6),d1
+    subq    #1,d1
 
 ;   /* top line */
-;   plot_horizontal_line(base, row, col, width);
-    move.w  18(a6),-(sp)    ; push width
-    move.w  14(a6),-(sp)    ; push col
-    move.w  12(a6),-(sp)    ; push row
-    move.l  8(a6),-(sp)     ; push base address
+    move.w  18(a6),-(sp)
+    move.w  14(a6),-(sp)
+    move.w  12(a6),-(sp)
+    move.l  8(a6),-(sp)
     jsr     _plot_horizontal_line
-    adda.l  #10,sp          ; clean up: 4 + 2+2+2 = 10 
+    adda.l  #10,sp
 
 ;   /* bottom line */
-;   plot_horizontal_line(base, (row + length - 1), col, width);
-    move.w  18(a6),-(sp)    ; push width
-    move.w  14(a6),-(sp)    ; push col
-    move.w  d0,-(sp)        ; push row + length - 1
-    move.l  8(a6),-(sp)     ; push base address
+    move.w  18(a6),-(sp)
+    move.w  14(a6),-(sp)
+    move.w  d0,-(sp)
+    move.l  8(a6),-(sp)
     jsr     _plot_horizontal_line
     adda.l  #10,sp          
 
 ;   /* left line */
-;   plot_vertical_line(base, row, col, length);
-    move.w  16(a6),-(sp)    ; push length
-    move.w  14(a6),-(sp)    ; push col
-    move.w  12(a6),-(sp)    ; push row
-    move.l  8(a6),-(sp)     ; push base address
+    move.w  16(a6),-(sp) 
+    move.w  14(a6),-(sp)
+    move.w  12(a6),-(sp)
+    move.l  8(a6),-(sp) 
     jsr     _plot_vertical_line
     adda.l  #10,sp          
 
 ;   /* right line */
-;   plot_vertical_line(base, row, (col + width - 1), length);
-    move.w  16(a6),-(sp)    ; push length 
-    move.w  d1,-(sp)        ; push col + width - 1 
-    move.w  12(a6),-(sp)    ; push row
-    move.l  8(a6),-(sp)     ; push base address
+    move.w  16(a6),-(sp)
+    move.w  d1,-(sp) 
+    move.w  12(a6),-(sp)
+    move.l  8(a6),-(sp)
     jsr     _plot_vertical_line
     adda.l  #10,sp          
 
@@ -624,22 +548,19 @@ plot_rectangle_done:
     rts
 ;-------------------------------------------------------------------------------------------------
 ;--------------------ROUTINE TO PLOT A SQUARE-----------------------------------------------------
-; void plot_square(UINT32 *base, UINT16 row, UINT16 col, UINT16 side);
 _plot_square:
     link    a6,#0
 
-    move.w  16(a6),d0       ; side
+    move.w  16(a6),d0 
     ble     plot_square_done
 
-    move.w  d0,-(sp)        ; push side for width 
-    move.w  d0,-(sp)        ; push side for length 
-    move.w  14(a6),-(sp)    ; push col
-    move.w  12(a6),-(sp)    ; push row
-    move.l  8(a6),-(sp)     ; push base address
+    move.w  d0,-(sp)
+    move.w  d0,-(sp)
+    move.w  14(a6),-(sp)
+    move.w  12(a6),-(sp)
+    move.l  8(a6),-(sp) 
     
     jsr     _plot_rectangle 
-    
-    ; 4 + 2+2+2+2 = 12
     adda.l  #12,sp          
     
 plot_square_done:
@@ -647,17 +568,15 @@ plot_square_done:
     rts
 ;-------------------------------------------------------------------------------------------------
 ;-------------------------ROUTINE TO PLOT A TRIANGLE----------------------------------------------
-;void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 trianglebase, UINT16 height, UINT8 direction){
-; base at 8(a6), row at 12(a6), col at 14(a6), trianglebase at 16(a6), height at 18(a6), direction at 20(a6)
 _plot_triangle:
     link    a6,#0
     movem.l d0-d4/a0,-(sp)
 
-;    if (trianglebase == 0 || height == 0) return; /* unless valid inputs given, dont attempt to plot */
-    move.w  18(a6),d0   ; get height
-    ble     plot_triangle_end  ; if height is 0, skip
-    move.w  16(a6),d1   ; get triangle base
-    ble     plot_triangle_end ; if triangle base is 0, skip
+;    if (trianglebase == 0 || height == 0) return;
+    move.w  18(a6),d0
+    ble     plot_triangle_end
+    move.w  16(a6),d1 
+    ble     plot_triangle_end 
 
     move.w  20(a6),d2   ; get direction
     cmpi.w  #0,d2
@@ -670,81 +589,73 @@ _plot_triangle:
     beq     plot_bottom_right_triangle
     bra     plot_triangle_end
 
-;    if (direction == 0) { /* top-left coordinate, the height goes downwards and base goes right */
 plot_top_left_triangle:
-;        plot_horizontal_line(base, row, col, trianglebase);
-    move.w  16(a6),-(sp)    ; trianglebase
-    move.w  14(a6),-(sp)    ; col
-    move.w  12(a6),-(sp)    ; row
-    move.l  8(a6),-(sp)     ; base
+
+    move.w  16(a6),-(sp) 
+    move.w  14(a6),-(sp)
+    move.w  12(a6),-(sp)
+    move.l  8(a6),-(sp) 
     jsr     _plot_horizontal_line
     adda.l  #10,sp
 
-;        plot_vertical_line(base, row, col, height);
-    move.w  18(a6),-(sp)    ; height
-    move.w  14(a6),-(sp)    ; col
-    move.w  12(a6),-(sp)    ; row
-    move.l  8(a6),-(sp)     ; base
+    move.w  18(a6),-(sp) 
+    move.w  14(a6),-(sp)
+    move.w  12(a6),-(sp)
+    move.l  8(a6),-(sp) 
     jsr     _plot_vertical_line
     adda.l  #10,sp
 
-;        plot_line(base, (row + (height - 1)), col, row, (col + (trianglebase - 1)));
-    move.w  14(a6),d1       ; col
-    move.w  16(a6),d0       ; trianglebase
+    move.w  14(a6),d1 
+    move.w  16(a6),d0 
     add.w   d1,d0
-    subq.w  #1,d0           ; col + trianglebase - 1
-    move.w  d0,-(sp)        ; end_col
-    move.w  12(a6),-(sp)    ; end_row (row)
-    move.w  14(a6),-(sp)    ; start_col (col)
-    move.w  12(a6),d0       ; row
-    add.w   18(a6),d0       ; row + height
-    subq.w  #1,d0           ; row + height - 1
-    move.w  d0,-(sp)        ; start_row
-    move.l  8(a6),-(sp)     ; base
+    subq.w  #1,d0     
+    move.w  d0,-(sp)  
+    move.w  12(a6),-(sp)
+    move.w  14(a6),-(sp)
+    move.w  12(a6),d0   
+    add.w   18(a6),d0   
+    subq.w  #1,d0       
+    move.w  d0,-(sp)    
+    move.l  8(a6),-(sp) 
     jsr     _plot_line
     adda.l  #12,sp
     bra     plot_triangle_end
 
-;    } else if (direction == 1) { /* top-right coordinate, height goes down, base goes left */
 plot_top_right_triangle:
-;        plot_horizontal_line(base, row, (col - (trianglebase - 1)), trianglebase);
-    move.w  16(a6),-(sp)    ; trianglebase
-    move.w  14(a6),d0       ; col
-    sub.w   16(a6),d0       ; col - trianglebase
-    addq.w  #1,d0           ; col - (trianglebase - 1)
-    move.w  d0,-(sp)        ; start_col
-    move.w  12(a6),-(sp)    ; row
-    move.l  8(a6),-(sp)     ; base
+    move.w  16(a6),-(sp) 
+    move.w  14(a6),d0    
+    sub.w   16(a6),d0    
+    addq.w  #1,d0        
+    move.w  d0,-(sp)     
+    move.w  12(a6),-(sp) 
+    move.l  8(a6),-(sp) 
+    
     jsr     _plot_horizontal_line
     adda.l  #10,sp
 
-;        plot_vertical_line(base, row, col, height);
-    move.w  18(a6),-(sp)    ; height
-    move.w  14(a6),-(sp)    ; col
-    move.w  12(a6),-(sp)    ; row
-    move.l  8(a6),-(sp)     ; base
+    move.w  18(a6),-(sp)
+    move.w  14(a6),-(sp)
+    move.w  12(a6),-(sp)
+    move.l  8(a6),-(sp) 
     jsr     _plot_vertical_line
     adda.l  #10,sp
 
-;        plot_line(base, (row + (height - 1)), col, row, (col - (trianglebase - 1)));
-    move.w  14(a6),d0       ; col
-    sub.w   16(a6),d0       ; col - trianglebase
-    addq.w  #1,d0           ; col - (trianglebase - 1)
-    move.w  d0,-(sp)        ; end_col
-    move.w  12(a6),-(sp)    ; end_row
-    move.w  14(a6),-(sp)    ; start_col
-    move.w  12(a6),d0       ; row
-    add.w   18(a6),d0       ; row + height
-    subq.w  #1,d0           ; row + height - 1
-    move.w  d0,-(sp)        ; start_row
-    move.l  8(a6),-(sp)     ; base
+    move.w  14(a6),d0  
+    sub.w   16(a6),d0  
+    addq.w  #1,d0      
+    move.w  d0,-(sp)   
+    move.w  12(a6),-(sp)
+    move.w  14(a6),-(sp)
+    move.w  12(a6),d0   
+    add.w   18(a6),d0   
+    subq.w  #1,d0       
+    move.w  d0,-(sp)    
+    move.l  8(a6),-(sp) 
     jsr     _plot_line
     adda.l  #12,sp
     bra     plot_triangle_end
 
-;    } else if (direction == 2) { /* bottom-left coordinate, height goes up, base goes right */
 plot_bottom_left_triangle:
-;        plot_horizontal_line(base, row, col, trianglebase);
     move.w  16(a6),-(sp)
     move.w  14(a6),-(sp)
     move.w  12(a6),-(sp)
@@ -752,36 +663,32 @@ plot_bottom_left_triangle:
     jsr     _plot_horizontal_line
     adda.l  #10,sp
 
-;        plot_vertical_line(base, (row - (height - 1)), col, height);
-    move.w  18(a6),-(sp)    ; height
-    move.w  14(a6),-(sp)    ; col
-    move.w  12(a6),d0       ; row
-    sub.w   18(a6),d0       ; row - height
-    addq.w  #1,d0           ; row - (height - 1)
-    move.w  d0,-(sp)        ; start_row
-    move.l  8(a6),-(sp)     ; base
+    move.w  18(a6),-(sp)
+    move.w  14(a6),-(sp)
+    move.w  12(a6),d0   
+    sub.w   18(a6),d0   
+    addq.w  #1,d0       
+    move.w  d0,-(sp)    
+    move.l  8(a6),-(sp) 
     jsr     _plot_vertical_line
     adda.l  #10,sp
 
-;        plot_line(base, (row - (height - 1)), col, row, (col + (trianglebase - 1)));
-    move.w  14(a6),d0       ; col
-    add.w   16(a6),d0       ; col + trianglebase
-    subq.w  #1,d0           ; col + (trianglebase - 1)
-    move.w  d0,-(sp)        ; end_col
-    move.w  12(a6),-(sp)    ; end_row
-    move.w  14(a6),-(sp)    ; start_col
-    move.w  12(a6),d0       ; row
-    sub.w   18(a6),d0       ; row - height
-    addq.w  #1,d0           ; row - (height - 1)
-    move.w  d0,-(sp)        ; start_row
-    move.l  8(a6),-(sp)     ; base
+    move.w  14(a6),d0 
+    add.w   16(a6),d0 
+    subq.w  #1,d0     
+    move.w  d0,-(sp)  
+    move.w  12(a6),-(sp)
+    move.w  14(a6),-(sp)
+    move.w  12(a6),d0   
+    sub.w   18(a6),d0   
+    addq.w  #1,d0       
+    move.w  d0,-(sp)    
+    move.l  8(a6),-(sp) 
     jsr     _plot_line
     adda.l  #12,sp
     bra     plot_triangle_end
 
-;    } else if (direction == 3) { /* bottom-right coordinate, height goes up, base goes left */
 plot_bottom_right_triangle:
-;        plot_horizontal_line(base, row, (col - (trianglebase - 1)), trianglebase);
     move.w  16(a6),-(sp)
     move.w  14(a6),d0
     sub.w   16(a6),d0
@@ -792,7 +699,6 @@ plot_bottom_right_triangle:
     jsr     _plot_horizontal_line
     adda.l  #10,sp
 
-;        plot_vertical_line(base, (row - (height - 1)), col, height);
     move.w  18(a6),-(sp)
     move.w  14(a6),-(sp)
     move.w  12(a6),d0
@@ -803,17 +709,16 @@ plot_bottom_right_triangle:
     jsr     _plot_vertical_line
     adda.l  #10,sp
 
-;        plot_line(base, (row - (height - 1)), col, row, (col - (trianglebase - 1)));
     move.w  14(a6),d0
     sub.w   16(a6),d0
     addq.w  #1,d0
-    move.w  d0,-(sp)        ; end_col
-    move.w  12(a6),-(sp)    ; end_row
-    move.w  14(a6),-(sp)    ; start_col
+    move.w  d0,-(sp)      
+    move.w  12(a6),-(sp)  
+    move.w  14(a6),-(sp)  
     move.w  12(a6),d0
     sub.w   18(a6),d0
     addq.w  #1,d0
-    move.w  d0,-(sp)        ; start_row
+    move.w  d0,-(sp)   
     move.l  8(a6),-(sp)
     jsr     _plot_line
     adda.l  #12,sp
@@ -823,67 +728,63 @@ plot_triangle_end:
     unlk    a6
     rts
 ;-------------------------------------------------------------------------------------------------
-;-------------------------ROUTINE TO PLOT A BITMAP_8----------------------------------------------
-; void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height, const UINT8 *bitmap)
-; base at 8(a6), row 12(a6), col 14(a6), height 16(a6), bitmap 18(a6)
+;-------------------------ROUTINE TO PLOT A BITMAP 8 BITS WIDE------------------------------------
 _plot_8_bitmap:
-    link    a6,#-4              ; -2(a6) is shift, -4(a6) is height
+    link    a6,#-4 
     movem.l d0-d7/a0-a1,-(sp)
     
     ; if (height == 0) return;
-    move.w  16(a6),d2           ; get the height
+    move.w  16(a6),d2  
     ble     plot_8_bitmap_done
     
     ; if (row + height > 400) height = 400 - row; 
-    move.w  12(a6),d1           ; get the row
+    move.w  12(a6),d1   
     move.w  d1,d0
-    add.w   d2,d0               ; row + height
+    add.w   d2,d0
     cmpi.w  #400,d0
     ble     bitmap_8_size_done
     move.w  #400,d2
-    sub.w   d1,d2               ; height = 400 - row
+    sub.w   d1,d2 
 
 bitmap_8_size_done:
-    move.w  d2,-4(a6)           ; height in -4(a6)
+    move.w  d2,-4(a6)   
 
     ; shift = (col & 7); 
-    move.w  14(a6),d3           ; get the col
-    andi.w  #7,d3               ; col & 7
-    move.w  d3,-2(a6)           ; shift in -2(a6)
+    move.w  14(a6),d3     
+    andi.w  #7,d3         
+    move.w  d3,-2(a6)  
 
     ; start_point = base + (row * 80) + (col >> 3);
-    lsl.w   #4,d1               ; row * 16
+    lsl.w   #4,d1    
     move.w  d1,d0
-    lsl.w   #2,d1               ; row * 64
-    add.w   d0,d1               ; row * 80
+    lsl.w   #2,d1    
+    add.w   d0,d1   
     
-    move.w  14(a6),d0           ; get col
-    lsr.w   #3,d0               ; col >> 3
+    move.w  14(a6),d0  
+    lsr.w   #3,d0 
     add.w   d0,d1               
     
-    move.l  8(a6),a0            ; load base address from stack
-    adda.w  d1,a0               ; start_point = base + (row * 80) + (col >> 3) in a0
+    move.l  8(a6),a0    
+    adda.w  d1,a0       
     
-    move.l  18(a6),a1           ; get bitmap address in a1
+    move.l  18(a6),a1   
     
-    move.w  -4(a6),d2           ; height from -4(a6)
+    move.w  -4(a6),d2  
     subq.w  #1,d2               ; for dbra
     
-    move.w  -2(a6),d6           ; d6 = shift
+    move.w  -2(a6),d6  
     move.w  #8,d7
-    sub.w   d6,d7               ; d7 = 8 - shift
+    sub.w   d6,d7 
 
 plot_bitmap_8_loop:
     moveq   #0,d0
-    move.b  (a1)+,d0            ; get bitmap byte adn i++
-    move.w  d0,d1               ; copy for overflow
+    move.b  (a1)+,d0  
+    move.w  d0,d1     
     
-    lsr.w   d6,d0               ; shift bits right
-    or.b    d0,(a0)             ; plot corss byte bits
+    lsr.w   d6,d0     
+    or.b    d0,(a0)   
     
-    ; if (shift > 0 && ((col >> 3) < (BYTES_PER_ROW - 1))){
-    ;        *(current + 1) |= (bitmap[i] << (8 - shift));
-    ;    }
+    ; if (shift > 0 && ((col >> 3) < (BYTES_PER_ROW - 1)))
     tst.w   d6
     beq     bitmap_8_next_row
     
@@ -892,91 +793,88 @@ plot_bitmap_8_loop:
     cmpi.w  #79,d3
     bge     bitmap_8_next_row
     
-    lsl.w   d7,d1               ; shift remainder left
-    or.b    d1,1(a0)            ; plot into next screen byte
+    lsl.w   d7,d1
+    or.b    d1,1(a0)
 
 bitmap_8_next_row:
-    adda.w  #80,a0              ; move down one row
+    adda.w  #80,a0 
     dbra    d2,plot_bitmap_8_loop
 
 plot_8_bitmap_done:
     movem.l (sp)+,d0-d7/a0-a1
     unlk    a6
     rts
-
 ;-------------------------------------------------------------------------------------------------
-;-------------------------ROUTINE TO PLOT A BITMAP_16----------------------------------------------
-; void plot_bitmap_16(UINT16 *base, UINT16 row, UINT16 col, UINT16 height, const UINT16 *bitmap)
-; base at 8(a6), row 12(a6), col 14(a6), height 16(a6), bitmap 18(a6)
+;-------------------------ROUTINE TO PLOT A BITMAP 16 BITS WIDE-----------------------------------
 _plot_16_bitmap:
-    link    a6,#-4              ; -2(a6) holds shift, -4(a6) holds loop_counter
+    link    a6,#-4            
     movem.l d0-d7/a0-a2,-(sp)
 
     ; if (height == 0) return;
-    move.w  16(a6),d2           ; height
+    move.w  16(a6),d2
     ble     plot_16_bitmap_done
 
     ; if (row + height > 400) height = 400 - row;
-    move.w  12(a6),d1           ; row
+    move.w  12(a6),d1
     move.w  d1,d0
-    add.w   d2,d0               ; row + height
+    add.w   d2,d0 
     cmpi.w  #400,d0
     ble     plot_16_size_done
     move.w  #400,d2
-    sub.w   d1,d2               ; height = 400 - row
+    sub.w   d1,d2   
 
 plot_16_size_done:
-    move.w  d2,d7               ; Keep height in d7 for the loop
-    subq.w  #1,d7               ; for dbra
+    move.w  d2,d7    
+    subq.w  #1,d7    
     
     ; shift = (col & 15);
-    move.w  14(a6),d3           ; col
+    move.w  14(a6),d3    
     andi.w  #15,d3
-    move.w  d3,-2(a6)           ; store shift
+    move.w  d3,-2(a6) 
 
     ; start_point = base + (row * 40) + (col >> 4);
-    move.w  d1,d0               ; row
-    lsl.w   #6,d1               ; row * 64
-    lsl.w   #4,d0               ; row * 16
-    add.w   d0,d1               ; row * 80
+    move.w  d1,d0 
+    lsl.w   #6,d1 
+    lsl.w   #4,d0 
+    add.w   d0,d1 
 
-    move.w  14(a6),d0           ; col
-    lsr.w   #4,d0               ; col >> 4 (word index)
-    lsl.w   #1,d0               ; word index * 2 (byte offset)
-    add.w   d0,d1               ; total byte offset
+    move.w  14(a6),d0 
+    lsr.w   #4,d0 
+    lsl.w   #1,d0 
+    add.w   d0,d1 
 
-    move.l  8(a6),a0            ; base
-    adda.w  d1,a0               ; a0 = start_point
+    move.l  8(a6),a0 
+    adda.w  d1,a0    
 
-    move.l  18(a6),a1           ; a1 = bitmap pointer
+    move.l  18(a6),a1 
     
-    move.w  -2(a6),d6           ; d6 = shift
+    move.w  -2(a6),d6 
     move.w  #16,d5
-    sub.w   d6,d5               ; d5 = 16 - shift
+    sub.w   d6,d5  
 
 plot_16_loop:
     ; *current |= (bitmap[i] >> shift);
-    move.w  (a1)+,d0            ; d0 = bitmap[i], i++
+    move.w  (a1)+,d0   
     move.w  d0,d1               
     
-    lsr.w   d6,d0               ; bitmap[i] >> shift
-    or.w    d0,(a0)             ; *current |= (bitmap[i] >> shift)
+    lsr.w   d6,d0
+    or.w    d0,(a0)
 
     ; if (shift > 0 && ((col >> 4) < (WORDS_PER_ROW - 1)))
     tst.w   d6
     beq     plot_16_next_row
     
     move.w  14(a6),d3
-    lsr.w   #4,d3               ; col >> 4
-    cmpi.w  #39,d3              ; WORDS_PER_ROW - 1
+    lsr.w   #4,d3
+    cmpi.w  #39,d3
     bge     plot_16_next_row
 
     ; *(current + 1) |= (bitmap[i] << (16 - shift));
-    lsl.w   d5,d1               ; bitmap[i] << (16 - shift)
-    or.w    d1,2(a0)            ; *(current + 1) |= (bitmap[i] << (16 - shift))
+    lsl.w   d5,d1 
+    or.w    d1,2(a0) 
 
 plot_16_next_row:
-    adda.w  #80,a0              ; current += 80 (WORDS_PER_ROW * 2)
+    adda.w  #80,a0 
     dbra    d7,plot_16_loop
 
 plot_16_bitmap_done:
@@ -984,148 +882,142 @@ plot_16_bitmap_done:
     unlk    a6
     rts
 ;-------------------------------------------------------------------------------------------------
-;-------------------------ROUTINE TO PLOT A BITMAP_32----------------------------------------------
-; void plot_bitmap_32(UINT32 *base, UINT16 row, UINT16 col, UINT16 height, const UINT32 *bitmap)
-; base at 8(a6), row 12(a6), col 14(a6), height 16(a6), bitmap 18(a6)
+;-------------------------ROUTINE TO PLOT A BITMAP 32 BITS WIDE-----------------------------------
 _plot_32_bitmap:
-    link    a6,#-4              ; -2(a6) holds shift, -4(a6) holds loop_counter
+    link    a6,#-4    
     movem.l d0-d7/a0-a2,-(sp)
 
     ; if (height == 0) return;
-    move.w  16(a6),d2           ; height
+    move.w  16(a6),d2 
     ble     plot_32_bitmap_done
 
     ; if (row + height > 400) height = 400 - row;
-    move.w  12(a6),d1           ; row
+    move.w  12(a6),d1  
     move.w  d1,d0
-    add.w   d2,d0               ; row + height
+    add.w   d2,d0      
     cmpi.w  #400,d0
     ble     plot_32_size_done
     move.w  #400,d2
-    sub.w   d1,d2               ; height = 400 - row
+    sub.w   d1,d2 
 
 plot_32_size_done:
-    move.w  d2,d7               ; Keep height in d7 for the loop
-    subq.w  #1,d7               ; for dbra
+    move.w  d2,d7 
+    subq.w  #1,d7 
     
     ; shift = (col & 31);
-    move.w  14(a6),d3           ; col
+    move.w  14(a6),d3 
     andi.w  #31,d3
-    move.w  d3,-2(a6)           ; store shift
+    move.w  d3,-2(a6) 
 
     ; start_point = base + (row * 20LONGS) + (col >> 5);
-    move.w  d1,d0               ; row
-    lsl.w   #6,d1               ; row * 64
-    lsl.w   #4,d0               ; row * 16
-    add.w   d0,d1               ; row * 80
+    move.w  d1,d0
+    lsl.w   #6,d1  
+    lsl.w   #4,d0  
+    add.w   d0,d1
 
-    move.w  14(a6),d0           ; col
-    lsr.w   #5,d0               ; col >> 5 (word index)
-    lsl.w   #2,d0               ; long index * 4 (byte offset)
-    add.w   d0,d1               ; total byte offset
+    move.w  14(a6),d0 
+    lsr.w   #5,d0 
+    lsl.w   #2,d0 
+    add.w   d0,d1 
 
-    move.l  8(a6),a0            ; base
-    adda.w  d1,a0               ; a0 = start_point
+    move.l  8(a6),a0 
+    adda.w  d1,a0    
 
-    move.l  18(a6),a1           ; a1 = bitmap pointer
+    move.l  18(a6),a1
     
-    move.w  -2(a6),d6           ; d6 = shift
+    move.w  -2(a6),d6
     move.w  #32,d5
-    sub.w   d6,d5               ; d5 = 32 - shift
+    sub.w   d6,d5 
 
 plot_32_loop:
     ; *current |= (bitmap[i] >> shift);
-    move.l  (a1)+,d0            ; d0 = bitmap[i], i++
+    move.l  (a1)+,d0
     move.l  d0,d1               
     
-    lsr.l   d6,d0               ; bitmap[i] >> shift
-    or.l    d0,(a0)             ; *current |= (bitmap[i] >> shift)
+    lsr.l   d6,d0
+    or.l    d0,(a0) 
 
     ; if (shift > 0 && ((col >> 4) < (WORDS_PER_ROW - 1)))
     tst.w   d6
     beq     plot_32_next_row
     
     move.w  14(a6),d3
-    lsr.w   #5,d3               ; col >> 5
-    cmpi.w  #19,d3              ; LONGS_PER_ROW - 1
+    lsr.w   #5,d3
+    cmpi.w  #19,d3
     bge     plot_32_next_row
 
     ; *(current + 1) |= (bitmap[i] << (32 - shift));
-    lsl.l   d5,d1               ; bitmap[i] << (32 - shift)
-    or.l    d1,4(a0)            ; *(current + 1) |= (bitmap[i] << (32 - shift))
+    lsl.l   d5,d1     
+    or.l    d1,4(a0) 
 
 plot_32_next_row:
-    adda.w  #80,a0              ; current += 80 (LONGS_PER_ROW * 4)
+    adda.w  #80,a0   
     dbra    d7,plot_32_loop
 
 plot_32_bitmap_done:
     movem.l (sp)+,d0-d7/a0-a2
     unlk    a6
     rts
-
-
 ;-------------------------------------------------------------------------------------------------
 ;------------------------------ROUTINE TO PLOT A CHARACTER----------------------------------------
-; void plot_character(UINT8 *base, UINT16 row, UINT16 col, char ch)
-  ; base at 8(a6), row at 12(a6), col at 14(a6), ch at 16(a6)
 _plot_character:
     link    a6,#0
     movem.l d0-d7/a0-a1,-(sp)
 
     ; IS_PRINTABLE(i) = (i >= ' ' && i <= '~')
-    move.w  16(a6),d0           ; Load char (i)
-    andi.w  #$FF,d0             ; isolate the lower byte
-    cmpi.b  #' ',d0             ; check less than space 
+    move.w  16(a6),d0 
+    andi.w  #$FF,d0   
+    cmpi.b  #' ',d0   
     blt     plot_char_done  
-    cmpi.b  #'~',d0             ; check greater than '~'
+    cmpi.b  #'~',d0 
     bgt     plot_char_done
 
     ; GLYPH_START(i) (font + (((i) - ' ') << 3))
-    sub.w   #' ',d0             ; ch - 32
-    lsl.w   #3,d0               ; << 3
-    xref    _font               ; get the font table reference
-    lea     _font,a1            ; load the address of the font table
-    adda.w  d0,a1               ; font + ((ch - ' ') << 3) is in a1
+    sub.w   #' ',d0 
+    lsl.w   #3,d0 
+    xref    _font 
+    lea     _font,a1
+    adda.w  d0,a1
 
     ; start_point = base + (row * 80) + (col >> 3)
-    move.w  12(a6),d1           ; row
+    move.w  12(a6),d1 
     move.w  d1,d2
-    lsl.w   #6,d1               ; row * 64
-    lsl.w   #4,d2               ; row * 16
-    add.w   d2,d1               ; d1 = row * 80
+    lsl.w   #6,d1  
+    lsl.w   #4,d2  
+    add.w   d2,d1  
 
-    move.w  14(a6),d0           ; col
-    move.w  d0,d3               ; for shift calculations
-    lsr.w   #3,d0               ; col >> 3
-    add.w   d0,d1               ; d1 = row * 80 + (col >> 3)
+    move.w  14(a6),d0
+    move.w  d0,d3  
+    lsr.w   #3,d0  
+    add.w   d0,d1  
 
-    move.l  8(a6),a0            ; base
-    adda.w  d1,a0               ; base + row * 80 + (col >> 3)
+    move.l  8(a6),a0
+    adda.w  d1,a0   
 
     ; shifts
-    andi.w  #7,d3               ; col & 7
+    andi.w  #7,d3   
     move.w  #8,d4
-    sub.w   d3,d4               ; 8 - shift
+    sub.w   d3,d4   
 
     moveq   #7,d5               ; for dbra
 
 plot_char_loop:
     moveq   #0,d0
-    move.b  (a1)+,d0            ; character[i], i++
+    move.b  (a1)+,d0 
     
-    move.w  d0,d1               ; copy for cross byte plotting
-    lsr.w   d3,d0               ; character[i] >> shift
-    or.b    d0,(a0)             ; *current |= (character[i] >> shift)
+    move.w  d0,d1  
+    lsr.w   d3,d0  
+    or.b    d0,(a0) 
 
     ; if (shift > 0) 
     tst.w   d3
     beq     plot_char_next_row
 
-    lsl.w   d4,d1               ; character[i] << (8 - shift)
-    or.b    d1,1(a0)            ; *(current + 1) |= (character[i] << (8 - shift))
+    lsl.w   d4,d1   
+    or.b    d1,1(a0) 
 
 plot_char_next_row:
-    adda.w  #80,a0              ; current += BYTES_PER_ROW
+    adda.w  #80,a0   
     dbra    d5,plot_char_loop
 
 plot_char_done:
@@ -1134,31 +1026,30 @@ plot_char_done:
     rts
 ;-------------------------------------------------------------------------------------------------
 ;------------------------------ROUTINE TO PLOT A STRING-------------------------------------------
-; void plot_string(UINT8 *base, UINT16 row, UINT16 col, char *ch)
 _plot_string:
     link    a6,#0
     movem.l d0-d4/a0-a2,-(sp) 
 
-    move.l  8(a6),a0            ; get base
-    move.w  12(a6),d2           ; get row
-    move.w  14(a6),d3           ; get col
-    move.l  16(a6),a2           ; get ch address
+    move.l  8(a6),a0 
+    move.w  12(a6),d2 
+    move.w  14(a6),d3 
+    move.l  16(a6),a2 
 
 plot_string_loop:
     clr.l   d4               
-    move.b  (a2)+,d4            ; i++
-    cmpi.b  #0,d4               ; while (ch[i] != '\0')
+    move.b  (a2)+,d4  
+    cmpi.b  #0,d4     
     beq     plot_string_done    
 
-    ; plot_character(base, row, col, ch)
-    move.w  d4,-(sp)            ; push current char
-    move.w  d3,-(sp)            ; push current column 
-    move.w  d2,-(sp)            ; push row
-    move.l  a0,-(sp)            ; push base address
+    move.w  d4,-(sp) 
+    move.w  d3,-(sp) 
+    move.w  d2,-(sp) 
+    move.l  a0,-(sp) 
+    
     jsr     _plot_character     
-    adda.l  #10,sp              ; 2+2+2+4 = 10 bytes
+    adda.l  #10,sp   
 
-    addq.w  #8,d3               ; col += 8
+    addq.w  #8,d3 
     bra     plot_string_loop    
 
 plot_string_done:
@@ -1166,12 +1057,7 @@ plot_string_done:
     unlk    a6
     rts
 ;-------------------------------------------------------------------------------------------------
-;=========================GLOBAL VARIABLES========================================================
-base: ds.l	1
 ;-------------------------ROUTINE TO EXIT THE PROGRAM--------------------------------------------
-; terminates the program
 exit:   
             clr.w   -(sp)
             trap    #1
-;-------------------------------------------------------------------------------------------------
-
