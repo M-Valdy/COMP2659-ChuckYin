@@ -74,7 +74,7 @@ clear_screen:
 	link	a6,#0	; no local variables
 	movem.l	d0/a0,-(sp)
 
-	move.l	base,a0 ; load address of base
+	move.l	8(a6),a0 ; load address of base
 	
 	move.l	#PIXEL_COUNT,d0 ; load pixel count
 	lsr.l	#5,d0	; get the number of longwords on the screen
@@ -220,8 +220,8 @@ plot_pixel:
     movem.l d0-d2/a0,-(sp)
     
     subq.l  #2,sp ; reserves space for a return value
-    move.w  10(a6),-(sp) ; push col number onto the stack
-    move.w  8(a6),-(sp) ; push row number onto the stack
+    move.w  14(a6),-(sp) ; push col number onto the stack
+    move.w  12(a6),-(sp) ; push row number onto the stack
     
     jsr     px_in_bounds
     addq.l  #4,sp   ; clean up the stack, 2 words
@@ -234,22 +234,22 @@ plot_pixel:
     ; main logic if in bounds 
     ; base + (row*BYTES_PER_ROW) + (col >> 3)
 
-    move.w  8(a6),d1 ; store row index for arithmatic (8(a6) is row)
+    move.w  12(a6),d1 ; store row index for arithmatic (8(a6) is row)
     ; mulu.w  #BYTES_PER_ROW,d1 ; row*BYTES_PER_ROW can be optimsed using bitshifts
-	; BYTES_PER_ROW for this is 80, 64+16, 2^6+2^4 thus two lsl commands could be potentially faster
+    ; BYTES_PER_ROW for this is 80, 64+16, 2^6+2^4 thus two lsl commands could be potentially faster
     lsl.w   #4,d1         ; row * 2^4
     move.w  d1,d0         
     lsl.w   #2,d1         ; (row * 2^4) * 2^2 = row * 2^6
     add.w   d0,d1         ; (row * 2^6) + (row * 2^4) = row * 80
 
     
-    move.w  10(a6),d2    ; store col index for arithmatic
+    move.w  14(a6),d2    ; store col index for arithmatic
     move.w  d2,d0        ; copy col for bit math later
     lsr.w   #3,d2        ; col >> 3
     
     add.l   d2,d1   ; (row*BYTES_PER_ROW) + (col >> 3)
 
-    move.l  base,a0 ; load address
+    move.l  8(a6),a0 ; load address
     adda.l  d1,a0   ; add total offset to the address register
     
     ; d0 still holds the original col index
@@ -277,9 +277,9 @@ plot_horizontal_line:
     link    a6,#-10     ; 2 (long) masks, an offset value for the end address(word)
     movem.l d0-d3/a0-a2,-(sp) 
 
-    move.w  12(a6),d2   ; get the length
+    move.w  16(a6),d2   ; get the length
     ble     plot_horizontal_line_end ; is length is 0, skip
-    move.w  10(a6),d1   ; col value
+    move.w  14(a6),d1   ; col value
     
     ; end calculations
     
@@ -304,18 +304,18 @@ plot_horizontal_line:
     move.l  d0,-8(a6)   ; RIGHTMASK
 
     ; Row offset calculations
-    move.w  8(a6),d1    ; load row index
+    move.w  12(a6),d1    ; load row index
     lsl.w   #4,d1       ; row * 2^4
     move.w  d1,d0         
     lsl.w   #2,d1       ; row * 2^6
     add.w   d0,d1       ; (row * 2^4) + (row * 2^6) = row * 80
 
     ; start point calcualtion
-    move.w  10(a6),d2   ; store col index
+    move.w  14(a6),d2   ; store col index
     lsr.w   #5,d2       ; col >> 5 (get longword offset)
     lsl.w   #2,d2       ; convert long to byte
     
-    move.l  base,a0     
+    move.l  8(a6),a0     
     adda.w  d1,a0       ; add row offset
     adda.w  d2,a0       ; THE START ADDRESS in a0
 
@@ -324,34 +324,35 @@ plot_horizontal_line:
     lsr.w   #5,d2       ; end >> 5
     lsl.w   #2,d2       ; convert to byte offset
 
-    move.l  base,a1     
+    move.l  8(a6),a1     
     adda.w  d1,a1       ; Re-use row offset in d1
     adda.w  d2,a1       ; THE END ADDRESS in a1
 
-	; main plotting logic
-	; get the masks in d0 and d1
-	move.l	-4(a6),d0	; the leftmask
-	move.l	-8(a6),d1	; rightmask
+    ; main plotting logic
+    ; get the masks in d0 and d1
+    move.l  -4(a6),d0   ; the leftmask
+    move.l  -8(a6),d1   ; rightmask
 
-	cmp.l	a0,a1	; if start_point == end_point
-	bne		multiplot_horizontal_line ; !(if start_point == end_point)
-	
-	and.l	d1,d0	; leftmask & rightmaks 
-	or.l	d0,(a0)	; current |= (leftmask & rigthmask)
-	bra	plot_horizontal_line_end
+    cmp.l   a0,a1   ; if start_point == end_point
+    bne     multiplot_horizontal_line ; !(if start_point == end_point)
+    
+    and.l   d1,d0   ; leftmask & rightmaks 
+    or.l    d0,(a0) ; current |= (leftmask & rigthmask)
+    bra plot_horizontal_line_end
 
 multiplot_horizontal_line:
-	move.l	a0,a2	; current = start_point
-	
-	or.l	d0,(a2)	; start_point |= leftmask
+    move.l  a0,a2   ; current = start_point
+    
+    or.l    d0,(a2)+ ; start_point |= leftmask
 
 fill_h_line_loop:
-	cmp.l	a2,a1
-	beq		fill_h_line_loop_done
-	move.l	#HOR_LONG_MASK,(a2)+
+    cmp.l   a2,a1
+    beq     fill_h_line_loop_done
+    move.l  #HOR_LONG_MASK,(a2)+
+    bra     fill_h_line_loop
 
 fill_h_line_loop_done:
-	or.l	d1,(a1)	; end_point |= rightmask
+    or.l    d1,(a1) ; end_point |= rightmask
 
 plot_horizontal_line_end:
     movem.l (sp)+,d0-d3/a0-a2 
@@ -359,31 +360,35 @@ plot_horizontal_line_end:
     rts
 
 ;-------------------------------------------------------------------------------------------------
-;----------------ROUTINE TO PLOT A VERTICAL LINE--------------------------------------------------
-; void plot_vertical_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
+;---------------------ROUTINE FOR PLOTTING A VERTICAL LINE--------------------------------------
+;void plot_vertical_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
+; PURPOSE: PLOT A SINGLE VERTICAL LINE AT THE GIVEN COORDINATES AND OF A GIVEN LENGTH
+; INPUT: COORDINATES X (COL) AND Y (ROW), LENGTH OF THE LINE TO BE PLOTTED
+; OUTPUT: NONE
 plot_vertical_line:
     link    a6,#-6          ; two local variables, a longword and a word
-    movem.l d0-d4/a0-a1,-(sp) 
+    movem.l d0-d4/a0-a2,-(sp) 
 
-    move.w  12(a6),d3       ; get the length
-    ble     plot_horizontal_line_end ; if lenght is 0, skip
-    ; end Calculations
-    move.w  8(a6),d1        ; get the row offset 
+    move.w  16(a6),d3       ; get the length
+    ble     plot_vertical_line_end ; if length is 0, skip
     
-    move.l  d3,d4           ; copy length for the loop counter later
+    ; end Calculations
+    move.w  12(a6),d1        ; get the row offset 
+    
+    move.w  d3,d4           ; copy length for the loop counter later
     subq.w  #1,d3           ; length - 1
     add.w   d1,d3           ; row + length - 1
     move.w  d3,-6(a6)       ; THE END OFFSET
 
     ; col offset calculation for reuse
-    move.w  10(a6),d2       ; get the col index
+    move.w  14(a6),d2       ; get the col index
     
     ; determine the BIT MASK for the vertical line
-    move.l	#VER_LONG_MASK,d0
-	move.l	d2,d3
-	and.w	#31,d3	; col & 31
-	lsr.l	d3,d0
-	move.l	d0,-4(a6) ; the specific mask
+    move.l  #VER_LONG_MASK,d0
+    move.l  d2,d3
+    andi.l  #31,d3          ; col & 31
+    lsr.l   d3,d0
+    move.l  d0,-4(a6)       ; the specific mask
 
     ; calculate the column byte offset
     lsr.w   #5,d2           ; col >> 5 (get longword index)
@@ -391,22 +396,22 @@ plot_vertical_line:
     
     ; start point calculation
     lsl.w   #4,d1           ; row * 2^4
-    move.w  d1,d0          
+    move.w  d1,d0           
     lsl.w   #2,d1           ; row * 2^2 * 2^4
     add.w   d0,d1           ; (row * 2^4) + (row * 2^6) = row * 80
     
-    move.l  base,a0         ; load actual screen address
+    move.l  8(a6),a0        ; load actual screen address
     adda.w  d1,a0           ; add row offset
     adda.w  d2,a0           ; THE START ADDRESS in a0
 
     ; end point calculations
     move.w  -6(a6),d1       ; get END OFFSET
     lsl.w   #4,d1           ; End Y * 2^4
-    move.w  d1,d0          
+    move.w  d1,d0           
     lsl.w   #2,d1           ; End Y * 2^2 * 2^4
     add.w   d0,d1           ; End Y * 80
     
-    move.l  base,a1         
+    move.l  8(a6),a1         
     adda.w  d1,a1           ; add row offset
     adda.w  d2,a1           ; THE END ADDRESS in a1
 
@@ -419,13 +424,12 @@ vertical_line_loop:
     cmp.l   a2,a1           
     beq.s   plot_vertical_line_end
     adda.w  #80,a2          ; skip a row
-    bra.s   vertical_line_loop
+    bra      vertical_line_loop
 
 plot_vertical_line_end:
     movem.l (sp)+,d0-d4/a0-a2
     unlk    a6
     rts
-
 ;-------------------------------------------------------------------------------------------------
 ;------------------------------ROUTINE TO PLOT A LINE BETWEEN ANY TWO GIVEN POINT-----------------
 ; void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col);
