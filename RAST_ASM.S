@@ -15,7 +15,9 @@
     XDEF _plot_8_bitmap
     XDEF _plot_16_bitmap
     XDEF _plot_32_bitmap
-    ;XREF font
+    XDEF _plot_character
+    XDEF _plot_string
+    ;XDEF _plot_string
 ;=====================CONSTANTS=====================================================================
 
 SCREEN_WIDTH	EQU	640	; #define SCREEN_WIDTH
@@ -1067,128 +1069,102 @@ plot_32_bitmap_done:
 ; void plot_character(UINT8 *base, UINT16 row, UINT16 col, char ch)
   ; base at 8(a6), row at 12(a6), col at 14(a6), ch at 16(a6)
 _plot_character:
-    link    a6,#-18
-    movem.l d0-d4/a0-a1,-(sp)
+    link    a6,#0
+    movem.l d0-d7/a0-a1,-(sp)
 
-plot_character_init:
-    clr.l   -4(a6)          ; i = 0
-    movea.l  8(a6),a0     ; load base address into a0
-    move.w  12(a6),d0     ; load row into d0
-    move.w  14(a6),d1     ; load col into d1
-    move.b  16(a6),d2     ; load char into d2
+    ; IS_PRINTABLE(i) = (i >= ' ' && i <= '~')
+    move.w  16(a6),d0           ; Load char (i)
+    andi.w  #$FF,d0             ; isolate the lower byte
+    cmpi.b  #' ',d0             ; check less than space 
+    blt     plot_char_done  
+    cmpi.b  #'~',d0             ; check greater than '~'
+    bgt     plot_char_done
 
+    ; GLYPH_START(i) (font + (((i) - ' ') << 3))
+    sub.w   #' ',d0             ; ch - 32
+    lsl.w   #3,d0               ; << 3
+    xref    _font               ; get the font table reference
+    lea     _font,a1            ; load the address of the font table
+    adda.w  d0,a1               ; font + ((ch - ' ') << 3) is in a1
 
+    ; start_point = base + (row * 80) + (col >> 3)
+    move.w  12(a6),d1           ; row
+    move.w  d1,d2
+    lsl.w   #6,d1               ; row * 64
+    lsl.w   #4,d2               ; row * 16
+    add.w   d2,d1               ; d1 = row * 80
 
-if_can_print:
-;    if (IS_PRINTABLE(ch))
-;    #define IS_PRINTABLE(i) ((i) >= ' ' && (i) <= '~')
-;    #define GLYPH_START(i) (font + (((i) - ' ') << 3))
-    cmp.b   #' ',d2      ; check if ch >= ' '
-    blo     plot_character_done  ; if ch < ' ', done
-    cmp.b   #'~',d2      ; check if ch <= '~'
-    bhi     plot_character_done  ; if ch > '~', done
-;    character = GLYPH_START(ch);
-    move.w  d2,d3       ; move ch to d3 for the calculation
-    sub.b   #' ',d3     ; ch - ' '
-    lsl.w   #3,d3       ; (ch - ' ') << 3, multiply by 8 to get byte offset for the character in the font
-    ;lea     font,a1     ; load font base address into a1......................................................?
-    adda.l  d3,a1       ; character = font + ((ch - ' ') << 3)
-    move.l  a1,-10(a6)  ; store character address at -10(a6)
-;   start_point = base + (row * BYTES_PER_ROW) + (col >> 3);
-    move.w  14(a6),d3            ; move col to d3    
-    lsr.w   #3,d3                ; col >> 3
-    move.w  12(a6),d4            ; get row
-    mulu.w  #BYTES_PER_ROW,d4    ; row * BYTES_PER_ROW
-    add.w   d3,d4                ; row * BYTES_PER_ROW + (col >> 3)
-    move.l  8(a6),a0             ; load base address into a0
-    adda.l  d4,a0                ; base + row * BYTES_PER_ROW + (col >> 3)... no multiplying since bytes
-    move.l  a0,-14(a6)           ; store start_point at -14(a6)
-;   current = start_point;
-    move.l  -14(a6),a1           ; load start_point into a1... so I can use a1 later
-    move.l  a1,-18(a6)           ; store current at -18(a6)
-;   shift = (col & 7);
-    move.w  d1,d3       ; load col to d3
-    and.w   #7,d3       ; shift = col & 7
-    move.w  d3,-6(a6)   ; store shift at -6(a6)
+    move.w  14(a6),d0           ; col
+    move.w  d0,d3               ; for shift calculations
+    lsr.w   #3,d0               ; col >> 3
+    add.w   d0,d1               ; d1 = row * 80 + (col >> 3)
 
+    move.l  8(a6),a0            ; base
+    adda.w  d1,a0               ; base + row * 80 + (col >> 3)
 
+    ; shifts
+    andi.w  #7,d3               ; col & 7
+    move.w  #8,d4
+    sub.w   d3,d4               ; 8 - shift
 
-;   uhhh dont forget shift = d3, i = d0, d4 can be anything, a1 = current, a0 = character*, d2 = loaded with character[i]
-    move.l  -4(a6),d0   ; get i value (0) into d0 for the loop
-    move.l -10(a6),a0
-loop_to_eight:
-    cmp.l   #8,d0
-    beq     plot_character_done
-;   *current |= (character[i] >> shift);
-    move.b  (a0,d0.l),d2        ; d2 = character[i]
-    lsr.l   d3,d2               ; shift character[i]
-    or.b    d2,(a1)
+    moveq   #7,d5               ; for dbra
 
+plot_char_loop:
+    moveq   #0,d0
+    move.b  (a1)+,d0            ; character[i], i++
+    
+    move.w  d0,d1               ; copy for cross byte plotting
+    lsr.w   d3,d0               ; character[i] >> shift
+    or.b    d0,(a0)             ; *current |= (character[i] >> shift)
 
-if_shift_not_zero:
-    tst.w   d3          
-    beq     loop_to_eight_end  ; if shift == 0, skip the conditional logic
-;   *(current + 1) |= (character[i] << (8 - shift));
-    move.w  #8,d4         ; d4 = 8
-    sub.w   d3,d4         ; d4 = 8 - shift
-    move.b  (a0,d0.l),d2   
-    lsl.l   d4,d2         ; d2 = character[i] << (8 - shift)............................. check later
-    or.b    d2,1(a1)      ; *current |= (character[i] << (8 - shift))
+    ; if (shift > 0) 
+    tst.w   d3
+    beq     plot_char_next_row
 
+    lsl.w   d4,d1               ; character[i] << (8 - shift)
+    or.b    d1,1(a0)            ; *(current + 1) |= (character[i] << (8 - shift))
 
+plot_char_next_row:
+    adda.w  #80,a0              ; current += BYTES_PER_ROW
+    dbra    d5,plot_char_loop
 
-loop_to_eight_end:
-    add.l   #BYTES_PER_ROW,a1  ; current += BYTES_PER_ROW
-    addq.l  #1,d0              ; i++
-    bra     loop_to_eight
-plot_character_done:
-    movem.l (sp)+,d0-d4/a0-a1
+plot_char_done:
+    movem.l (sp)+,d0-d7/a0-a1
     unlk    a6
     rts
-
 ;-------------------------------------------------------------------------------------------------
 ;------------------------------ROUTINE TO PLOT A STRING-------------------------------------------
 ; void plot_string(UINT8 *base, UINT16 row, UINT16 col, char *ch)
 _plot_string:
-    link    a6,#-4       ; UINT8 -1(a6) *start_point; UINT8 -2(a6) *current; UINT16 -4(a6) i = 0;
-    movem.l d0-d3/a0-a1,-(sp)
+    link    a6,#0
+    movem.l d0-d4/a0-a2,-(sp) 
 
-    clr.w   -4(a6)       ; i = 0
-    move.l  8(a6),a0    ; load base address into a0
-    move.w  12(a6),d0    ; load row into d0
-    move.w  14(a6),d1    ; load col into d1
-    move.l 16(a6),a1    ; load pointer to string into a1
-    
-    move.w  -4(a6),d2      ; get i
-while_string_loop:
-;   if (ch[i] == '\0') break;
-    ;move.w  -4(a6),d2      ; get i
-    move.b  (a1,d2.w),d3   ; load character at index i
-    cmp.b   #0,d3          ; check if character is null terminator
-    beq     plot_string_done  ; if null terminator, exit loop
+    move.l  8(a6),a0            ; get base
+    move.w  12(a6),d2           ; get row
+    move.w  14(a6),d3           ; get col
+    move.l  16(a6),a2           ; get ch address
 
-;   push arguments for plot_character(base, row, col, ch[i])
-    clr.w   -(sp)         ; align stack for the character argument
-    move.b  d3,(sp)       ; push character ch[i] (into low byte of word)
-    move.w  d1,-(sp)      ; push col
-    move.w  d0,-(sp)      ; push row
-    move.l  a0,-(sp)      ; push base address
+plot_string_loop:
+    clr.l   d4               
+    move.b  (a2)+,d4            ; i++
+    cmpi.b  #0,d4               ; while (ch[i] != '\0')
+    beq     plot_string_done    
 
-    jsr     _plot_character ; call plot_character routine
-    adda.l  #10,sp         ; clean up the stack by 10 bytes
+    ; plot_character(base, row, col, ch)
+    move.w  d4,-(sp)            ; push current char
+    move.w  d3,-(sp)            ; push current column 
+    move.w  d2,-(sp)            ; push row
+    move.l  a0,-(sp)            ; push base address
+    jsr     _plot_character     
+    adda.l  #10,sp              ; 2+2+2+4 = 10 bytes
 
-    addq.w  #1,d2          ; i++
-    ;move.w  d2,-4(a6)      ; save updated i back to -4(a6)
-
-;   col+= 8 for the next character
-    addq.w  #8,d1          ; col += 8
-    bra     while_string_loop    
+    addq.w  #8,d3               ; col += 8
+    bra     plot_string_loop    
 
 plot_string_done:
-    movem.l (sp)+,d0-d3/a0-a1
+    movem.l (sp)+,d0-d4/a0-a2
     unlk    a6
     rts
-
 ;-------------------------------------------------------------------------------------------------
 ;=========================GLOBAL VARIABLES========================================================
 base: ds.l	1
