@@ -1088,11 +1088,11 @@ if_can_print:
     move.l -10(a6),a0
 loop_to_eight:
     cmp.l   #8,d0
-    beq     loop_to_eight_end
+    beq     plot_character_done
 ;   *current |= (character[i] >> shift);
     move.b  (a0,d0.l),d2        ; d2 = character[i]
     lsr.l   d3,d2               ; shift character[i]
-    or.b    d3,(a1)
+    or.b    d2,(a1)
 
 
 if_shift_not_zero:
