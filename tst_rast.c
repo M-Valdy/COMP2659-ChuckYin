@@ -7,8 +7,11 @@ extern void clear_region();
 extern void plot_pixel();
 extern void	plot_horizontal_line();
 extern void	plot_vertical_line();
+extern void plot_line();
 extern void plot_rectangle();
 extern void plot_square();
+extern void	plot_triangle();
+
 
 
 int main()
@@ -18,10 +21,10 @@ int main()
 	plot_pixel(base, 10, 10);
 	plot_horizontal_line(base, 105, 100, 10);
 	plot_vertical_line(base, 105, 100, 10);
-	/* plot_line(base, 10, 10, 10, 20); */
+	plot_line(base, 10, 10, 10, 20);
 	plot_rectangle(base, 200, 200, 10, 20);
 	plot_square(base, 10, 100, 50);
-	
+	plot_triangle(base, 300, 300, 10, 10, 0);
 	/* plot_string(base, 50, 50, "My bad?");*/
 
 	/* plot_bitmap_8(base, 200, 200, 8, invader_8x8); */

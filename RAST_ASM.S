@@ -435,7 +435,7 @@ plot_line:
     movem.l d3-d7/a1,-(sp) ; d3 start row, d4 start col, d5 end row, d6 end col, d7 for locals
 
 set_regs:
-    movea.l 8(a6),a1    ; load base address into a1
+    move.l  8(a6),a1    ; load base address into a1
     move.w  12(a6),d3   ; start row
     move.w  14(a6),d4   ; start col
     move.w  16(a6),d5   ; end row
@@ -803,7 +803,7 @@ bitmap_8_init:
     move.l  a0,-12(a6)   ; current = start_point
     move.l  -12(a6),a3
 
-    movea.l 18(a6),a4   ; load bitmap address into a4 (20(a6) is the bitmap address)
+    move.l 18(a6),a4   ; load bitmap address into a4 (20(a6) is the bitmap address)
 
 bitmap_8_loop:
     cmpa.l  a1,a3    ; if current <= end_point
@@ -826,7 +826,7 @@ bitmap_8_loop:
     lsl.l   d1,d2       ; bitmap[i] << (8 - shift)
     or.b    d2,(a3)   ; *(current + 1) |= (bitmap[i] << (8 - shift))
     move.l  a3,-12(a6)   ; move new result to current for the next loop
-    bra     bitmap_8_increment
+    bra     bitmap8_increment
 
 bitmap8_increment:
     adda.l  #BYTES_PER_ROW,a3   ; current += BYTES_PER_ROW
@@ -888,7 +888,7 @@ bitmap_16_variable_init:
     move.l  a0,-12(a6)   ; current = start_point
     move.l  -12(a6),a3
 
-    movea.l 18(a6),a4   ; load bitmap address into a4 (20(a6) is the bitmap address)
+    move.l 18(a6),a4   ; load bitmap address into a4 (20(a6) is the bitmap address)
 
 bitmap_16_loop:
     cmpa.l  a1,a3    ; if current <= end_point
@@ -985,7 +985,7 @@ locals_init:
     adda.l  d0,a1                ; base + end * LONGS_PER_ROW + (col >> 5)
     move.l  a1,-12(a6)           ; store end_point at -12(a6)
 
-    movea.l a0,-4(a6)            ; current = start_point, store at -4(a6)
+    move.l a0,-4(a6)            ; current = start_point, store at -4(a6)
     move.l  -20(a6),d0           ; get i value (0) into d0 for the loop
     move.l  18(a6),a2            ; a2 = bitmap pointer
 loop_start:
@@ -1034,8 +1034,8 @@ plot_bitmap_32_done:
 ;-------------------------------------------------------------------------------------------------
 ;------------------------------ROUTINE TO PLOT A CHARACTER----------------------------------------
 ; void plot_character(UINT8 *base, UINT16 row, UINT16 col, char ch)
-
-
+plot_character:
+    rts
 
 ;-------------------------------------------------------------------------------------------------
 ;------------------------------ROUTINE TO PLOT A STRING-------------------------------------------
@@ -1045,10 +1045,10 @@ plot_string:
     movem.l d0-d3/a0-a1,-(sp)
 
     clr.w   -4(a6)       ; i = 0
-    movea.l  8(a6),a0    ; load base address into a0
+    move.l  8(a6),a0    ; load base address into a0
     move.w  12(a6),d0    ; load row into d0
     move.w  14(a6),d1    ; load col into d1
-    movea.l 16(a6),a1    ; load pointer to string into a1
+    move.l 16(a6),a1    ; load pointer to string into a1
     
     move.w  -4(a6),d2      ; get i
 while_string_loop:
