@@ -1091,8 +1091,8 @@ loop_to_eight:
     beq     loop_to_eight_end
 ;   *current |= (character[i] >> shift);
     move.b  (a0,d0.l),d2        ; d2 = character[i]
-    lsr.l   d2,d3               ; shift character[i]
-    or.b    (a1),d3
+    lsr.l   d3,d2               ; shift character[i]
+    or.b    d3,(a1)
 
 
 if_shift_not_zero:
