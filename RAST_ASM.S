@@ -748,6 +748,41 @@ plot_northeast_triangle:
     add.l   #12,sp
     bra plot_triangle_done
 
+plot_northwest_triangle:
+    ; plot_line(base, row, col, row, (col - (trianglebase - 1)))
+    move.w  14(a6),d2   ; get the triangle base
+    subq.w  #1,d2       ; trianglebase - 1
+    sub.w   12(a6),d2   ; col - trianglebase + 1
+    move.w  d2,-(sp)    ; push col - trianglebase + 1
+    move.w  10(a6),-(sp)    ; push row
+    move.w  12(a6),-(sp)    ; push col
+    move.w  10(a6),-(sp)    ; push row again
+    move.l  8(a6),-(sp)     ; push base address
+    jsr     plot_line       ; the line being plotted is the base
+    add.l   #12,sp
+
+    ; plot_line(base, row, col, (row - (height - 1)), col)
+    move.w  12(a6),-(sp)    ; push col
+    move.w  16(a6),d1        ; get the height
+    subq.w  #1,d1       ; height - 1
+    move.w  10(a6),d3   ; get row for arithmatic
+    sub.w   d1,d3       ; row - height - 1
+    move.w  d3,-(sp)    ; push row - height - 1
+    move.w  12(a6),-(sp)    ; push col
+    move.w  10(a6),-(sp)    ; push row
+    move.l  8(a6),-(sp)     ; push base address
+    jsr     plot_line       ; plot the perpendicular line
+    add.l   #12,sp
+
+    ; plot_line(base, (row - (height - 1)), col, row, (col - (trianglebase - 1)))
+    move.w  d2,-(sp)        ; push col - trianglebase - 1
+    move.w  10(a6),-(sp)        ; push row
+    move.w  12(a6),-(sp)    ; push col
+    move.w  d3,-(sp)        ; push row - height - 1
+    move.l  8(a6),-(sp)     ; push base address
+    jsr     plot_line       ; plot the hypotenuse line
+    add.l   #12,sp
+
 plot_triangle_done:
     movem.l (sp)+,d0-d4/a0
     unlk    a6
