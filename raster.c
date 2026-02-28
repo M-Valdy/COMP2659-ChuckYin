@@ -25,31 +25,7 @@
 #define VER_BYTE_MASK ((UINT8)0x80) /* 1 followed by all 0's mask to handle the byte(s), for VERTICAL LINES*/
 #define VER_WORD_MASK ((UINT16)0x8000) /* 1 followed by all 0's mask to handle the word(s), for VERTICAL */
 #define VER_LONG_MASK ((UINT32)0x80000000) /* 1 followed by all 0's mask to handle the long(s), for VERTICAL */
-void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 trianglebase, UINT16 height, UINT8 direction){
-    UINT32 *start_point;
-    if (trianglebase == 0 || height == 0) return; /* unless valid inputs given, dont attempt to plot */
 
-    if (direction == 0) { /* top-left coordinate, the height goes downwards adn base goes right */
-        plot_line(base, row, col, row, (col + (trianglebase - 1))); /* plot base */
-        plot_line(base, row, col, (row + (height - 1)), col); /* plot perpendicular */       
-        plot_line(base, (row + (height - 1)), col, row, (col + (trianglebase - 1))); /* plot hypotenuse */
-
-    } else if (direction == 1) { /* top-right coordinate, the height goes downwards and base goes left */
-        plot_line(base, row, col, row, (col - (trianglebase - 1))); /* plot base */
-        plot_line(base, row, col, (row + (height - 1)), col); /* plot perpendicular */
-        plot_line(base, (row + (height - 1)), col, row, (col - (trianglebase - 1))); /* plot hypotenuse */
-
-    } else if (direction == 2) { /* bottom-left coordinate, the hieght goes upwards and the base goes right */
-        plot_line(base, row, col, row, (col + (trianglebase - 1))); /* plot base */
-        plot_line(base, row, col, (row - (height - 1)), col); /* plot perpendicular */
-        plot_line(base, (row - (height - 1)), col, row, (col + (trianglebase - 1))); /* plot hypotenuese */
-
-    } else if (direction == 3) { /* bottom-right coordinate, the goes upwards and base goes left */
-        plot_line(base, row, col, row, (col - (trianglebase - 1))); /* plot base */
-        plot_line(base, row, col, (row - (height - 1)), col); /* plot_perpendicular */
-        plot_line(base, (row - (height - 1)), col, row, (col - (trianglebase - 1))); /* plot hypotenuese */
-    }
-}
 
 /* GNERAL FUCNTON STRUCTURE FOR THE BITMAP FUCNTIONS, 'X' IS THE WIDTH OF THE BITMAP- BYTE, WORD, LONGWORD....
  * HERE, TO MIMICK DIVISON BY BITSHIFTING RIGHT:

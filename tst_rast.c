@@ -61,10 +61,10 @@ int main()
 	plot_rectangle(base, 35, 35, 10, 40);
 	plot_square(base, 35, 10, 10);
 	
-	plot_triangle(base, 150, 200, 20, 60, 0);
-	plot_triangle(base, 150, 300, 20, 60, 1);
-	plot_triangle(base, 250, 200, 20, 60, 2);
-	plot_triangle(base, 250, 300, 20, 60, 3);
+	plot_triangle(base, 150, 200, 10, 10, 0);
+	plot_triangle(base, 150, 220, 10, 10, 1);
+	plot_triangle(base, 150, 240, 10, 10, 2);
+	plot_triangle(base, 150, 260, 10, 10, 3);
 	
 	plot_8_bitmap(base, 200, 200, 8, cross_8x8);
 	plot_16_bitmap(base, 200, 250, 16, batman_16x16);
