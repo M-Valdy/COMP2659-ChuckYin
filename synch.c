@@ -3,8 +3,8 @@
 
 /* @author Paolo */
 void synch_update(Model *model) {
-    updateChuck(&model->chuck);
     int i;
+    updateChuck(&model->chuck);
 
     for (i = 0; i < 15; i++) {
         updateWomenWalking(&model->womenWalking[i]);
