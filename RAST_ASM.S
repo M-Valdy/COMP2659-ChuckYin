@@ -1037,7 +1037,7 @@ plot_bitmap_32_done:
 ; UINT32 i @-4(a6); UINT16 shift @-6(a6); const UINT8 *character @-10(a6); UINT8 *start_point @-14(a6); UINT8 *current @-18(a6);   
 ; base @ 8(a6); row @ 12(a6); col @ 14(a6); ch @ 16(a6)
 plot_character:
-    link    a6,#18
+    link    a6,#-18
     movem.l d0-d4/a0-a1,-(sp)
 
 plot_character_init:
@@ -1085,9 +1085,9 @@ if_can_print:
 
 ;   uhhh dont forget shift = d3, i = d0, d4 can be anything, a1 = current, a0 = character*, d2 = loaded with character[i]
     move.l  -4(a6),d0   ; get i value (0) into d0 for the loop
-    movea.l -10(a6),a0
+    move.l -10(a6),a0
 loop_to_eight:
-    cmp.l   #7,d0
+    cmp.l   #8,d0
     beq     loop_to_eight_end
 ;   *current |= (character[i] >> shift);
     move.b  (a0,d0.l),d2        ; d2 = character[i]
@@ -1110,6 +1110,7 @@ if_shift_not_zero:
 loop_to_eight_end:
     add.l   #BYTES_PER_ROW,a1  ; current += BYTES_PER_ROW
     addq.l  #1,d0              ; i++
+    bra     loop_to_eight
 plot_character_done:
     movem.l (sp)+,d0-d4/a0-a1
     unlk    a6
