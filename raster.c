@@ -81,60 +81,6 @@
  * }
 */
 
-
-void plot_16_bitmap(UINT16 *base, UINT16 row, UINT16 col, UINT16 height, const UINT16 *bitmap){
-    UINT16 *current;
-    UINT16 *start_point;
-    UINT16 *end_point;
-    UINT16 i; 
-    UINT16 end;
-    UINT16 shift;
-
-    if (height == 0) return;
-    if (row + height > 400) height = 400 - row;
-
-    shift = (col & 15);
-    end = row + (height - 1);
-    start_point = base + (row * WORDS_PER_ROW) + (col >> 4);
-    end_point = base + (end * WORDS_PER_ROW) + (col >> 4);
-
-    i = 0;
-    for (current = start_point; current <= end_point; current += WORDS_PER_ROW) {
-        *current |= (bitmap[i] >> shift);
-        if (shift > 0 && ((col >> 4) < (WORDS_PER_ROW - 1))){
-            *(current + 1) |= (bitmap[i] << (16 - shift));
-        }
-        i++;
-    }
-}
-
-void plot_32_bitmap(UINT32 *base, UINT16 row, UINT16 col, UINT16 height, const UINT32 *bitmap){
-    UINT32 *current;
-    UINT32 *start_point;
-    UINT32 *end_point;
-    UINT32 end;
-    UINT32 i; 
-    UINT32 shift;
-
-    if (height == 0) return;
-
-    if (row + height > 400) height = 400 - row;
-
-    end = row + (height - 1);
-    shift = (col & 31);
-    start_point = base + (row * LONGS_PER_ROW) + (col >> 5);
-    end_point = base + (end * LONGS_PER_ROW) + (col >> 5);
-
-    for (current = start_point; current <= end_point; current += LONGS_PER_ROW) {
-        *current |= (bitmap[i] >> shift);
-     
-        if (shift > 0 && ((col >> 5) < (LONGS_PER_ROW - 1))){
-            *(current + 1) |= (bitmap[i] << (32 - shift));
-        }
-        i++;
-    }   
-}
-
 void plot_character(UINT8 *base, UINT16 row, UINT16 col, char ch){
     UINT8 *start_point;      /* starting position */
     UINT8 *current;          /*  current position */
