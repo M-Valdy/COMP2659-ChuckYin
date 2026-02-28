@@ -9,8 +9,6 @@
 int main() {
     void *base = Physbase();
     char userInput = 'hi';
-    int i;
-    int x;
     Model renderTestDriver;
     Model_init(&renderTestDriver);
     while (userInput != '0') {
