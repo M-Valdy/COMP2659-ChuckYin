@@ -15,7 +15,7 @@
  OUTPUT: Entire game screen with all game objects rendered at their current positions
 
 */
-void render_intial_state(const Model *model, UINT8 *base);
+void master_render(const Model *model, UINT8 *base);
 
 
 void render_Chuck(UINT32 *base, UINT16 row, UINT16 col, const Chuck* chuck);

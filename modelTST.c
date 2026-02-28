@@ -4,6 +4,7 @@
 #include "asynch.h"
 #include "synch.h"
 
+/* @author Paolo */
 int main() {
     char userInput = '0';
     int i;

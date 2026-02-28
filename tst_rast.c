@@ -13,7 +13,7 @@ extern void plot_square();
 extern void	plot_triangle();
 
 
-
+/* @author Gaurik */
 int main()
 {
 	void *base = Physbase();
