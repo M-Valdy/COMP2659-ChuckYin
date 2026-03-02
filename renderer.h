@@ -15,10 +15,14 @@
  OUTPUT: Entire game screen with all game objects rendered at their current positions
 
 */
+<<<<<<< Updated upstream
 void master_render(const Model *model, UINT8 *base);
+=======
+void render_initial_state(const Model *model, UINT32 *base);
+>>>>>>> Stashed changes
 
 
-void render_Chuck(UINT32 *base, UINT16 row, UINT16 col, const Chuck* chuck);
+void render_Chuck(UINT32 *base, UINT16 row, UINT16 col, Chuck* chuck);
 
 /*----- Function: render_WomenWalking -----
     PURPOSE: Renders the women walking on the screen at their current positions.
@@ -28,7 +32,7 @@ void render_Chuck(UINT32 *base, UINT16 row, UINT16 col, const Chuck* chuck);
 
     OUTPUT: Women walking rendered on the screen at their current positions
 */
-void render_WomenWalking(UINT32 *base, UINT16 row, UINT16 col, const WomenWalking* womenWalking_bitmap);
+void render_WomenWalking(UINT32 *base, UINT16 row, UINT16 col, WomenWalking* womenWalking);
 
 /*----- Function: render_WomenSwimming -----
     PURPOSE: Renders the women swimming on the screen at their current positions.
@@ -38,9 +42,9 @@ void render_WomenWalking(UINT32 *base, UINT16 row, UINT16 col, const WomenWalkin
 
     OUTPUT: Women swimming rendered on the screen at their current positions
 */
-void render_women_swimming_forward(UINT32 *base, UINT16 row, UINT16 col, const WomenSwimming* womenSwimming_forward_bitmap);
+void render_women_swimming_forward(UINT32 *base, UINT16 row, UINT16 col, WomenSwimming* womenSwimming);
 
-void render_women_swimming_backward(UINT32 *base, UINT16 row, UINT16 col, const WomenSwimming* womenSwimming_forward_bitmap);
+void render_women_swimming_backward(UINT32 *base, UINT16 row, UINT16 col, WomenSwimming* womenSwimming);
 
 /*----- Function: render_tree -----
     PURPOSE: Renders the trees on the screen at their current positions.
@@ -50,7 +54,7 @@ void render_women_swimming_backward(UINT32 *base, UINT16 row, UINT16 col, const 
 
     OUTPUT: Trees rendered on the screen at their current positions
 */
-void render_tree(UINT32 *base, UINT16 row, UINT16 col, Tree* tree_bitmap);
+void render_tree(UINT32 *base, UINT16 row, UINT16 col, Tree* tree);
 
 /*----- Function: render_water -----
     PURPOSE: Renders the water on the screen at its current position.
@@ -60,7 +64,7 @@ void render_tree(UINT32 *base, UINT16 row, UINT16 col, Tree* tree_bitmap);
 
     OUTPUT: Water rendered on the screen at its current position
 */
-void render_water(UINT32 *base, UINT16 row, UINT16 col, Water* water_bitmap);
+void render_water(UINT32 *base, UINT16 row, UINT16 col, Water* water);
 
 
 /*----- Function: render_road -----
@@ -71,6 +75,8 @@ void render_water(UINT32 *base, UINT16 row, UINT16 col, Water* water_bitmap);
 
     OUTPUT: Road rendered on the screen at its current position
 */
-void render_road_upper(UINT32 *base, UINT16 row, UINT16 col, Road* road_bitmap);
+void render_road_upper(UINT32 *base, UINT16 row, UINT16 col, Road* road);
+
+void render_road_lower(UINT32 *base, UINT16 row, UINT16 col, Road* road);
 
 #endif
