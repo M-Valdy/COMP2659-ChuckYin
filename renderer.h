@@ -15,11 +15,7 @@
  OUTPUT: Entire game screen with all game objects rendered at their current positions
 
 */
-<<<<<<< Updated upstream
-void master_render(const Model *model, UINT8 *base);
-=======
 void render_initial_state(const Model *model, UINT32 *base);
->>>>>>> Stashed changes
 
 
 void render_Chuck(UINT32 *base, UINT16 row, UINT16 col, Chuck* chuck);
