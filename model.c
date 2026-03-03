@@ -5,7 +5,7 @@
     This is the bitmap that contains the dimensions of the Chuck sprite
     which will be used for rendering and collision detection
 */
-const UINT32 Chuck_bitmap[CHUCK_HEIGHT] =
+const UINT8 Chuck_bitmap[CHUCK_HEIGHT] =
 {
     0x00000000, 
     0x003FFC00, 
@@ -42,7 +42,7 @@ const UINT32 Chuck_bitmap[CHUCK_HEIGHT] =
 };
 
 /* @author Paolo */
-const UINT32 womenWalking_bitmap[WALKER_HEIGHT] =
+const UINT16 womenWalking_bitmap[WALKER_HEIGHT] =
 {
     0xFFFFFFFF, 
     0xFFE007FF, 
@@ -79,44 +79,28 @@ const UINT32 womenWalking_bitmap[WALKER_HEIGHT] =
 };
 
 /* @author Paolo */
-const UINT32 womenSwimming_forward_bitmap[SWIMMER_HEIGHT] =
+const UINT16 womenSwimming_forward_bitmap[SWIMMER_HEIGHT] =
 {
-    0x00000000, 
-    0x00000000, 
-    0x00000000, 
-    0x00000000, 
-    0x00000000, 
-    0x00000000, 
-    0x001FF800, 
-    0x003FFC00, 
-    0x007FFE00, 
-    0x01FFFF80, 
-    0x03FFFFC0, 
-    0x03FFFFC0, 
-    0x03FFFFC0, 
-    0x07FFFFE0, 
-    0x0FC7E3F0, 
-    0x0F8001F0,
-    0x0F8001F0, 
-    0x0F0000F0, 
-    0x0D1818B0, 
-    0x1D1818B8, 
-    0x1D0000B8, 
-    0x1F0000F8, 
-    0x1F0000F8, 
-    0x3F0000FC, 
-    0x7F83C1FE, 
-    0xFFC003FF, 
-    0xFFE007FF, 
-    0xFFF00FFF, 
-    0x00000000, 
-    0x00000000, 
-    0x00000000, 
-    0x00000000
+    0x1ffb,
+    0x3ffc,
+    0x7ffe,
+    0xffff,
+    0xffff,
+    0xc813,
+    0xc423,
+    0xc243,
+    0xcdb3,
+    0xcc33,
+    0xc003,
+    0xcff3,
+    0xdffb,
+    0xdffb,
+    0xdffb,
+    0xc003
 };
 
 /* @author Paolo */
-const UINT32 womenSwimming_backward_bitmap[SWIMMER_HEIGHT] =
+const UINT16 womenSwimming_backward_bitmap[SWIMMER_HEIGHT] =
 {
     0x00000000, 
     0x00000000, 

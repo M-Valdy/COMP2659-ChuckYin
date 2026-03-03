@@ -38,9 +38,7 @@ void render_WomenWalking(UINT32 *base, UINT16 row, UINT16 col, WomenWalking* wom
 
     OUTPUT: Women swimming rendered on the screen at their current positions
 */
-void render_women_swimming_forward(UINT32 *base, UINT16 row, UINT16 col, WomenSwimming* womenSwimming);
-
-void render_women_swimming_backward(UINT32 *base, UINT16 row, UINT16 col, WomenSwimming* womenSwimming);
+void render_women_swimming(UINT32 *base, UINT16 row, UINT16 col, WomenSwimming* womenSwimming);
 
 /*----- Function: render_water -----
     PURPOSE: Renders the water on the screen at its current position.
@@ -58,11 +56,10 @@ void render_water(UINT32 *base, UINT16 row, UINT16 col, Water* water);
 
     INPUT: Road*: a pointer to the array of Road objects in the model
            Address(UINT8*): to the start of the screen
+           int isLower: flag indicating whether to render the lower part of the road
 
     OUTPUT: Road rendered on the screen at its current position
 */
-void render_road_upper(UINT32 *base, UINT16 row, UINT16 col, Road* road);
-
-void render_road_lower(UINT32 *base, UINT16 row, UINT16 col, Road* road);
+void render_road(UINT32 *base, UINT16 row, UINT16 col, Road* road, int isLower);
 
 #endif

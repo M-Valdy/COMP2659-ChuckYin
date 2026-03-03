@@ -3,7 +3,7 @@
 
  /* Also known as the "master render" function */
 void render_initial_state(const Model *model, UINT32 *base) {
-
+    clear_screen(base);
     
 
 }
@@ -18,14 +18,13 @@ void render_WomenWalking(UINT32 *base, UINT16 row, UINT16 col, WomenWalking* wom
     plot_32_bitmap(base, row, col, WALKER_HEIGHT, womenWalking_bitmap);
 }
 
-void render_women_swimming_forward(UINT32 *base, UINT16 row, UINT16 col, WomenSwimming* womenSwimming){
+void render_women_swimming(UINT32 *base, UINT16 row, UINT16 col, WomenSwimming* womenSwimming){
     initWomenSwimming(womenSwimming, row, col);
-    plot_32_bitmap(base, row, col, SWIMMER_HEIGHT, womenSwimming_forward_bitmap);
-}
-
-void render_women_swimming_backward(UINT32 *base, UINT16 row, UINT16 col, WomenSwimming* womenSwimming){
-    initWomenSwimming(womenSwimming, row, col);
-    plot_32_bitmap(base, row, col, SWIMMER_HEIGHT, womenSwimming_backward_bitmap);
+    if (womenSwimming->isForward) {
+        plot_32_bitmap(base, row, col, SWIMMER_HEIGHT, womenSwimming_forward_bitmap);
+    } else {
+        plot_32_bitmap(base, row, col, SWIMMER_HEIGHT, womenSwimming_backward_bitmap);
+    }
 }
 
 void render_water(UINT32 *base, UINT16 row, UINT16 col, Water* water){
@@ -33,12 +32,12 @@ void render_water(UINT32 *base, UINT16 row, UINT16 col, Water* water){
     plot_32_bitmap(base, row, col, WATER_HEIGHT, water_bitmap);
 }
 
-void render_road_upper(UINT32 *base, UINT16 row, UINT16 col, Road* road){
-    initRoad(road, row, col, 0);
-    plot_32_bitmap(base, row, col, ROAD_HEIGHT, road_bitmap_upper);
-}
-void render_road_lower(UINT32 *base, UINT16 row, UINT16 col, Road* road){
-    initRoad(road, row, col, 1);
-    plot_32_bitmap(base, row, col, ROAD_HEIGHT, road_bitmap_lower);
+void render_road(UINT32 *base, UINT16 row, UINT16 col, Road* road, int isLower){
+    initRoad(road, row, col, isLower);
+    if (road->isLower == 0) {
+        plot_32_bitmap(base, row, col, ROAD_HEIGHT, road_bitmap_upper);
+    } else {
+        plot_32_bitmap(base, row, col, ROAD_HEIGHT, road_bitmap_lower);
+    }
 }
 
