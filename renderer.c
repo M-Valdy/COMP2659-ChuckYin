@@ -28,11 +28,6 @@ void render_women_swimming_backward(UINT32 *base, UINT16 row, UINT16 col, WomenS
     plot_32_bitmap(base, row, col, SWIMMER_HEIGHT, womenSwimming_backward_bitmap);
 }
 
-void render_tree(UINT32 *base, UINT16 row, UINT16 col, Tree* tree) {
-    initTree(tree, row, col);
-    plot_32_bitmap(base, row, col, TREE_HEIGHT, tree_bitmap);
-}
-
 void render_water(UINT32 *base, UINT16 row, UINT16 col, Water* water){
     initWater(water, row, col);
     plot_32_bitmap(base, row, col, WATER_HEIGHT, water_bitmap);

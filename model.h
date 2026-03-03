@@ -1,12 +1,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "Chuck.h"
-#include "w-walk.h"
-#include "w-swim.h"
-#include "tree.h"
+
 #include "water.h"
-#include "road.h"
 
 /*
 
@@ -21,6 +17,17 @@
     @authors Meagan Valderrama, Paolo Deocareza
 */
 
+#define CHUCK_HEIGHT 8
+#define WALKER_HEIGHT 16
+#define SWIMMER_HEIGHT 16
+#define ROAD_HEIGHT 32
+extern const UINT32 Chuck_bitmap[CHUCK_HEIGHT];
+extern const UINT32 womenWalking_bitmap[WALKER_HEIGHT];
+extern const UINT32 womenSwimming_forward_bitmap[SWIMMER_HEIGHT];
+extern const UINT32 womenSwimming_backward_bitmap[SWIMMER_HEIGHT];
+extern const UINT32 road_bitmap_upper[ROAD_HEIGHT];
+extern const UINT32 road_bitmap_lower[ROAD_HEIGHT];
+extern const UINT32 water_bitmap[WATER_HEIGHT];
 
 typedef struct {
     int gameOver;
@@ -32,38 +39,276 @@ typedef struct {
     Road road[120]; /* need 40 road segments per road (20 to cover the whole screen width, double it to make it 64 pixels high), 3 roads total */ 
 } Model;
 
+typedef struct {
+    unsigned int x;
+    unsigned int y;
+    int isWalking;
+    int deltaX;
+    int deltaY;
+    int isColliding; /* 1 = obstacle collision, 0 = no collision, 2 = death collision */
+    int canMoveRight;
+    int canMoveLeft;
+    int canMoveUp;
+    int canMoveDown;
+} Chuck;
 
-/*----- Function: Model_init -----
+typedef struct {
+    unsigned int x,y;
+    int deltaX, deltaY;
+} WomenWalking;
 
- PURPOSE: Initializes the model by setting the initial positions and states of all game objects.
+typedef struct {
+    unsigned int x,y;
+    int deltaX, deltaY;
+    int isColliding;
+    int isForward; /*1 = looking forward, 0 = looking backward*/ 
+    int frameCount;
+} WomenSwimming;
 
- INPUT: Model*: a pointer to the model containing all game objects
+typedef struct {
+    unsigned int x,y;
+    int isLower;
+} Road;
 
- OUTPUT: Entire game screen with all game objects initialized to their starting positions and states
+typedef struct {
+    unsigned int x,y;
+} Water;
+
+
+/*----- Function: initChuck -----
+
+ PURPOSE: Initializes the Chuck struct by setting his initial position, walking state, 
+        movement deltas, collision state, and movement permissions.
+
+ INPUT: Chuck*: a pointer to the model containing the player character Chuck
+        unsigned int x: the initial x position of Chuck
+        unsigned int y: the initial y position of Chuck
+
+ OUTPUT: Chuck struct initialized with the provided position 
+        and default states for walking, movement, and collision.
+
+ ASSUMPTIONS: The renderer is working with the same coordinate system as the one used to 
+       initialize Chuck's position, and that the initial position provided is within 
+       the bounds of the game screen.
 
 */
-void Model_init(Model *model);
+void initChuck(Chuck* chuck, unsigned int x, unsigned int y);
 
-/*----- Function: init_land -----
 
- PURPOSE: Initializes water and road objects in their appropriate coordinates
+/*----- Function: startWalking -----
 
- INPUT: Model*: a pointer to the model containing all game objects
+ PURPOSE: Sets the walking state of Chuck to 1 and initializes movement deltas.
 
- OUTPUT: All water and road objects ready to be rendered
+ INPUT: Chuck*: a pointer to the model containing the player character Chuck
+        int deltaX: the x direction of movement (1 for right, -1 for left)
+        int deltaY: the y direction of movement (1 for down, -1 for up)
 
-*/
-void init_land(Model *model);
+ OUTPUT: Chuck struct with walking state set to 1 and movement deltas set
 
-/*----- Function: init_women -----
-
- PURPOSE: Initializes swimmers and walking women in their appropriate coordinates
-
- INPUT: Model*: a pointer to the model containing all game objects
-
- OUTPUT: All swimmers and walking women objects ready to be rendered
+ ASSUMPTIONS: This function assumes
+        - isWalking state is properly set to 0
+        - movement deltas will be used in the updateChuck function to change 
+        Chuck's position accordingly. 
 
 */
-void init_women(Model *model);
+void startWalking(Chuck* chuck, int deltaX, int deltaY);
+
+
+/*----- Function: updateChuck -----
+
+ PURPOSE: Changes Chuck's position based on his movement deltas if he's walking, and checks for collisions 
+        and movement permissions before updating his position.
+
+ INPUT: Chuck*: a pointer to the model containing the player character Chuck
+
+ OUTPUT: Chuck struct with updated position state
+
+ ASSUMPTIONS: This function assumes
+       - isWalking state is properly set to either 0 or 1
+       - movement deltas are set correctly based on the direction of movement
+       - collision state and movement permissions are updated correctly by 
+       other functions before this function is called
+
+*/
+void updateChuck(Chuck* chuck);
+
+
+/*----- Function: stopWalking -----
+
+ PURPOSE: Sets the walking state of Chuck to 0 and resets movement deltas.
+
+ INPUT: Chuck*: a pointer to the model containing the player character Chuck
+
+ OUTPUT: Chuck struct with walking state set to 0 and movement deltas reset to 0
+
+ ASSUMPTIONS: This function assumes
+        - isWalking state is properly set to 1 before this function is called
+        - movement deltas will be reset to 0 to stop Chuck's movement in the updateChuck function.
+
+*/
+void stopWalking(Chuck* chuck);
+
+/*----- Function: checkXCollision -----
+
+ PURPOSE: Checks for collisions between Chuck and the water in the x direction and updates movement permissions accordingly.
+
+ INPUT: Chuck*: a pointer to the model containing the player character Chuck
+        Water*: a pointer to the water object in the model
+
+ OUTPUT: Chuck struct with updated movement permissions for left and right movement based on collision state with water
+
+ ASSUMPTIONS: This function assumes
+        - Chuck's position and dimensions are defined such that his edges can be checked for collision 
+        with the water's edges
+        - The water object has defined dimensions that can be used to check for collisions with Chuck
+*/
+void checkXCollision(Chuck* chuck, Water* water);
+
+
+/*----- Function: checkYCollision -----
+
+ PURPOSE: Checks for collisions between Chuck and the water in the y direction and updates movement permissions accordingly.
+
+ INPUT: Chuck*: a pointer to the model containing the player character Chuck
+        Water*: a pointer to the water object in the model
+
+ OUTPUT: Chuck struct with updated movement permissions for up and down movement based on collision state with water
+
+ ASSUMPTIONS: This function assumes
+        - Chuck's position and dimensions are defined such that his edges can be checked for collision 
+        with the water's edges
+        - The water object has defined dimensions that can be used to check for collisions with Chuck
+*/
+void checkYCollision(Chuck* chuck, Water* water);
+
+/*-----Function: initWomenWalking-----
+ PURPOSE: Initializes the WomenWalking struct with the given x and y coordinates.
+
+ INPUT: WomenWalking*: a pointer to the model containing the women walking
+        unsigned int x: the initial x position of the women walking
+        unsigned int y: the initial y position of the women walking
+
+ OUTPUT: WomenWalking struct initialized with the provided position and default movement deltas.
+
+ ASSUMPTIONS: The renderer is working with the same coordinate system as the one used to 
+       initialize WomenWalking's position, and that the initial position provided is within 
+       the bounds of the game screen.
+*/
+void initWomenWalking(WomenWalking* womenWalking, unsigned int x, unsigned int y);
+
+
+/*-----Function: updateWomenWalking-----
+ PURPOSE: Updates the position of the women walking based on their movement deltas, 
+    and changes direction when they reach the edge of the screen.
+
+ INPUT: WomenWalking*: a pointer to the model containing the women walking
+
+ OUTPUT: WomenWalking struct with updated position based on movement deltas and screen boundaries.
+ ASSUMPTIONS: This function assumes
+        - movement deltas are set correctly based on the direction of movement
+        - the screen width is 640 pixels, and the
+*/
+void updateWomenWalking(WomenWalking* womenWalking);
+
+/*-----Function: collisionWomenWalking-----
+ PURPOSE: Checks for collision between the women walking and Chuck.
+ 
+ INPUT: WomenWalking*: a pointer to the model containing the women walking
+        Chuck*: a pointer to the model containing Chuck
+
+ OUTPUT: Updates the collision state of Chuck if a collision is detected.
+
+ ASSUMPTIONS: This function assumes
+        - both WomenWalking and Chuck have defined positions and dimensions
+        - collision detection is based on overlapping bounding boxes
+*/
+void collisionWomenWalking(WomenWalking* womenWalking, Chuck* chuck);
+
+
+/*----- Function: setIsForward -----
+
+ PURPOSE: Sets the isForward state of a WomenSwimming object to a random value (0 or 1).
+        Using complicated mathematics that can be translated in Assembly instead of the rand 
+        function in C.
+
+ INPUT: WomenSwimming*: a pointer to an object containing a woman swimming
+        int isForward: the value to set isForward to (0 or 1)
+
+ OUTPUT: The isForward field of the WomenSwimming object is set to the provided value.
+
+ ASSUMPTIONS: The seed variable is properly initialized and updated elsewhere in the code.
+ 
+*/
+void setIsForward(WomenSwimming* womenSwimming, int isForward);
+
+
+
+/*----- Function: initWomenSwimming -----
+
+ PURPOSE: Initializes the WomenSwimming struct by setting their initial position, movement deltas, 
+        collision state, whether they are facing forward or backward, and frame count.
+
+ INPUT: WomenSwimming*: a pointer to an object containing a woman swimming
+        unsigned int x: the initial x position of the woman swimming
+        unsigned int y: the initial y position of the woman swimming
+
+ OUTPUT: Women Swimming struct initialized with the provided position and default states for movement, 
+ collision, facing direction, and frame count.
+ 
+ ASSUMPTIONS: The renderer is working with the same coordinate system as the one used
+
+*/
+void initWomenSwimming(WomenSwimming* womenSwimming, unsigned int x, unsigned int y);
+
+
+/*----- Function: updateWomenSwimming -----
+
+ PURPOSE: Updates the position of the women swimming based on their forward/backward states
+        then it switches their facing direction after 70 frames.
+
+ INPUT: WomenSwimming*: a pointer to an object containing a woman swimming
+
+ OUTPUT: Updated position and facing direction of the woman swimming based on the animation 
+        frame count and their current facing direction.
+
+ ASSUMPTIONS: This function assumes that the frame count is being properly incremented elsewhere in the code, 
+        and that the forward/backward state is properly initialized using the setIsForward function. 
+*/
+void updateWomenSwimming(WomenSwimming* womenSwimming);
+
+
+/*----- Function: collisionWomenSwimming -----
+
+ PURPOSE: Handles the collision between a woman swimming and Chuck. Sets the movement of 
+        both Chuck and the women swimming to 0. And then it sets the collision state of both Chuck and the women
+        swimming to indicate that a collision has occurred.
+
+ INPUT: WomenSwimming*: a pointer to an object containing a woman swimming
+        Chuck*: a pointer to the Chuck struct
+
+ OUTPUT: Updates the collision state of both the woman swimming and Chuck.
+ 
+ ASSUMPTIONS: This function assumes that the positions and forward/backward states are properly set
+*/
+void collisionWomenSwimming(WomenSwimming* womenSwimming, Chuck* chuck);
+
+void initRoad(Road* road, UINT16 x, UINT16 y, int z);
+
+/*----- Function: initWater -----
+
+ PURPOSE: Initializes the Water struct by setting its initial position.
+
+ INPUT: Water*: a pointer to the model containing the water object
+        unsigned int x: the initial x position of the water
+        unsigned int y: the initial y position of the water
+
+ OUTPUT: Water struct initialized with the provided position.
+
+ ASSUMPTIONS: The renderer is working with the same coordinate system as the one used to 
+       initialize the water's position, and that the initial position provided is within 
+       the bounds of the game screen.
+
+*/
+void initWater(Water* water, unsigned int x, unsigned int y);
 
 #endif

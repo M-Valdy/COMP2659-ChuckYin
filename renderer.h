@@ -42,16 +42,6 @@ void render_women_swimming_forward(UINT32 *base, UINT16 row, UINT16 col, WomenSw
 
 void render_women_swimming_backward(UINT32 *base, UINT16 row, UINT16 col, WomenSwimming* womenSwimming);
 
-/*----- Function: render_tree -----
-    PURPOSE: Renders the trees on the screen at their current positions.
-
-    INPUT: Tree*: a pointer to the array of Tree objects in the model
-           Address(UINT8*): to the start of the screen
-
-    OUTPUT: Trees rendered on the screen at their current positions
-*/
-void render_tree(UINT32 *base, UINT16 row, UINT16 col, Tree* tree);
-
 /*----- Function: render_water -----
     PURPOSE: Renders the water on the screen at its current position.
 
