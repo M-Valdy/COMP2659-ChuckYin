@@ -81,7 +81,7 @@ const UINT16 womenWalking_bitmap[WALKER_HEIGHT] =
 /* @author Paolo */
 const UINT16 womenSwimming_forward_bitmap[SWIMMER_HEIGHT] =
 {
-    0x1ffb,
+    0x1ff8,
     0x3ffc,
     0x7ffe,
     0xffff,

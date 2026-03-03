@@ -7,7 +7,7 @@ int main()
 
 	const UINT16 womenSwimming_forward_bitmap[16] =
 {
-    0x1ffb,
+    0x1ff8,
     0x3ffc,
     0x7ffe,
     0xffff,
