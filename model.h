@@ -1,9 +1,6 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-
-#include "water.h"
-
 /*
 
     This file defines the struct that contains all the structures that represent the state 
@@ -21,6 +18,7 @@
 #define WALKER_HEIGHT 16
 #define SWIMMER_HEIGHT 16
 #define ROAD_HEIGHT 32
+#define WATER_HEIGHT 32
 extern const UINT32 Chuck_bitmap[CHUCK_HEIGHT];
 extern const UINT32 womenWalking_bitmap[WALKER_HEIGHT];
 extern const UINT32 womenSwimming_forward_bitmap[SWIMMER_HEIGHT];
