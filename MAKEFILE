@@ -1,3 +1,5 @@
+CC = cc68x
+
 # linking command
 tst_rast: tst_rast.o raster.o rast_asm.o font.o
 	cc68x -g tst_rast.o raster.o rast_asm.o font.o -o tst_rast
@@ -21,19 +23,21 @@ cond.o: cond.c cond.h
 	cc68x -g -c cond.c
 asynch.o: asynch.c asynch.h
 	cc68x -g -c asynch.c
+synch.o: synch.c synch.h
+	cc68x -g -c synch.c
 renderer.o: renderer.c renderer.h
 	cc68x -g -c renderer.c
 events.o: events.c events.h
 	cc68x -g -c events.c
 
 # paolos awesome render test driver hehe
-rendrTST: rendrTST.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o
-	cc68x -g rendrTST.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o -o rendrtst
-rendrTST.o: rendrTST.c
-	cc68x -g -c rendrTST.c
+rendrtst: rendrtst.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o
+	cc68x -g rendrtst.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o -o rendrtst
+rendrtst.o: rendrtst.c
+	$(CC) -g -c rendrtst.c
 
 # paolos awesome model test driver hehe
-modelTST: modelTST.o model.o cond.o synch.o asynch.o
-	cc68x -g modelTST.o model.o cond.o synch.o asynch.o -o modltst
-modelTST.o: modelTST.c
-	cc68x -g -c modelTST.c
+modeltst: modeltst.o model.o cond.o synch.o asynch.o
+	cc68x -g modeltst.o model.o cond.o synch.o asynch.o -o modeltst
+modeltst.o: modeltst.c
+	$(CC) -g -c modeltst.c

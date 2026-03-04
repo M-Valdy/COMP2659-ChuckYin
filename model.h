@@ -1,6 +1,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include "types.h"
+
 /*
 
     This file defines the struct that contains all the structures that represent the state 
@@ -26,16 +28,6 @@ extern const UINT32 womenSwimming_backward_bitmap[SWIMMER_HEIGHT];
 extern const UINT32 road_bitmap_upper[ROAD_HEIGHT];
 extern const UINT32 road_bitmap_lower[ROAD_HEIGHT];
 extern const UINT32 water_bitmap[WATER_HEIGHT];
-
-typedef struct {
-    int gameOver;
-    int crossCount;
-    Chuck chuck;
-    WomenWalking womenWalking[15];
-    WomenSwimming womenSwimming[15];
-    Water water[120]; /* need 40 Water objects per stream (20 to cover the whole screen width, double it to make it 64 pixels high), 3 water streams total */ 
-    Road road[120]; /* need 40 road segments per road (20 to cover the whole screen width, double it to make it 64 pixels high), 3 roads total */ 
-} Model;
 
 typedef struct {
     unsigned int x;
@@ -72,6 +64,15 @@ typedef struct {
     unsigned int x,y;
 } Water;
 
+typedef struct {
+    int gameOver;
+    int crossCount;
+    Chuck chuck;
+    WomenWalking womenWalking[15];
+    WomenSwimming womenSwimming[15];
+    Water water[120]; /* need 40 Water objects per stream (20 to cover the whole screen width, double it to make it 64 pixels high), 3 water streams total */ 
+    Road road[120]; /* need 40 road segments per road (20 to cover the whole screen width, double it to make it 64 pixels high), 3 roads total */ 
+} Model;
 
 /*----- Function: initChuck -----
 
@@ -308,5 +309,38 @@ void initRoad(Road* road, UINT16 x, UINT16 y, int z);
 
 */
 void initWater(Water* water, unsigned int x, unsigned int y);
+
+/*----- Function: Model_init -----
+
+ PURPOSE: Initializes the model by setting the initial positions and states of all game objects.
+
+ INPUT: Model*: a pointer to the model containing all game objects
+
+ OUTPUT: Entire game screen with all game objects initialized to their starting positions and states
+
+*/
+void Model_init(Model *model);
+
+/*----- Function: init_land -----
+
+ PURPOSE: Initializes water and road objects in their appropriate coordinates
+
+ INPUT: Model*: a pointer to the model containing all game objects
+
+ OUTPUT: All water and road objects ready to be rendered
+
+*/
+void init_land(Model *model);
+
+/*----- Function: init_women -----
+
+ PURPOSE: Initializes swimmers and walking women in their appropriate coordinates
+
+ INPUT: Model*: a pointer to the model containing all game objects
+
+ OUTPUT: All swimmers and walking women objects ready to be rendered
+
+*/
+void init_women(Model *model);
 
 #endif
