@@ -43,12 +43,12 @@ void render_road(UINT32 *base, UINT16 row, UINT16 col, const Road* road){
 void master_render(const Model *model, UINT32 *base) {
     int i;
     for (i = 0; i < 120; i++) {
-        render_water(base, model->water[i].x, model->water[i].y, &model->water[i]);
-        render_road(base, model->road[i].x, model->road[i].y, &model->road[i]);
+        render_water(base, model->water[i].y, model->water[i].x, &model->water[i]);
+        render_road(base, model->road[i].y, model->road[i].x, &model->road[i]);
     }
     for (i = 0; i < 15; i++) {
-        render_WomenWalking(base, model->womenWalking[i].x, model->womenWalking[i].y, &model->womenWalking[i]);
-        render_women_swimming(base, model->womenSwimming[i].x, model->womenSwimming[i].y, &model->womenSwimming[i]);
+        render_WomenWalking(base, model->womenWalking[i].y, model->womenWalking[i].x, &model->womenWalking[i]);
+        render_women_swimming(base, model->womenSwimming[i].y, model->womenSwimming[i].x, &model->womenSwimming[i]);
     }
-    render_Chuck(base, model->chuck.x, model->chuck.y, &model->chuck);
+    render_Chuck(base, model->chuck.y, model->chuck.x, &model->chuck);
 }

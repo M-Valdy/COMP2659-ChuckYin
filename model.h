@@ -16,9 +16,9 @@
     @authors Meagan Valderrama, Paolo Deocareza
 */
 
-#define CHUCK_HEIGHT 8
-#define WALKER_HEIGHT 16
-#define SWIMMER_HEIGHT 16
+#define CHUCK_HEIGHT 32
+#define WALKER_HEIGHT 32
+#define SWIMMER_HEIGHT 32
 #define ROAD_HEIGHT 32
 #define WATER_HEIGHT 32
 extern const UINT32 Chuck_bitmap[CHUCK_HEIGHT];

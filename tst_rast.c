@@ -29,7 +29,7 @@ int main()
 	clear_screen(base);
 	
 	plot_16_bitmap(base, 200, 250, 16, womenSwimming_forward_bitmap);
-	s
+	
 	plot_character(base, 350, 200, 'A');
 	plot_string(base, 350, 210, "Hello there.");
 	
