@@ -27,10 +27,17 @@ void render_initial_state(const Model *model, UINT32 *base);
  OUTPUT: Entire game screen with all game objects rendered at their current positions
 
 */
-void master_render(const Model *model, UINT8 *base);
+void master_render(const Model *model, UINT32 *base);
 
+/*----- Function: render_Chuck -----
+    PURPOSE: Renders Chuck on the screen at their current positions.
+    
+    INPUT: Chuck*: a pointer to the array of Chuck objects in the model
+           Address(UINT8*): to the start of the screen
 
-void render_Chuck(UINT32 *base, UINT16 row, UINT16 col, Chuck* chuck);
+    OUTPUT: Chuck rendered on the screen at their current positions
+*/
+void render_Chuck(UINT32 *base, UINT16 row, UINT16 col, const Chuck* chuck);
 
 /*----- Function: render_WomenWalking -----
     PURPOSE: Renders the women walking on the screen at their current positions.
@@ -40,7 +47,7 @@ void render_Chuck(UINT32 *base, UINT16 row, UINT16 col, Chuck* chuck);
 
     OUTPUT: Women walking rendered on the screen at their current positions
 */
-void render_WomenWalking(UINT32 *base, UINT16 row, UINT16 col, WomenWalking* womenWalking);
+void render_WomenWalking(UINT32 *base, UINT16 row, UINT16 col, const WomenWalking* womenWalking);
 
 /*----- Function: render_WomenSwimming -----
     PURPOSE: Renders the women swimming on the screen at their current positions.
@@ -50,7 +57,7 @@ void render_WomenWalking(UINT32 *base, UINT16 row, UINT16 col, WomenWalking* wom
 
     OUTPUT: Women swimming rendered on the screen at their current positions
 */
-void render_women_swimming(UINT32 *base, UINT16 row, UINT16 col, WomenSwimming* womenSwimming);
+void render_women_swimming(UINT32 *base, UINT16 row, UINT16 col, const WomenSwimming* womenSwimming);
 
 /*----- Function: render_water -----
     PURPOSE: Renders the water on the screen at its current position.
@@ -60,7 +67,7 @@ void render_women_swimming(UINT32 *base, UINT16 row, UINT16 col, WomenSwimming* 
 
     OUTPUT: Water rendered on the screen at its current position
 */
-void render_water(UINT32 *base, UINT16 row, UINT16 col, Water* water);
+void render_water(UINT32 *base, UINT16 row, UINT16 col, const Water* water);
 
 
 /*----- Function: render_road -----
@@ -72,6 +79,6 @@ void render_water(UINT32 *base, UINT16 row, UINT16 col, Water* water);
 
     OUTPUT: Road rendered on the screen at its current position
 */
-void render_road(UINT32 *base, UINT16 row, UINT16 col, Road* road, int isLower);
+void render_road(UINT32 *base, UINT16 row, UINT16 col, const Road* road);
 
 #endif
