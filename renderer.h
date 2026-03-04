@@ -5,7 +5,19 @@
 #include "model.h"
 #include "raster.h"
 
-/*----- Function: render -----
+/*----- Function: render_initial_state -----
+
+ PURPOSE: Clears the screen
+
+ INPUT: Model*: a pointer to the model containing all game objects
+        Address(UINT32*): to the start of the screen
+
+ OUTPUT: Game screen will be cleared
+
+*/
+void render_initial_state(const Model *model, UINT32 *base);
+
+/*----- Function: master_render-----
 
  PURPOSE: Renders the entire game screen by drawing all game objects in the model.
 
@@ -15,7 +27,7 @@
  OUTPUT: Entire game screen with all game objects rendered at their current positions
 
 */
-void render_initial_state(const Model *model, UINT32 *base);
+void master_render(const Model *model, UINT8 *base);
 
 
 void render_Chuck(UINT32 *base, UINT16 row, UINT16 col, Chuck* chuck);

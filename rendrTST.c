@@ -8,7 +8,7 @@
 /* @author Paolo */
 int main() {
     void *base = Physbase();
-    char userInput = 'hi';
+    char userInput = 'h';
     Model renderTestDriver;
     Model_init(&renderTestDriver);
     while (userInput != '0') {
@@ -26,6 +26,6 @@ int main() {
             asynch_button_D(&renderTestDriver);
         }
         clear_screen(base);
-    } /* gcc -std=c89 -Wall -Wextra -pedantic rendrTST.c model.c Chuck.c cond.c asynch.c synch.c w-walk.c w-swim.c road.c water.c RAST_ASM.s -o rendrTST.exe */
+    }
     return 0;
 }
