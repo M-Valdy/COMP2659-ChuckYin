@@ -782,7 +782,7 @@ plot_bitmap_8_loop:
     move.w  d0,d1     
     
     lsr.w   d6,d0     
-    or.b    d0,(a0)   
+    eor.b    d0,(a0)   
     
     ; if (shift > 0 && ((col >> 3) < (BYTES_PER_ROW - 1)))
     tst.w   d6
@@ -794,7 +794,7 @@ plot_bitmap_8_loop:
     bge     bitmap_8_next_row
     
     lsl.w   d7,d1
-    or.b    d1,1(a0)
+    eor.b    d1,1(a0)
 
 bitmap_8_next_row:
     adda.w  #80,a0 
@@ -858,7 +858,7 @@ plot_16_loop:
     move.w  d0,d1               
     
     lsr.w   d6,d0
-    or.w    d0,(a0)
+    eor.w    d0,(a0)
 
     ; if (shift > 0 && ((col >> 4) < (WORDS_PER_ROW - 1)))
     tst.w   d6
@@ -871,7 +871,7 @@ plot_16_loop:
 
     ; *(current + 1) |= (bitmap[i] << (16 - shift));
     lsl.w   d5,d1 
-    or.w    d1,2(a0) 
+    eor.w    d1,2(a0) 
 
 plot_16_next_row:
     adda.w  #80,a0 
@@ -935,7 +935,7 @@ plot_32_loop:
     move.l  d0,d1               
     
     lsr.l   d6,d0
-    or.l    d0,(a0) 
+    eor.l    d0,(a0) 
 
     ; if (shift > 0 && ((col >> 4) < (WORDS_PER_ROW - 1)))
     tst.w   d6
@@ -948,7 +948,7 @@ plot_32_loop:
 
     ; *(current + 1) |= (bitmap[i] << (32 - shift));
     lsl.l   d5,d1     
-    or.l    d1,4(a0) 
+    eor.l    d1,4(a0) 
 
 plot_32_next_row:
     adda.w  #80,a0   
