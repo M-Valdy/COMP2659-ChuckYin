@@ -69,8 +69,8 @@ typedef struct {
     int crossCount;
     Chuck chuck;
     WomenWalking womenWalking[15];
-    WomenSwimming womenSwimming[15];
-    Water water[120]; /* need 40 Water objects per stream (20 to cover the whole screen width, double it to make it 64 pixels high), 3 water streams total */ 
+    WomenSwimming womenSwimming[30];
+    Water water[80]; /* need 40 Water objects per stream (20 to cover the whole screen width, double it to make it 64 pixels high), 3 water streams total */ 
     Road road[120]; /* need 40 road segments per road (20 to cover the whole screen width, double it to make it 64 pixels high), 3 roads total */ 
 } Model;
 
@@ -224,21 +224,18 @@ void updateWomenWalking(WomenWalking* womenWalking);
 void collisionWomenWalking(WomenWalking* womenWalking, Chuck* chuck);
 
 
-/*----- Function: setIsForward -----
+/*----- Function: intGenerator -----
 
- PURPOSE: Sets the isForward state of a WomenSwimming object to a random value (0 or 1).
-        Using complicated mathematics that can be translated in Assembly instead of the rand 
-        function in C.
+ PURPOSE: Used for anything that might need a random number
 
- INPUT: WomenSwimming*: a pointer to an object containing a woman swimming
-        int isForward: the value to set isForward to (0 or 1)
+ INPUT: int max: the max possible value in the range
 
- OUTPUT: The isForward field of the WomenSwimming object is set to the provided value.
+ OUTPUT: The random value generated, which will be used for frameCount and isForward initializations.
 
  ASSUMPTIONS: The seed variable is properly initialized and updated elsewhere in the code.
  
 */
-void setIsForward(WomenSwimming* womenSwimming, int isForward);
+int intGenerator(int max);
 
 
 

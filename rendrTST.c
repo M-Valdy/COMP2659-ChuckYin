@@ -15,7 +15,7 @@ int main() {
     Model_init(&renderTestDriver);
     clear_screen(base);
     
-    /*render_road(base, renderTestDriver.road[0].y, renderTestDriver.road[0].x, &renderTestDriver.road[0]);*/
+    /*
     for (i = 0; i < 120; i++) {
         render_water(base, renderTestDriver.water[i].y, renderTestDriver.water[i].x, &renderTestDriver.water[i]);
         render_road(base, renderTestDriver.road[i].y, renderTestDriver.road[i].x, &renderTestDriver.road[i]);
@@ -25,7 +25,8 @@ int main() {
         render_women_swimming(base, renderTestDriver.womenSwimming[i].y, renderTestDriver.womenSwimming[i].x, &renderTestDriver.womenSwimming[i]);
     }
     render_Chuck(base, renderTestDriver.chuck.y, renderTestDriver.chuck.x, &renderTestDriver.chuck);
-    /*
+    */
+    
     while (userInput != '0') {
         clear_screen(base);
         synch_update(&renderTestDriver);
@@ -41,6 +42,6 @@ int main() {
         } else if (userInput == 'd') {
             asynch_button_D(&renderTestDriver);
         }
-    }*/
+    }
     return 0;
 }

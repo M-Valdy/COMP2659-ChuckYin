@@ -14,10 +14,13 @@ static const Coords WALKERS_SPAWN_POINTS[15] = {
 };
 
 /* @author Paolo */
-static const Coords SWIMMERS_SPAWN_POINTS[15] = {
+static const Coords SWIMMERS_SPAWN_POINTS[30] = {
     {  23, 208 }, {  67, 208 }, { 116, 208 }, { 253, 208 }, { 300, 208 },
     { 435, 208 }, { 483, 208 }, { 527, 208 }, { 2, 240 }, { 69, 240 },
-    {  140, 240 }, { 217, 240 }, { 343, 240 }, { 418, 240 }, { 495, 240 }
+    {  140, 240 }, { 217, 240 }, { 343, 240 }, { 418, 240 }, { 495, 240 },
+    {  23, 80 }, {  67, 80 }, { 116, 80 }, { 253, 80 }, { 300, 80 },
+    { 435, 80 }, { 483, 80 }, { 527, 80 }, { 2, 112 }, { 175, 80 },
+    {  140, 112 }, { 279, 112 }, { 343, 112 }, { 598, 80 }, { 588, 112 }
 };
 
 /*
@@ -64,38 +67,38 @@ const UINT32 Chuck_bitmap[CHUCK_HEIGHT] =
 /* @author Paolo */
 const UINT32 womenWalking_bitmap[WALKER_HEIGHT] =
 {
-    0xFFFFFFFF, 
-    0xFFE007FF, 
-    0xFF8181FF, 
-    0xFF0E70FF, 
-    0xFF1008FF, 
-    0xFE20047F, 
-    0xFE40027F, 
-    0xFC80013F, 
-    0xFD1818BF, 
-    0xFD1818BF, 
-    0xFE00007F, 
-    0xFC00003F, 
-    0xFC00003F, 
-    0xFC03C03F, 
-    0xFC00003F, 
-    0xF900009F,
-    0xFB8001DF, 
-    0xF3E007CF, 
-    0xE7F00FE7, 
-    0xFFC003FF, 
-    0xFF8001FF, 
-    0xFF9009FF, 
-    0xFF9009FF, 
-    0xFF9009FF, 
-    0xFF9009FF, 
-    0xFF9009FF, 
-    0xFF93C9FF, 
-    0xFFF3CFFF, 
-    0xFFF3CFFF, 
-    0xFFF3CFFF, 
-    0xFFF3CFFF, 
-    0xFFFFFFFF
+    0x00000000, 
+    0x001FF800, 
+    0x007E7E00, 
+    0x00F18F00, 
+    0x00EFF700, 
+    0x01DFFB80, 
+    0x01BFFD80, 
+    0x037FFEC0, 
+    0x02E7E740, 
+    0x02E7E740, 
+    0x01FFFF80, 
+    0x03FFFFC0, 
+    0x03FFFFC0, 
+    0x03FC3FC0, 
+    0x03FFFFC0, 
+    0x06FFFF60, 
+    0x047FFE20, 
+    0x0C1FF830, 
+    0x180FF018, 
+    0x003FFC00, 
+    0x007FFE00, 
+    0x006FF600, 
+    0x006FF600, 
+    0x006FF600, 
+    0x006FF600,
+    0x006FF600, 
+    0x006C3600, 
+    0x000C3000, 
+    0x000C3000, 
+    0x000C3000, 
+    0x000C3000, 
+    0x00000000 
 };
 
 /* @author Paolo */
@@ -378,28 +381,30 @@ void checkYCollision(Chuck* chuck, Water* water) {
     }
 }
 
-/* @author Meagan */
+/* @author Meagan & Paolo*/
 void initWomenWalking(WomenWalking* womenWalking, UINT16 x, UINT16 y) {
     womenWalking->x = x;
     womenWalking->y = y;
-    womenWalking->deltaX = 1;
+    womenWalking->deltaX = 15;
     womenWalking->deltaY = 0;
 }
 
 /* @author Paolo */
 void updateWomenWalking(WomenWalking* womenWalking) {
-    womenWalking->x += womenWalking->deltaX;
-    if (womenWalking->x + 32 >= 640) {
-        womenWalking->deltaX = -1; /* Move left */
+    if (womenWalking->x + WALKER_HEIGHT >= 640) {
+        womenWalking->x = 640 - WALKER_HEIGHT;
+        womenWalking->deltaX = -15; /* Move left */
     } else if (womenWalking->x <= 0) {
-        womenWalking->deltaX = 1; /* Move right */
+        womenWalking->x = 0;
+        womenWalking->deltaX = 15; /* Move right */
     }
-    
+    womenWalking->x += womenWalking->deltaX;
 }
 
-/* @author Meagan */
+/* @author Meagan & Paolo */
 void collisionWomenWalking(WomenWalking* womenWalking, Chuck* chuck) {
-    if (womenWalking->x == chuck->x && womenWalking->y == chuck->y) {
+    if (womenWalking->x+WALKER_HEIGHT >= chuck->x && womenWalking->x <= chuck->x+CHUCK_HEIGHT &&  
+        womenWalking->y <= chuck->y+CHUCK_HEIGHT && womenWalking->y+WALKER_HEIGHT >= chuck->y ) {
         /* womenWalking collides with Chuck, stop movement */
         womenWalking->deltaX = 0;
         womenWalking->deltaY = 0;
@@ -412,29 +417,30 @@ void collisionWomenWalking(WomenWalking* womenWalking, Chuck* chuck) {
  This is for making the pseudo-random numbers for isForward state */
 static UINT16 seed = 12345;
 
-/* @author Meagan */
-void setIsForward(WomenSwimming* womenSwimming, int isForward) {
-    seed = (seed * 25173 + 13849) & 0x7FFF; /* make a random number */
-    seed = seed & 0x0001; /* make it either 0 or 1 */
-    womenSwimming->isForward = seed; /* set isForward to the random number */
+/* @author Meagan & Paolo */
+int intGenerator(int max) { /* used Bing and Copilot for help. Max must be any of these: 1,3,7,15,31,63 */
+    seed = (seed * 25173 + 13849) & 0x7FFF;
+    return (seed >> 8) & max;
 }
 
-/* @author Meagan */
+/* @author Meagan & Paolo*/
 void initWomenSwimming(WomenSwimming* womenSwimming, UINT16 x, UINT16 y) {
     womenSwimming->x = x;
     womenSwimming->y = y;
     womenSwimming->deltaX = 0;
     womenSwimming->deltaY = 0;
     womenSwimming->isColliding = 0;
-    setIsForward(womenSwimming, 0); /* set isForward to a random value of either 0 or 1 */
+    womenSwimming->isForward = intGenerator(1); /* set isForward to a random value of either 0 or 1 */
+    womenSwimming->frameCount = intGenerator(3);
 }
 
 /* @author Paolo */
 void updateWomenSwimming(WomenSwimming* womenSwimming) {
-    if (womenSwimming->frameCount == 70 && womenSwimming->isForward == 1) {
+    if (womenSwimming->frameCount == 3 && womenSwimming->isForward == 1) {
         womenSwimming->isForward = 0; /* Switch to backward bitmap after 70 frames */
         womenSwimming->frameCount = 0; /* Reset frame count after switching direction */
-    } else if (womenSwimming->frameCount == 70 && womenSwimming->isForward == 0) {
+    } else if (womenSwimming->frameCount == 3 && womenSwimming->isForward == 0) {
+        womenSwimming->frameCount = 0;
         womenSwimming->isForward = 1; /* Switch to forward bitmap after 70 frames */
     }
     womenSwimming->frameCount++;
@@ -443,7 +449,8 @@ void updateWomenSwimming(WomenSwimming* womenSwimming) {
 
 /* @author Meagan */
 void collisionWomenSwimming(WomenSwimming* womenSwimming, Chuck* chuck) {
-    if (womenSwimming->x == chuck->x && womenSwimming->y == chuck->y && womenSwimming->isForward == 1) {
+    if (womenSwimming->x+WALKER_HEIGHT >= chuck->x && womenSwimming->x <= chuck->x+CHUCK_HEIGHT &&  
+        womenSwimming->y <= chuck->y+CHUCK_HEIGHT && womenSwimming->y+WALKER_HEIGHT >= chuck->y && womenSwimming->isForward == 1) {
         /* womenSwimming collides with Chuck, stop movement */
         womenSwimming->deltaX = 0;
         womenSwimming->deltaY = 0;
@@ -480,17 +487,19 @@ void isWaterColliding(Water* water, Chuck* chuck) {
     Initializes the roads. Since water objects are always 64 pixels below, might as well just use the same coordinates while adding 64
 */
 void init_land(Model *model) {
-    int i;
-    int x;
+    int i = 0;
+    int x = 0;
     int y = 16;
-    int count;
-    int isDown;
+    int count = 0;
+    int isDown = 0;
     for (i = 0; i < 120; i++) {
-        initWater(&model->water[i], x, y+64);
+        if (i < 80) { /* spawn area shouldnt be water, so i added this if statement after this realization*/
+            initWater(&model->water[i], x, y+64);
+        }
         initRoad(&model->road[i], x, y, isDown);
         x += 32;
         count++;
-        if (count == 19) {
+        if (count > 19) {
             count = 0;
             isDown++;
             if (isDown == 2) {
@@ -511,6 +520,8 @@ void init_women(Model *model) {
 
     for (i = 0; i < 15; i++) {
         initWomenWalking(&model->womenWalking[i], WALKERS_SPAWN_POINTS[i].x, WALKERS_SPAWN_POINTS[i].y);
+    }
+    for (i = 0; i < 30; i++) {
         initWomenSwimming(&model->womenSwimming[i], SWIMMERS_SPAWN_POINTS[i].x, SWIMMERS_SPAWN_POINTS[i].y); 
     }
 }
