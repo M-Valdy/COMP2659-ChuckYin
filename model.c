@@ -394,8 +394,8 @@ void updateWomenWalking(WomenWalking* womenWalking) {
     if (womenWalking->x + WALKER_HEIGHT >= 640) {
         womenWalking->x = 640 - WALKER_HEIGHT;
         womenWalking->deltaX = -15; /* Move left */
-    } else if (womenWalking->x <= 0) {
-        womenWalking->x = 0;
+    } else if (womenWalking->x-15 <= 0) {
+        womenWalking->x = 15;
         womenWalking->deltaX = 15; /* Move right */
     }
     womenWalking->x += womenWalking->deltaX;

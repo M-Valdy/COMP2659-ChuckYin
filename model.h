@@ -43,7 +43,7 @@ typedef struct {
 } Chuck;
 
 typedef struct {
-    unsigned int x,y;
+    int x, y;
     int deltaX, deltaY;
 } WomenWalking;
 

@@ -29,6 +29,7 @@ int main() {
     
     while (userInput != '0') {
         clear_screen(base);
+        Vsync();
         synch_update(&renderTestDriver);
         cond_update(&renderTestDriver);
         master_render(&renderTestDriver, base);
