@@ -3,9 +3,10 @@
 /* @author Paolo */
 void cond_update(Model *model) {
     int i;
-    model->chuck.isColliding = 0;
+    
     if (model->chuck.isColliding == 1) {
         stopWalking(&model->chuck);
+        model->chuck.isColliding = 0;
     } else if (model->chuck.isColliding == 2) {
         model->crossCount = 0;
         initChuck(&model->chuck, 320, 350); /* Reset Chuck to starting position to bottom middle of screen */
