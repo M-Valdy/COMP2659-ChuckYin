@@ -25,5 +25,6 @@ void cond_update(Model *model) {
     }
     if (model->crossCount == 4) { /* Chuck needs to cross the roads 5 times */
         model->gameOver = 1;
+        model->crossCount = 0;
     }
 }

@@ -55,4 +55,6 @@ void master_render(const Model *model, UINT32 *base) {
         render_women_swimming(base, model->womenSwimming[i].y, model->womenSwimming[i].x, &model->womenSwimming[i]);
     }
     render_Chuck(base, model->chuck.y, model->chuck.x, &model->chuck);
+    plot_string(base, 390, 5, "Cross Count is");
+    plot_character(base, 390, 125, model->crossCount + '0');
 }
