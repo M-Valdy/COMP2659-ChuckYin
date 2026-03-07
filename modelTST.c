@@ -37,19 +37,19 @@ void checkSynch(Model *model) {
 void checkAsynch(Model *model) {
     printf("================================================================================\n");
 
-    printf("Chuck's initial position: (%u, %u)\n", model->chuck.x, model->chuck.y);
+    printf("Chuck's initial position: (%d, %d)\n", model->chuck.x, model->chuck.y);
     asynch_button_W(model);
     updateChuck(&model->chuck); 
-    printf("Chuck's position after moving up: (%u, %u)\n", model->chuck.x, model->chuck.y);
+    printf("Chuck's position after moving up: (%d, %d)\n", model->chuck.x, model->chuck.y);
     asynch_button_A(model);
     updateChuck(&model->chuck); 
-    printf("Chuck's position after moving left: (%u, %u)\n", model->chuck.x, model->chuck.y);
+    printf("Chuck's position after moving left: (%d, %d)\n", model->chuck.x, model->chuck.y);
     asynch_button_S(model);
     updateChuck(&model->chuck); 
-    printf("Chuck's position after moving down: (%u, %u)\n", model->chuck.x, model->chuck.y);
+    printf("Chuck's position after moving down: (%d, %d)\n", model->chuck.x, model->chuck.y);
     asynch_button_D(model);
     updateChuck(&model->chuck); 
-    printf("Chuck's position after moving right: (%u, %u)\n", model->chuck.x, model->chuck.y);
+    printf("Chuck's position after moving right: (%d, %d)\n", model->chuck.x, model->chuck.y);
 
     printf("================================================================================\n");
 }
@@ -63,7 +63,7 @@ void checkCond(Model *model) {
     cond_update(model);
     printf("Cross count after: %d\n", model->crossCount);
     printf("Current gameOver value:  %d\n", model->gameOver);
-    printf("Chuck's Y coordinate is: %u\n", model->chuck.y);
+    printf("Chuck's Y coordinate is: %d\n", model->chuck.y);
     
     printf("================================================================================\n");
 }
@@ -73,14 +73,14 @@ void checkCond2(Model *model) {
     printf("================================================================================\n");
 
     model->chuck.x = 50;
-    printf("Chuck's current position: (%u, %u)\n", model->chuck.x, model->chuck.y);
+    printf("Chuck's current position: (%d, %d)\n", model->chuck.x, model->chuck.y);
     printf("Cross count before: %d\n", model->crossCount);
     model->womenWalking[0].x = model->chuck.x;
     model->womenWalking[0].y = model->chuck.y;
     cond_update(model);
-    printf("Chuck->isColliding: %u\n", model->chuck.isColliding);
+    printf("Chuck->isColliding: %d\n", model->chuck.isColliding);
     cond_update(model);
-    printf("Chuck's position after collision: (%u, %u)\n", model->chuck.x, model->chuck.y);
+    printf("Chuck's position after collision: (%d, %d)\n", model->chuck.x, model->chuck.y);
     printf("Cross count after: %d\n", model->crossCount);
 
     printf("================================================================================\n");

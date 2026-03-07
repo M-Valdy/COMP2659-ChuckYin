@@ -300,44 +300,28 @@ void initChuck(Chuck* chuck, unsigned int x, unsigned int y) {
     chuck->canMoveDown = 1;
 }
 
-/* @author Meagan & Paolo */
+/* @author Meagan */
 /* function for starting Chuck's walking in a specified direction */
 void startWalking(Chuck* chuck, int deltaX, int deltaY) {
     chuck->isWalking = 1;
     chuck->deltaX = deltaX;
     chuck->deltaY = deltaY;
-    if (chuck->deltaX > 0) { /* moving right */
-        chuck->canMoveLeft = 1; /* can move left if currently moving right */
-    } else if (chuck->deltaX < 0) { /* moving left */
-        chuck->canMoveRight = 1; /* can move right if currently moving left */
-    }
-    if (chuck->deltaY > 0) { /* moving down */
-        chuck->canMoveUp = 1; /* can move up if currently moving down */
-    } else if (chuck->deltaY < 0) { /* moving up */
-        chuck->canMoveDown = 1; /* can move down if currently moving up */
-    }
 }
 
 /* @author Meagan & Paolo
 function for updating Chuck's position based on his walking state */
 void updateChuck(Chuck* chuck) {
     if (chuck->isWalking) {
-        /* check if he's allowed to move there first. */
-        if (chuck->canMoveRight == 0 && chuck->deltaX > 0) {
-            chuck->deltaX = 0;  
+        chuck->oldx = chuck->x;
+        chuck->oldy = chuck->y;
+        if (chuck->x >= 6 && chuck->x <= 633) {
+            chuck->x += chuck->deltaX;
         }
-        if (chuck->canMoveLeft == 0 && chuck->deltaX < 0) {
-            chuck->deltaX = 0;
+        if (chuck->y >= 6 && chuck->y <= 393) {
+            chuck->y += chuck->deltaY;
         }
-        if (chuck->canMoveUp == 0 && chuck->deltaY < 0) {
-            chuck->deltaY = 0;
-        }
-        if (chuck->canMoveDown == 0 && chuck->deltaY > 0) {
-            chuck->deltaY = 0;
-        }
-
-        chuck->x += chuck->deltaX;
-        chuck->y += chuck->deltaY;
+        chuck->deltaX = 0;
+        chuck->deltaY = 0;
     }
 }
 
@@ -347,38 +331,6 @@ void stopWalking(Chuck* chuck) {
     chuck->isWalking = 0;
     chuck->deltaX = 0;
     chuck->deltaY = 0;
-}
-
-/* @author Paolo 
-// if Chuck's right edge is touching the left edge of the water, then can't move right
-// if Chuck's left edge is touching the right edge of the water, then can't move right */
-void checkXCollision(Chuck* chuck, Water* water) {
-    if (chuck->x + 32 == water->x) { 
-        chuck->canMoveRight = 0;
-    } else {
-        chuck->canMoveRight = 1;
-    }
-    if (chuck->x == water->x + 32) { 
-        chuck->canMoveLeft = 0;
-    } else {
-        chuck->canMoveLeft = 1;
-    }
-}
-
-/* @author Paolo
-// if Chuck's top edge is touching the bottom edge of the water, then can't move up
-// if Chuck's bottom edge is touching the top edge of the water, then can't move down */
-void checkYCollision(Chuck* chuck, Water* water) {
-    if (chuck->y == water->y - 32) { 
-        chuck->canMoveUp = 0;
-    } else {
-        chuck->canMoveUp = 1;
-    }
-    if (chuck->y - CHUCK_HEIGHT == water->y) { 
-        chuck->canMoveDown = 0;
-    } else {
-        chuck->canMoveDown = 1;
-    }
 }
 
 /* @author Meagan & Paolo*/

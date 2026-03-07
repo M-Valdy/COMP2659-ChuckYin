@@ -68,6 +68,7 @@ int main() {
             synch_update(&frogger, back);
             cond_update(&frogger);
             clear_screen(back);
+            back = front;
             master_render(&frogger, back); /* TO DO: need to optimize master_render by implementing functions for clearing affected bitmaps and rendering */
             
             /* Use Vsync to prevent premature rendering */

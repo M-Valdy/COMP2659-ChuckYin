@@ -30,8 +30,10 @@ extern const UINT32 road_bitmap_lower[ROAD_HEIGHT];
 extern const UINT32 water_bitmap[WATER_HEIGHT];
 
 typedef struct {
-    unsigned int x;
-    unsigned int y;
+    int x;
+    int y;
+    int oldx;
+    int oldy;
     int isWalking;
     int deltaX;
     int deltaY;
@@ -44,6 +46,7 @@ typedef struct {
 
 typedef struct {
     int x, y;
+    int oldx, oldy;
     int deltaX, deltaY;
 } WomenWalking;
 
@@ -147,38 +150,6 @@ void updateChuck(Chuck* chuck);
 */
 void stopWalking(Chuck* chuck);
 
-/*----- Function: checkXCollision -----
-
- PURPOSE: Checks for collisions between Chuck and the water in the x direction and updates movement permissions accordingly.
-
- INPUT: Chuck*: a pointer to the model containing the player character Chuck
-        Water*: a pointer to the water object in the model
-
- OUTPUT: Chuck struct with updated movement permissions for left and right movement based on collision state with water
-
- ASSUMPTIONS: This function assumes
-        - Chuck's position and dimensions are defined such that his edges can be checked for collision 
-        with the water's edges
-        - The water object has defined dimensions that can be used to check for collisions with Chuck
-*/
-void checkXCollision(Chuck* chuck, Water* water);
-
-
-/*----- Function: checkYCollision -----
-
- PURPOSE: Checks for collisions between Chuck and the water in the y direction and updates movement permissions accordingly.
-
- INPUT: Chuck*: a pointer to the model containing the player character Chuck
-        Water*: a pointer to the water object in the model
-
- OUTPUT: Chuck struct with updated movement permissions for up and down movement based on collision state with water
-
- ASSUMPTIONS: This function assumes
-        - Chuck's position and dimensions are defined such that his edges can be checked for collision 
-        with the water's edges
-        - The water object has defined dimensions that can be used to check for collisions with Chuck
-*/
-void checkYCollision(Chuck* chuck, Water* water);
 
 /*-----Function: initWomenWalking-----
  PURPOSE: Initializes the WomenWalking struct with the given x and y coordinates.
