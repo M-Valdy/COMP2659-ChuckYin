@@ -13,7 +13,7 @@ UINT32 get_time() {
     long *timer;
     UINT32 time;
 
-    *timer = (long *)0x462;
+    timer = (long *)0x462;
     old_ssp = Super(0);
     time = *timer;
     Super(old_ssp); 
@@ -35,12 +35,15 @@ int main() {
     /* Also said that we need to make frame buffers to be 256 byte aligned */
     void *base = Physbase();
     void *front, *back;
+    void *raw_back;
     front = base;
-    back = Malloc(32000); /* TO DO: make it 256 byte aligned */
+    raw_back = (void *)Malloc(32000L + 255L);
+    back = (void *)(((long)raw_back + 255L) & 0xFFFFFF00L);
     
     Model_init(&frogger);
     render_initial_state(&frogger, back);
     
+    timeThen = get_time();
     while (frogger.gameOver != 1) {
         if (has_input()) {
             ch = get_input();
@@ -52,13 +55,17 @@ int main() {
                 asynch_button_S(&frogger);
             } else if (ch == 'd') {
                 asynch_button_D(&frogger);
+            } else if (ch == 'x') {
+                asynch_button_X(&frogger);
+            } else if (ch == 'p') {
+                asynch_button_P(&frogger);
             }
         }
 
         timeNow = get_time();
         timeElapsed = timeNow - timeThen;
         if (timeElapsed > 0) {
-            synch_update(&frogger);
+            synch_update(&frogger, back);
             cond_update(&frogger);
             clear_screen(back);
             master_render(&frogger, back); /* TO DO: need to optimize master_render by implementing functions for clearing affected bitmaps and rendering */
@@ -70,6 +77,8 @@ int main() {
             temp = front;
             front = back;
             back = temp;
+
+            timeThen = timeNow;
         }
     }
 

@@ -383,9 +383,15 @@ void checkYCollision(Chuck* chuck, Water* water) {
 
 /* @author Meagan & Paolo*/
 void initWomenWalking(WomenWalking* womenWalking, UINT16 x, UINT16 y) {
+    int multiplier;
     womenWalking->x = x;
     womenWalking->y = y;
-    womenWalking->deltaX = 15;
+    multiplier = intGenerator(1);
+    if (multiplier == 1) {
+        womenWalking->deltaX = 10;
+    } else if (multiplier == 0) {
+        womenWalking->deltaX = -10;
+    }
     womenWalking->deltaY = 0;
 }
 
@@ -393,10 +399,10 @@ void initWomenWalking(WomenWalking* womenWalking, UINT16 x, UINT16 y) {
 void updateWomenWalking(WomenWalking* womenWalking) {
     if (womenWalking->x + WALKER_HEIGHT >= 640) {
         womenWalking->x = 640 - WALKER_HEIGHT;
-        womenWalking->deltaX = -15; /* Move left */
+        womenWalking->deltaX = -10; /* Move left */
     } else if (womenWalking->x-15 <= 0) {
         womenWalking->x = 15;
-        womenWalking->deltaX = 15; /* Move right */
+        womenWalking->deltaX = 10; /* Move right */
     }
     womenWalking->x += womenWalking->deltaX;
 }
@@ -405,9 +411,6 @@ void updateWomenWalking(WomenWalking* womenWalking) {
 void collisionWomenWalking(WomenWalking* womenWalking, Chuck* chuck) {
     if (womenWalking->x+WALKER_HEIGHT >= chuck->x && womenWalking->x <= chuck->x+CHUCK_HEIGHT &&  
         womenWalking->y <= chuck->y+CHUCK_HEIGHT && womenWalking->y+WALKER_HEIGHT >= chuck->y ) {
-        /* womenWalking collides with Chuck, stop movement */
-        womenWalking->deltaX = 0;
-        womenWalking->deltaY = 0;
         stopWalking(chuck); /* Stop Chuck from walking */
         chuck->isColliding = 2; /* Set death collision flag for Chuck */
     }
@@ -418,7 +421,7 @@ void collisionWomenWalking(WomenWalking* womenWalking, Chuck* chuck) {
 static UINT16 seed = 12345;
 
 /* @author Meagan & Paolo */
-int intGenerator(int max) { /* used Bing and Copilot for help. Max must be any of these: 1,3,7,15,31,63 */
+int intGenerator(int max) { /* used Bing and Copilot for help. Max must be any of these: 1,3,7,15,31,63, 127, 255, 511, 1023 */
     seed = (seed * 25173 + 13849) & 0x7FFF;
     return (seed >> 8) & max;
 }
@@ -431,20 +434,19 @@ void initWomenSwimming(WomenSwimming* womenSwimming, UINT16 x, UINT16 y) {
     womenSwimming->deltaY = 0;
     womenSwimming->isColliding = 0;
     womenSwimming->isForward = intGenerator(1); /* set isForward to a random value of either 0 or 1 */
-    womenSwimming->frameCount = intGenerator(3);
+    womenSwimming->frameCount = intGenerator(31);
 }
 
 /* @author Paolo */
 void updateWomenSwimming(WomenSwimming* womenSwimming) {
-    if (womenSwimming->frameCount == 3 && womenSwimming->isForward == 1) {
-        womenSwimming->isForward = 0; /* Switch to backward bitmap after 70 frames */
+    if (womenSwimming->frameCount == 31 && womenSwimming->isForward == 1) {
+        womenSwimming->isForward = 0; /* Switch to backward bitmap after 31 frames */
         womenSwimming->frameCount = 0; /* Reset frame count after switching direction */
-    } else if (womenSwimming->frameCount == 3 && womenSwimming->isForward == 0) {
+    } else if (womenSwimming->frameCount == 31 && womenSwimming->isForward == 0) {
         womenSwimming->frameCount = 0;
-        womenSwimming->isForward = 1; /* Switch to forward bitmap after 70 frames */
+        womenSwimming->isForward = 1; /* Switch to forward bitmap after 31 frames */
     }
     womenSwimming->frameCount++;
-    
 }
 
 /* @author Meagan */

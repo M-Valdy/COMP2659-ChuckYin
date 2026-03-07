@@ -66,4 +66,29 @@ void asynch_button_S(Model *model);
 */
 void asynch_button_D(Model *model);
 
+/*----- Function: asynch_button_X -----
+
+ PURPOSE: Handles the asynchronous input event for the X key, which is stops the player from moving.
+
+ INPUT: Model*: a pointer to the model containing all game objects and their states
+
+ OUTPUT: Updates the model's state to reflect the input from the X key, such as setting Chuck's deltaX/Y to 0.
+
+ ASSUMPTIONS: This function assumes that the model is properly initialized and that 
+            Chuck's state can be updated based on the input event.
+*/
+void asynch_button_X(Model *model);
+
+/*----- Function: asynch_button_P -----
+
+ PURPOSE: Handles the asynchronous input event for the X key, which ends the game.
+
+ INPUT: Model*: a pointer to the model containing all game objects and their states
+
+ OUTPUT: Sets the gameOver value to 1.
+
+ ASSUMPTIONS: This function assumes that the model is properly initialized
+*/
+void asynch_button_P(Model *model);
+
 #endif

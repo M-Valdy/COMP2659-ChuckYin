@@ -53,6 +53,9 @@ void master_render(const Model *model, UINT32 *base) {
     }
     for (i = 0; i < 30; i++) {
         render_women_swimming(base, model->womenSwimming[i].y, model->womenSwimming[i].x, &model->womenSwimming[i]);
+        if (model->womenSwimming[i].frameCount <= 31 && model->womenSwimming[i].frameCount >= 25) {
+            plot_square(base, model->womenSwimming[i].y, model->womenSwimming[i].x, SWIMMER_HEIGHT);
+        }
     }
     render_Chuck(base, model->chuck.y, model->chuck.x, &model->chuck);
     plot_string(base, 390, 5, "Cross Count is");
