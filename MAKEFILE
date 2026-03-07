@@ -29,6 +29,8 @@ renderer.o: renderer.c renderer.h
 	cc68x -g -c renderer.c
 events.o: events.c events.h
 	cc68x -g -c events.c
+input.o: input.c input.h
+	cc68x -g -c input.c
 
 # paolos awesome render test driver hehe
 rendrtst.tos: rendrtst.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o
@@ -41,3 +43,9 @@ modeltst.tos: modeltst.o model.o cond.o synch.o asynch.o
 	cc68x -g modeltst.o model.o cond.o synch.o asynch.o -o modeltst.tos
 modeltst.o: modeltst.c
 	$(CC) -g -c modeltst.c
+
+# main game module
+frogger.tos: frogger.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o input.o
+	cc68x -g frogger.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o input.o -o frogger.tos
+frogger.o: frogger.c
+	$(CC) -g -c frogger.c
