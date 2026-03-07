@@ -42,6 +42,7 @@ int main() {
     
     Model_init(&frogger);
     render_initial_state(&frogger, back);
+    render_initial_state(&frogger, front);
     
     timeThen = get_time();
     while (frogger.gameOver != 1) {
@@ -65,10 +66,10 @@ int main() {
         timeNow = get_time();
         timeElapsed = timeNow - timeThen;
         if (timeElapsed > 0) {
-            synch_update(&frogger, back);
+            synch_update(&frogger);
             cond_update(&frogger);
             clear_screen(back);
-            back = front;
+            /*back = front;*/
             master_render(&frogger, back); /* TO DO: need to optimize master_render by implementing functions for clearing affected bitmaps and rendering */
             
             /* Use Vsync to prevent premature rendering */

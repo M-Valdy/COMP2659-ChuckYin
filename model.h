@@ -38,10 +38,6 @@ typedef struct {
     int deltaX;
     int deltaY;
     int isColliding; /* 1 = obstacle collision, 0 = no collision, 2 = death collision */
-    int canMoveRight;
-    int canMoveLeft;
-    int canMoveUp;
-    int canMoveDown;
 } Chuck;
 
 typedef struct {

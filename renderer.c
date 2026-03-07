@@ -58,6 +58,6 @@ void master_render(const Model *model, UINT32 *base) {
         }
     }
     render_Chuck(base, model->chuck.y, model->chuck.x, &model->chuck);
-    plot_string(base, 390, 5, "Cross Count is");
-    plot_character(base, 390, 125, model->crossCount + '0');
+    plot_string(base, 390, 15, "Cross Count is");
+    plot_character(base, 390, 135, model->crossCount + '0');
 }

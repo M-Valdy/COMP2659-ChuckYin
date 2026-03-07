@@ -290,14 +290,12 @@ function for initializing Chuck's position and state */
 void initChuck(Chuck* chuck, unsigned int x, unsigned int y) {
     chuck->x = x;
     chuck->y = y;
+    chuck->oldx = x;
+    chuck->oldy = y;
     chuck->isWalking = 0;
     chuck->isColliding = 0;
     chuck->deltaX = 0;
     chuck->deltaY = 0;
-    chuck->canMoveLeft = 1;
-    chuck->canMoveRight = 1;
-    chuck->canMoveUp = 1;
-    chuck->canMoveDown = 1;
 }
 
 /* @author Meagan */
@@ -338,6 +336,8 @@ void initWomenWalking(WomenWalking* womenWalking, UINT16 x, UINT16 y) {
     int multiplier;
     womenWalking->x = x;
     womenWalking->y = y;
+    womenWalking->oldx = x;
+    womenWalking->oldy = y;
     multiplier = intGenerator(1);
     if (multiplier == 1) {
         womenWalking->deltaX = 10;
@@ -349,6 +349,8 @@ void initWomenWalking(WomenWalking* womenWalking, UINT16 x, UINT16 y) {
 
 /* @author Paolo */
 void updateWomenWalking(WomenWalking* womenWalking) {
+    womenWalking->oldx = womenWalking->x;
+    womenWalking->oldy = womenWalking->y;
     if (womenWalking->x + WALKER_HEIGHT >= 640) {
         womenWalking->x = 640 - WALKER_HEIGHT;
         womenWalking->deltaX = -10; /* Move left */
