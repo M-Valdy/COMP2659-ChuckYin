@@ -285,13 +285,16 @@ const UINT32 water_bitmap[WATER_HEIGHT] =
     0x00000000,
 };
 
-/* @author Meagan
+/* @author Meagan & Paolo
 function for initializing Chuck's position and state */
-void initChuck(Chuck* chuck, unsigned int x, unsigned int y) {
+void initChuck(Chuck* chuck, int x, int y) {
     chuck->x = x;
     chuck->y = y;
-    chuck->oldx = x;
-    chuck->oldy = y;
+    if (chuck->deathCounter == 0) {
+        chuck->oldx = x;
+        chuck->oldy = y;
+        chuck->deathCounter = 1;
+    }
     chuck->isWalking = 0;
     chuck->isColliding = 0;
     chuck->deltaX = 0;
@@ -309,17 +312,16 @@ void startWalking(Chuck* chuck, int deltaX, int deltaY) {
 /* @author Meagan & Paolo
 function for updating Chuck's position based on his walking state */
 void updateChuck(Chuck* chuck) {
+    chuck->oldx = chuck->x;
+    chuck->oldy = chuck->y;
     if (chuck->isWalking) {
-        chuck->oldx = chuck->x;
-        chuck->oldy = chuck->y;
         if (chuck->x >= 6 && chuck->x <= 633) {
             chuck->x += chuck->deltaX;
         }
         if (chuck->y >= 6 && chuck->y <= 393) {
             chuck->y += chuck->deltaY;
         }
-        chuck->deltaX = 0;
-        chuck->deltaY = 0;
+        stopWalking(chuck);
     }
 }
 
@@ -338,35 +340,44 @@ void initWomenWalking(WomenWalking* womenWalking, UINT16 x, UINT16 y) {
     womenWalking->y = y;
     womenWalking->oldx = x;
     womenWalking->oldy = y;
+    womenWalking->isColliding = 0;
     multiplier = intGenerator(1);
     if (multiplier == 1) {
-        womenWalking->deltaX = 10;
+        womenWalking->deltaX = WALKER_SPEED;
     } else if (multiplier == 0) {
-        womenWalking->deltaX = -10;
+        womenWalking->deltaX = -1*WALKER_SPEED;
     }
     womenWalking->deltaY = 0;
 }
 
 /* @author Paolo */
 void updateWomenWalking(WomenWalking* womenWalking) {
-    womenWalking->oldx = womenWalking->x;
-    womenWalking->oldy = womenWalking->y;
+    /*womenWalking->oldx = womenWalking->x;
+    womenWalking->oldy = womenWalking->y;*/
     if (womenWalking->x + WALKER_HEIGHT >= 640) {
         womenWalking->x = 640 - WALKER_HEIGHT;
-        womenWalking->deltaX = -10; /* Move left */
+        womenWalking->deltaX = -1*WALKER_SPEED; /* Move left */
     } else if (womenWalking->x-15 <= 0) {
-        womenWalking->x = 15;
-        womenWalking->deltaX = 10; /* Move right */
+        womenWalking->x = WALKER_SPEED;
+        womenWalking->deltaX = WALKER_SPEED; /* Move right */
     }
+    womenWalking->oldx = womenWalking->x;
+    womenWalking->oldy = womenWalking->y;
     womenWalking->x += womenWalking->deltaX;
 }
 
-/* @author Meagan & Paolo */
+/* @author Meagan & Paolo 
+    Paolo's notes:
+    - i copied my swimmer if statement overhaul and pasted it here, check notes on it if need clarity
+*/
 void collisionWomenWalking(WomenWalking* womenWalking, Chuck* chuck) {
-    if (womenWalking->x+WALKER_HEIGHT >= chuck->x && womenWalking->x <= chuck->x+CHUCK_HEIGHT &&  
-        womenWalking->y <= chuck->y+CHUCK_HEIGHT && womenWalking->y+WALKER_HEIGHT >= chuck->y ) {
-        stopWalking(chuck); /* Stop Chuck from walking */
+    if (womenWalking->x+WALKER_HEIGHT-6 >= chuck->x && womenWalking->x <= chuck->x+CHUCK_HEIGHT-6 &&  
+        womenWalking->y <= chuck->y+CHUCK_HEIGHT-6 && womenWalking->y+WALKER_HEIGHT-6 >= chuck->y ) {
+        /*stopWalking(chuck); /* Stop Chuck from walking */
         chuck->isColliding = 2; /* Set death collision flag for Chuck */
+        womenWalking->isColliding = 1;
+    } else {
+        womenWalking->isColliding = 0;
     }
 }
 
@@ -388,39 +399,74 @@ void initWomenSwimming(WomenSwimming* womenSwimming, UINT16 x, UINT16 y) {
     womenSwimming->deltaY = 0;
     womenSwimming->isColliding = 0;
     womenSwimming->isForward = intGenerator(1); /* set isForward to a random value of either 0 or 1 */
-    womenSwimming->frameCount = intGenerator(31);
+    womenSwimming->frameCount = intGenerator(MAX_FRAMES);
 }
 
 /* @author Paolo */
 void updateWomenSwimming(WomenSwimming* womenSwimming) {
-    if (womenSwimming->frameCount == 31 && womenSwimming->isForward == 1) {
-        womenSwimming->isForward = 0; /* Switch to backward bitmap after 31 frames */
+    if (womenSwimming->frameCount == MAX_FRAMES && womenSwimming->isForward == 1) {
+        womenSwimming->isForward = 0; /* Switch to backward bitmap after MAX_FRAMES frames */
         womenSwimming->frameCount = 0; /* Reset frame count after switching direction */
-    } else if (womenSwimming->frameCount == 31 && womenSwimming->isForward == 0) {
+    } else if (womenSwimming->frameCount == MAX_FRAMES && womenSwimming->isForward == 0) {
         womenSwimming->frameCount = 0;
-        womenSwimming->isForward = 1; /* Switch to forward bitmap after 31 frames */
+        womenSwimming->isForward = 1; /* Switch to forward bitmap after MAX_FRAMES frames */
     }
     womenSwimming->frameCount++;
 }
 
-/* @author Meagan */
-void collisionWomenSwimming(WomenSwimming* womenSwimming, Chuck* chuck) {
-    if (womenSwimming->x+WALKER_HEIGHT >= chuck->x && womenSwimming->x <= chuck->x+CHUCK_HEIGHT &&  
-        womenSwimming->y <= chuck->y+CHUCK_HEIGHT && womenSwimming->y+WALKER_HEIGHT >= chuck->y && womenSwimming->isForward == 1) {
-        /* womenSwimming collides with Chuck, stop movement */
-        womenSwimming->deltaX = 0;
-        womenSwimming->deltaY = 0;
-        chuck->isWalking = 0; /* Stop Chuck from walking */
-        chuck->isColliding = 2; /* Set collision flag for Chuck */
+/* @author Meagan & Paolo 
+    Paolo's notes:
+    - i overhauled the if statement significantly. instead of women.x/y == chuck.x/y, it now uses their coords+HEIGHT
+    - if statement checks:
+        - if swimmer from left enters chucks bitmap
+        - if swimmer from right enters chucks bitmap
+        - if swimmer from above enters chucks bitmap
+        - if swimmer from below enters chucks bitmap
+    - i'm also adding -6 so it doesn't activate right away and player doesn't have to be pixel perfect to avoid collision
+*/
+void collisionWomenSwimming(WomenSwimming* womenSwimming, Chuck* chuck) { 
+    if (womenSwimming->x+SWIMMER_HEIGHT-6 >= chuck->x && womenSwimming->x <= chuck->x+CHUCK_HEIGHT-6 &&  
+        womenSwimming->y <= chuck->y+CHUCK_HEIGHT-6 && womenSwimming->y+SWIMMER_HEIGHT-6 >= chuck->y) {
+        if (womenSwimming->isForward == 1) {
+            /* womenSwimming collides with Chuck, stop movement */
+            womenSwimming->deltaX = 0;
+            womenSwimming->deltaY = 0;
+            chuck->isWalking = 0; /* Stop Chuck from walking */
+            chuck->isColliding = 2; /* Set collision flag for Chuck */
+        }
         womenSwimming->isColliding = 1;
+    } else {
+        womenSwimming->isColliding = 0;
     }
 }
 
+/* @author Paolo */
 void initRoad(Road* road, UINT16 x, UINT16 y, int z) {
     road->x = x;
     road->y = y;
     road->isLower = z;
+    road->isColliding = 0;
 }
+
+/* @author Paolo */
+void isRoadCollidingWalker(Road* road, WomenWalking* womenWalking) {
+    if (womenWalking->x < road->x + ROAD_HEIGHT + 10 || womenWalking->x + WALKER_HEIGHT + 10 > road->x) {
+        road->isColliding = 1;
+    } else { 
+        road->isColliding = 0;
+    }
+} 
+
+/* @author Paolo */
+void isRoadCollidingChuck(Road* road, Chuck* chuck) {
+    if (chuck->x < road->x + ROAD_HEIGHT || chuck->x + CHUCK_HEIGHT > road->x ||
+        chuck->y < road->y + ROAD_HEIGHT || chuck->y + CHUCK_HEIGHT > road->y) {
+        road->isColliding = 1;
+    } else {
+        road->isColliding = 0;
+    }
+}
+
 
 /* @author Meagan */
 /* Function to initialize water */
@@ -429,11 +475,14 @@ void initWater(Water* water, UINT16 x, UINT16 y) {
     water->y = y;
 }
 
-/* @author Meagan
+/* @author Meagan & Paolo
+    Paolo's notes: 
+    - copied my swimmer collision if statement overhaul
+    - i don't minus 5 because water is now small and its the players fault if they accidentally run over it
  Function to check if Chuck goes into the water (might change later) */
 void isWaterColliding(Water* water, Chuck* chuck) {
-    if (chuck->x < water->x + 32 && chuck->x + 32 > water->x &&
-        chuck->y < water->y + 32 && chuck->y + 32 > water->y) {
+    if (chuck->x < water->x + WATER_HEIGHT || chuck->x + CHUCK_HEIGHT > water->x ||
+        chuck->y < water->y + WATER_HEIGHT || chuck->y + CHUCK_HEIGHT > water->y) {
         /* Collision detected, change Chuck's state to death collision */
         chuck->isColliding = 2;
     }
@@ -486,6 +535,8 @@ void init_women(Model *model) {
 void Model_init(Model *model) {
     model->gameOver = 0;
     model->crossCount = 0;
+    model->oldCrossCount = 0;
+    model->chuck.deathCounter = 0;
     init_land(model);
     init_women(model);
     initChuck(&model->chuck, 320, 350);

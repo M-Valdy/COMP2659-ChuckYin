@@ -3,28 +3,48 @@
 /* @author Paolo */
 void cond_update(Model *model) {
     int i;
+    int h;
     
     if (model->chuck.isColliding == 1) {
         stopWalking(&model->chuck);
         model->chuck.isColliding = 0;
     } else if (model->chuck.isColliding == 2) {
+        model->oldCrossCount = model->crossCount;
         model->crossCount = 0;
+        /*model->chuck.oldx = model->chuck.x;
+        model->chuck.oldy = model->chuck.y;*/
         initChuck(&model->chuck, 320, 350); /* Reset Chuck to starting position to bottom middle of screen */
+        model->chuck.deathCounter++;
     }
+    /* Paolo's note: i didn't spend that much time trying to optimize this i just wanted it to work for now*/
 
     for (i = 0; i < 15; i++) {
         collisionWomenWalking(&model->womenWalking[i], &model->chuck);
+    }
+    /*for (h = 0; h < 120; h++) { 
+        for (i = 0; i < 15; i++) {
+            collisionWomenWalking(&model->womenWalking[i], &model->chuck);
+            if (&model->road[h].y == &model->womenWalking[i].y) {
+                isRoadCollidingWalker(&model->road[h], &model->womenWalking[i]);
+            }
+        }
+        isRoadCollidingChuck(&model->road[h], &model->chuck);
+    }*/
+    
+    for (i = 0; i < 30; i++) {
         collisionWomenSwimming(&model->womenSwimming[i], &model->chuck);
     }
-    /* no collision detection needed for water, just prevent Chuck from walking into it instead
-       because Chuck wont be able to get on women swimming since he will die if water collision is chuck.isColliding == 2 */
     
     if (model->chuck.y <= 16) { /* Send Chuck back to spawn point to cross again */
         model->crossCount++;
         initChuck(&model->chuck, 320, 350);
     }
-    if (model->crossCount == 4) { /* Chuck needs to cross the roads 5 times */
+    /* Chuck needs to cross the roads 5 times */
+    if (model->crossCount == 4) { 
         model->gameOver = 1;
+        model->oldCrossCount = model->crossCount;
         model->crossCount = 0;
     }
+
+    /* TO DO: for loop for water col now*/
 }

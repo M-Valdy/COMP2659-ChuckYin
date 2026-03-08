@@ -15,6 +15,9 @@
     Team names: Meagan Valderrama, Paolo Deocareza, and Gaurik Khullar
     @authors Meagan Valderrama, Paolo Deocareza
 */
+#define CHUCK_SPEED 6
+#define WALKER_SPEED 8
+#define MAX_FRAMES 63
 
 #define CHUCK_HEIGHT 32
 #define WALKER_HEIGHT 32
@@ -38,12 +41,14 @@ typedef struct {
     int deltaX;
     int deltaY;
     int isColliding; /* 1 = obstacle collision, 0 = no collision, 2 = death collision */
+    int deathCounter;
 } Chuck;
 
 typedef struct {
     int x, y;
     int oldx, oldy;
     int deltaX, deltaY;
+    int isColliding;
 } WomenWalking;
 
 typedef struct {
@@ -57,6 +62,7 @@ typedef struct {
 typedef struct {
     unsigned int x,y;
     int isLower;
+    int isColliding;
 } Road;
 
 typedef struct {
@@ -66,6 +72,7 @@ typedef struct {
 typedef struct {
     int gameOver;
     int crossCount;
+    int oldCrossCount;
     Chuck chuck;
     WomenWalking womenWalking[15];
     WomenSwimming womenSwimming[30];
@@ -90,7 +97,7 @@ typedef struct {
        the bounds of the game screen.
 
 */
-void initChuck(Chuck* chuck, unsigned int x, unsigned int y);
+void initChuck(Chuck* chuck, int x, int y);
 
 
 /*----- Function: startWalking -----
@@ -256,6 +263,8 @@ void updateWomenSwimming(WomenSwimming* womenSwimming);
 void collisionWomenSwimming(WomenSwimming* womenSwimming, Chuck* chuck);
 
 void initRoad(Road* road, UINT16 x, UINT16 y, int z);
+void isRoadCollidingWalker(Road* road, WomenWalking* womenWalking);
+void isRoadCollidingChuck(Road* road, Chuck* chuck);
 
 /*----- Function: initWater -----
 
