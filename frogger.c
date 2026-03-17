@@ -7,7 +7,9 @@
 #include <osbind.h>
 #include "input.h"
 
-/* @author Paolo */
+/* @author Paolo 
+    Copied most of the professor's screenshot on the checkpoint PDF
+*/
 UINT32 get_time() {
     long old_ssp;
     long *timer;
@@ -29,7 +31,7 @@ int main() {
     UINT32 timeThen, timeNow, timeElapsed;
     Model frogger;
 
-    /* GOOGLED "atari st double buffering how to allocate 32000 bytes not on the stack" and used the AI overview */
+    /* GOOGLED "atari st double buffering how to allocate 32000 bytes not on the stack" and used the AI overview for the 256 aligned part */
     /* https://stackoverflow.com/questions/38088732/explanation-to-aligned-malloc-implementation */
     /* Professor said in page9 of chuckpoint 3 that we need to allocated 32k bytes but NOT on the stack. We put it in the heap using GEMDOS' Malloc() */
     /* Also said that we need to make frame buffers to be 256 byte aligned */
@@ -68,11 +70,9 @@ int main() {
         if (timeElapsed > 0) {
             synch_update(&frogger);
             cond_update(&frogger);
-            /*clear_screen(back);*/
-            back = front;
-            master_render(&frogger, back); /* TO DO: need to optimize master_render by implementing functions for clearing affected bitmaps and rendering */
+            back = front; /* realized had to do this because it looked too choppy even though it was working */
+            master_render(&frogger, back); /* TO DO: need to optimize render_road */
             
-            /* Use Vsync to prevent premature rendering */
             Setscreen(-1L, (long)back, -1L);
             Vsync();
             /* swap buffers */
@@ -83,8 +83,6 @@ int main() {
             timeThen = timeNow;
         }
     }
-
-    /* Prevent crash-on-quit */
     Setscreen(-1L, (long)base, -1L);
 
     return 0;
