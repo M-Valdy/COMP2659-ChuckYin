@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdio.h>
 #include "types.h"
 
 /* Writes the given byte value (0-255) to the given PSG register (0-15). This is a helper

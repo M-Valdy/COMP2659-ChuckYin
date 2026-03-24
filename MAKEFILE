@@ -49,3 +49,10 @@ frogger.tos: frogger.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.
 	cc68x -g frogger.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o input.o -o frogger.tos
 frogger.o: frogger.c
 	$(CC) -g -c frogger.c
+
+# meagan's sound testing make files
+psg.o: psg.c psg.h
+	cc68x -g -c psg.c
+
+tst_sound.c: psg.o
+	cc68x
