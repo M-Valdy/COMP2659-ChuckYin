@@ -16,9 +16,10 @@ void write_psg(int reg, UINT8 val) {
     Super(old_ssp);
 }
 
-/* Helper function for checking channel validity*/
 int channel_check(int channel, int first, int last){
-    return (channel < first || channel > last);
+    if (channel < first || channel > last) {
+        return;
+    }
 }
 
 void read_psg(int reg) {
@@ -29,7 +30,7 @@ void read_psg(int reg) {
     long old_ssp = Super(0);
     *PSG_reg_select = reg;
     int val = *PSG_reg_write;
-    printf("Register: %d\n Value: %d\n", reg, val);
+    printf("%d", reg, val);
     Super(old_ssp);
 }
 

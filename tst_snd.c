@@ -1,5 +1,8 @@
 #include "psg.h"
+<<<<<<< HEAD
 #include <stdio.h>
+=======
+>>>>>>> e448fda6b1214581bf4636d1015e6770fc7d69db
 
 void psg_tst () {
     set_tone(0, 248);         /* channel A */
