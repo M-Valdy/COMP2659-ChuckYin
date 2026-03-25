@@ -25,8 +25,7 @@ void read_psg(int reg) {
     if (reg < 0 || 15 < reg) {
         long old_ssp = Super(0);
         *PSG_reg_select = reg;
-        char val = *PSG_reg_write;
-        printf("reg %d = %u\n", reg, val);
+        printf("reg %d = %u\n", reg, *PSG_reg_write);
         Super(old_ssp);
     }
 }
