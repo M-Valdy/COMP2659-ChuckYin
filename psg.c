@@ -22,19 +22,21 @@ int channel_check(int channel, int first, int last){
 
 void read_psg(int reg) {
     /*reads the current value of the psg reg*/
-    if (reg <= 0 || 15 =< reg) {
+    if (reg < 0 || 15 < reg) {
         long old_ssp = Super(0);
         *PSG_reg_select = reg;
         char val = *PSG_reg_write;
-        printf("%d%c", reg, val);
+        printf("reg %d = %u\n", reg, val);
         Super(old_ssp);
     }
 }
 
 /* FUnctions that are actualy used in the program*/
 void set_tone(int channel, int tuning) {
-    channel_check(channel, 0, 5);
-    if (tuning >= 0 || tuning <= 0x0fff) {
+    if (channel_check(channel, 0, 2)) {
+        return;
+    }    
+    if (tuning >= 0 && tuning <= 0x0fff) {
         int rough_tone = tuning & 0xFF; /* lower 8 bits for fine tune */
         int coarse_tone = (tuning >> 8) & 0x0F; /* upper 4 bits for coarse tune */
         if (channel == 0) {
@@ -51,8 +53,10 @@ void set_tone(int channel, int tuning) {
 }
 
 void set_volume(int channel, int volume) {
-    channel_check(channel, 8, 10);
-    if (volume >= 0 || volume <= 100) {
+    if (channel_check(channel, 0, 2)) {
+        return;
+    }
+    if (volume > 0 || volume < 31) {
         if (channel == 0) {
         write_psg(8, volume);
     } else if (channel == 1) {
@@ -64,8 +68,10 @@ void set_volume(int channel, int volume) {
 }
 
 void enable_channel(int channel, int tone_on, int noise_on) {
-    channel_check(channel, 7, 7);
-    if ((tone_on == 0 && tone_on == 1) || (noise_on == 0 && noise_on == 1)) {
+    if (channel_check(channel, 0, 2)) {
+        return;
+    }
+    if ((tone_on == 0 || tone_on == 1) && (noise_on == 0 || noise_on == 1)) {
         if (channel == 0) {
             if (tone_on) {
                 /* must set to 0 to enable tone */
