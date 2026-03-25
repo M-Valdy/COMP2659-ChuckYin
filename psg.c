@@ -27,7 +27,7 @@ void read_psg(int reg) {
         return;
     }
     *PSG_reg_select = reg;
-    printf("reg %d = %u\n", reg, *PSG_reg_write);
+    printf("reg %d = %u\n", reg, (UINT8)*PSG_reg_write);
     Super(old_ssp);
 }
 
