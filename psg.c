@@ -22,10 +22,10 @@ int channel_check(int channel, int first, int last){
 
 void read_psg(int reg) {
     /*reads the current value of the psg reg*/
+    long old_ssp = Super(0);
     if (reg < 0 || 15 < reg) {
         return;
     }
-    old_ssp = Super(0);
     *PSG_reg_select = reg;
     printf("reg %d = %u\n", reg, *PSG_reg_write);
     Super(old_ssp);
@@ -33,20 +33,22 @@ void read_psg(int reg) {
 
 /* FUnctions that are actualy used in the program*/
 void set_tone(int channel, int tuning) {
+    int fine_tone;
+    int coarse_tone;
     if (channel_check(channel, 0, 2)) {
         return;
     }    
     if (tuning >= 0 && tuning <= 0x0fff) {
-        int rough_tone = tuning & 0xFF; /* lower 8 bits for fine tune */
-        int coarse_tone = (tuning >> 8) & 0x0F; /* upper 4 bits for coarse tune */
+        fine_tone = tuning & 0xFF; /* lower 8 bits for fine tune */
+        coarse_tone = (tuning >> 8) & 0x0F; /* upper 4 bits for coarse tune */
         if (channel == 0) {
-            write_psg(0, rough_tone);
+            write_psg(0, fine_tone);
             write_psg(1, coarse_tone);
         } else if (channel == 1) {
-            write_psg(2, rough_tone);
+            write_psg(2, fine_tone);
             write_psg(3, coarse_tone);
         } else if (channel == 2) {
-            write_psg(4, rough_tone);
+            write_psg(4, fine_tone);
             write_psg(5, coarse_tone);
         }
     }
