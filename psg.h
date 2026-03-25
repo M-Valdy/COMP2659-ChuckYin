@@ -7,7 +7,7 @@ void write_psg(int reg, UINT8 val);
 
 
 /* For testing */
-UINT8 read_psg(int reg);
+void read_psg(int reg);
 
 
 /* Loads the tone registers (coarse and fine) for the given channel (0=A, 1=B, 2=C) with the
