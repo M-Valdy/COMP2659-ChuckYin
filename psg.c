@@ -17,89 +17,83 @@ void write_psg(int reg, UINT8 val) {
 }
 
 int channel_check(int channel, int first, int last){
-    if (channel < first || channel > last) {
-        return;
-    }
+    return (channel < first || channel > last);
 }
 
 void read_psg(int reg) {
     /*reads the current value of the psg reg*/
-    if (reg < 0 || 15 < reg) {
-        return;
+    if (reg <= 0 || 15 =< reg) {
+        long old_ssp = Super(0);
+        *PSG_reg_select = reg;
+        char val = *PSG_reg_write;
+        printf("%d%c", reg, val);
+        Super(old_ssp);
     }
-    long old_ssp = Super(0);
-    *PSG_reg_select = reg;
-    int val = *PSG_reg_write;
-    printf("%d", reg, val);
-    Super(old_ssp);
 }
 
 /* FUnctions that are actualy used in the program*/
 void set_tone(int channel, int tuning) {
     channel_check(channel, 0, 5);
-    if (tuning < 0 || tuning > 0x0fff) {
-        return;
-    }
-    int rough_tone = tuning & 0xFF; /* lower 8 bits for fine tune */
-    int coarse_tone = (tuning >> 8) & 0x0F; /* upper 4 bits for coarse tune */
-    if (channel == 0) {
-        write_psg(0, rough_tone);
-        write_psg(1, coarse_tone);
-    } else if (channel == 1) {
-        write_psg(2, rough_tone);
-        write_psg(3, coarse_tone);
-    } else if (channel == 2) {
-        write_psg(4, rough_tone);
-        write_psg(5, coarse_tone);
+    if (tuning >= 0 || tuning <= 0x0fff) {
+        int rough_tone = tuning & 0xFF; /* lower 8 bits for fine tune */
+        int coarse_tone = (tuning >> 8) & 0x0F; /* upper 4 bits for coarse tune */
+        if (channel == 0) {
+            write_psg(0, rough_tone);
+            write_psg(1, coarse_tone);
+        } else if (channel == 1) {
+            write_psg(2, rough_tone);
+            write_psg(3, coarse_tone);
+        } else if (channel == 2) {
+            write_psg(4, rough_tone);
+            write_psg(5, coarse_tone);
+        }
     }
 }
 
 void set_volume(int channel, int volume) {
     channel_check(channel, 8, 10);
-    if (volume < 0 || volume > 100) {
-        return;
-    }
-    if (channel == 0) {
+    if (volume >= 0 || volume <= 100) {
+        if (channel == 0) {
         write_psg(8, volume);
     } else if (channel == 1) {
         write_psg(9, volume);
     } else if (channel == 2) {
         write_psg(10, volume);
     }
+    }
 }
 
 void enable_channel(int channel, int tone_on, int noise_on) {
     channel_check(channel, 7, 7);
-    if ((tone_on != 0 && tone_on != 1) || (noise_on != 0 && noise_on != 1)) {
-        return;
+    if ((tone_on == 0 && tone_on == 1) || (noise_on == 0 && noise_on == 1)) {
+        if (channel == 0) {
+            if (tone_on) {
+                /* must set to 0 to enable tone */
+                mixer_val &= 0xFE; /* set bit 0 to 0 */
+            }
+            if (noise_on) {
+                /* must set to 0 to enable noise*/
+                mixer_val &= 0xF7; /* set bit 3 to 0 */
+            }
+        }
+        else if (channel == 1) {
+            if (tone_on) {
+                mixer_val &= 0xFD; /* set bit 1 to 0 */
+            }
+            if (noise_on) {
+                mixer_val &= 0xEF; /* set bit 4 to 0 */
+            }
+        }
+        if (channel == 2) {
+            if (tone_on) {
+                mixer_val &= 0xFB; /* set bit 2 to 0 */
+            }
+            if (noise_on) {
+                mixer_val &= 0xDF; /* set bit 5 to 0 */
+            }
+        }
+        write_psg(7, mixer_val);
     }
-    if (channel == 0) {
-        if (tone_on) {
-            /* must set to 0 to enable tone */
-            mixer_val &= 0xFE; /* set bit 0 to 0 */
-        }
-        if (noise_on) {
-            /* must set to 0 to enable noise*/
-            mixer_val &= 0xF7; /* set bit 3 to 0 */
-        }
-    }
-    else if (channel == 1) {
-        if (tone_on) {
-            mixer_val &= 0xFD; /* set bit 1 to 0 */
-        }
-        if (noise_on) {
-            mixer_val &= 0xEF; /* set bit 4 to 0 */
-        }
-    }
-    if (channel == 2) {
-        if (tone_on) {
-            mixer_val &= 0xFB; /* set bit 2 to 0 */
-        }
-        if (noise_on) {
-            mixer_val &= 0xDF; /* set bit 5 to 0 */
-        }
-    }
-    write_psg(7, mixer_val);
 }
 
 void stop_sound() {
