@@ -5,6 +5,7 @@
 
 volatile char *PSG_reg_select = 0xFF8800;
 volatile char *PSG_reg_write  = 0xFF8802;
+static UINT16 psg_regs[16] = {0};
 
 UINT8 mixer_val = 0x3F;
 
@@ -14,6 +15,7 @@ void write_psg(int reg, UINT8 val) {
     *PSG_reg_select = reg;
     *PSG_reg_write  = val;
     Super(old_ssp);
+    psg_regs[reg] = val
 }
 
 int channel_check(int channel, int first, int last){
@@ -22,13 +24,10 @@ int channel_check(int channel, int first, int last){
 
 void read_psg(int reg) {
     /*reads the current value of the psg reg*/
-    long old_ssp = Super(0);
     if (reg < 0 || 15 < reg) {
         return;
     }
-    *PSG_reg_select = reg;
-    printf("reg %d = %u\n", reg, (UINT8)*PSG_reg_write);
-    Super(old_ssp);
+    printf("reg %d = %u\n", reg,  psg_regs[reg]);
 }
 
 /* FUnctions that are actualy used in the program*/
