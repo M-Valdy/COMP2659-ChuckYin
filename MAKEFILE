@@ -51,9 +51,9 @@ frogger.o: frogger.c
 	$(CC) -g -c frogger.c
 
 # meagan's sound testing make files
-psg.o: psg.c psg.h
-	cc68x -g -c psg.c
-tst_snd.o: tst_snd.c 
-	cc68x -g -c tst_snd.c
 tst_snd.tos: tst_snd.o psg.o
 	cc68x -g tst_snd.o psg.o -o tst_snd.tos
+tst_snd.o: tst_snd.c psg.o
+	cc68x -g -c tst_snd.c
+psg.o: psg.c psg.h
+	cc68x -g -c psg.c

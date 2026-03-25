@@ -23,11 +23,12 @@ int channel_check(int channel, int first, int last){
 void read_psg(int reg) {
     /*reads the current value of the psg reg*/
     if (reg < 0 || 15 < reg) {
-        long old_ssp = Super(0);
-        *PSG_reg_select = reg;
-        printf("reg %d = %u\n", reg, *PSG_reg_write);
-        Super(old_ssp);
+        return;
     }
+    long old_ssp = Super(0);
+    *PSG_reg_select = reg;
+    printf("reg %d = %u\n", reg, *PSG_reg_write);
+    Super(old_ssp);
 }
 
 /* FUnctions that are actualy used in the program*/

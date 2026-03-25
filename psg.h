@@ -1,3 +1,6 @@
+#ifndef PSG_H
+#define PSG_H
+
 #include <stdio.h>
 #include "types.h"
 
@@ -24,3 +27,5 @@ void enable_channel(int channel, int tone_on, int noise_on);
 
 /* Silences all PSG sound production. */
 void stop_sound();
+
+#endif
