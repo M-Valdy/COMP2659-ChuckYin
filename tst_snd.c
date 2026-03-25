@@ -1,5 +1,6 @@
 #include "psg.h"
 #include <stdio.h>
+#include <osbind.h>
 
 void psg_tst () {
     set_tone(0, 248);         /* channel A */
