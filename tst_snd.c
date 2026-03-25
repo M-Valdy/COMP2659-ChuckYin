@@ -17,7 +17,7 @@ void psg_tst () {
         ;
 
     stop_sound();         /* stop sound */
-    read_psg(0);
+    read_psg(8);
     Cnecin();                 /* consume key */
 
 }
