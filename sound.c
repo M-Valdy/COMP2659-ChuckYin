@@ -1,6 +1,7 @@
 #include "sound.h"
 #include "psg.h"
 #include <osbind.h>
+#include <stdio.h>
 
 /* Frogger theme song music notes:
     A#4 F#4 F#4 F#4 
@@ -18,8 +19,8 @@ int notes[] = {
               };
 
 static int current_note = 0;
-static UINT32 start_time = 0;
 static int total_notes = sizeof(notes) / sizeof(notes[0]);
+static UINT32 next_time = 0;
 
 /* got this from Paolo's code in frogger.c */
 UINT32 get_time() {
@@ -60,5 +61,11 @@ void update_music(UINT32 time_elapsed){
         current_note++;
         set_tone(0, notes[current_note]);
         next_time += time_elapsed;
+
+        printf("current_note = %d\n", current_note);
+        read_psg(0);
+        read_psg(1);
+        read_psg(7);
+        read_psg(8);
     }
 }

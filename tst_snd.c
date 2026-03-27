@@ -1,4 +1,5 @@
 #include "psg.h"
+#include "sound.h"
 #include <stdio.h>
 #include <osbind.h>
 
@@ -23,16 +24,38 @@ void psg_tst () {
 }
 
 void music_tst(){
+    /* initial register state */
+    read_psg(0);
+    read_psg(1);
+    read_psg(7);
+    read_psg(8);
+
+    /* start first note */
     start_music();
-    update_music(30); /* 30 sec delay */
-    while (!Cconis())
-        ;
-    stop_sound();         /* stop sound */
-    Cnecin();                 /* consume key */
+
+    /* should now show first note, mixer on, volume set */
+    read_psg(0);
+    read_psg(1);
+    read_psg(7);
+    read_psg(8);
+
+    while (!Cconis()) {
+        /* advance music */
+        update_music(30);
+    }
+
+    stop_sound();
+
+    /* volume should now be 0 */
+    read_psg(0);
+    read_psg(1);
+    read_psg(7);
+    read_psg(8);
+
+    Cnecin();
 }
 
 int main () {
-    psg_tst();
     music_tst();
     return 0;
 }
