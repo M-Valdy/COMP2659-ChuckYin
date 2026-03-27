@@ -22,7 +22,17 @@ void psg_tst () {
 
 }
 
+void music_tst(){
+    start_music();
+    update_music(30); /* 30 sec delay */
+    while (!Cconis())
+        ;
+    stop_sound();         /* stop sound */
+    Cnecin();                 /* consume key */
+}
+
 int main () {
     psg_tst();
+    music_tst();
     return 0;
 }
