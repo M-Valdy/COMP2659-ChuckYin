@@ -103,6 +103,30 @@ void enable_channel(int channel, int tone_on, int noise_on) {
     }
 }
 
+
+void set_noise(int tuning) {
+    if (tuning < 0 || tuning > 0x1F) {
+        return;
+    }
+    write_psg(6,tuning);
+}
+
+
+void set_envelope(int shape, unsigned int sustain) {
+    int rough_sustain; /* lower 8 bits for sustain */
+    int fine_sustain; /* upper 8 bits for fine sustain */
+    if (shape < 0 || shape > 0x0F || sustain > 0xFFFF) {
+        return;
+    }
+    rough_sustain = sustain & 0xFF;
+    write_psg(11, rough_sustain);
+    fine_sustain = (sustain >> 8) & 0xFF;
+    write_psg(12, fine_sustain);
+    /* upper 4 bits for shape, cont, att, alt, hold signals */
+    write_psg(13, shape);
+}
+
+
 void stop_sound() {
     set_volume(0, 0);
     set_volume(1, 0);

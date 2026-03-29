@@ -55,7 +55,25 @@ void music_tst(){
     Cnecin();
 }
 
+void envelope_tst() {
+    /* set envelope with shape 0x0A and sustain 0x1234 */
+    set_envelope(0x08, 0x1000);
+
+    /* should show shape in register 13, rough sustain in register 11, fine sustain in register 12 */
+    read_psg(11);
+    read_psg(12);
+    read_psg(13);
+
+     while (!Cconis())
+        ;
+
+    stop_sound();
+    Cnecin();
+}
+
 int main () {
-    music_tst();
+    psg_tst();
+    envelope_tst();
+
     return 0;
 }

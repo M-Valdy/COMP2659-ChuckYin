@@ -17,6 +17,7 @@ void read_psg(int reg);
 given 12-bit tuning */
 void set_tone(int channel, int tuning);
 
+
 /* Loads the volume register for the given channel. */
 void set_volume(int channel, int volume);
 
@@ -24,6 +25,14 @@ void set_volume(int channel, int volume);
 /* Turns the given channel’s tone/noise signals on/off (0=off, 1=on).*/
 void enable_channel(int channel, int tone_on, int noise_on);
 
+
+/* Loads the noise register with the given tuning. */
+void set_noise(int tuning);
+
+
+/* Loads the PSG envelope control registers with the given envelope shape and 16-bit sus-
+tain.*/
+void set_envelope(int shape, unsigned int sustain);
 
 /* Silences all PSG sound production. */
 void stop_sound();
