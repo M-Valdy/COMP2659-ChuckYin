@@ -104,7 +104,7 @@ void plot_title(UINT32 *base){
 }
 
 void prompt_sq(UINT32 *base) {
-    plot_string(base, 30, (hor_start+17), "(Press P to play or Q to quit.)");
+    plot_string(base, 30, (hor_start-10), "(Enter P to play or Q to quit.)");
 }
 
 void make_quitButton(UINT32 *base){
