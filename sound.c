@@ -2,6 +2,7 @@
 #include "psg.h"
 #include <osbind.h>
 #include <stdio.h>
+#include "model.h"
 
 /* Frogger theme song music notes:
     A#4 F#4 F#4 F#4 
@@ -21,6 +22,7 @@ int notes[] = {
 static int current_note = 0;
 static int total_notes = sizeof(notes) / sizeof(notes[0]);
 static UINT32 next_time = 0;
+Model model;
 
 /* got this from Paolo's code in frogger.c */
 UINT32 get_time() {
@@ -53,14 +55,24 @@ void start_music() {
     set_tone(0, notes[0]);
     enable_channel(0, 1, 0);  /* tone enabled, noise disabled */
     set_volume(0, 11);        /* volume = 11 */
+    set_envelope(0x08, 0x1234);
 }
 
-/* Updates the music based on the elapsed time */
-void update_music(UINT32 time_elapsed){
-    if (current_note + 1 < total_notes && get_time() >= next_time) {
+void update_music(UINT32 note_length) {
+    if (get_time() >= next_time) {
         current_note++;
+
+        if (current_note >= total_notes) {
+            current_note = 0;
+        }
+
         set_tone(0, notes[current_note]);
-        next_time += time_elapsed;
+
+        if (current_note == 13) {
+            next_time += note_length * 2;
+        } else {
+            next_time += note_length;
+        }
 
         printf("current_note = %d\n", current_note);
         read_psg(0);
