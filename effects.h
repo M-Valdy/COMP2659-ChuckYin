@@ -1,5 +1,6 @@
 #include "psg.h"
 #include "events.h"
+#include "model.h"
 
 /*
     Channels and their purposes
@@ -17,9 +18,15 @@
 
 /* For Chuck walking, should be C4 then C5 in quick succession
     Sustain should be longer on the C5 */
-void play_chuck_walking();
+void play_chuck_walking(Chuck chuck);
 
 
+/* For Chuck win, should be D5 then D6 */
+void play_chuck_win(Chuck chuck);
 
-/* For Chuck win, should be D4 then D5 */
-void play_chuck_win();
+
+/* When touching the edges play C2 */
+void play_touch_edge(Chuck chuck);
+
+/* When colliding with obstacle, play E2 then C2 */
+void play_women_collide(Chuck chuck);

@@ -16,8 +16,9 @@ void psg_tst () {
 
 }
 
-void music_tst(){
+void music_tst(void) {
     /* initial register state */
+    printf("Before start_music:\n");
     read_psg(0);
     read_psg(1);
     read_psg(7);
@@ -26,12 +27,32 @@ void music_tst(){
     /* start first note */
     start_music();
 
-    /* should now show first note, mixer on, volume set */
+    printf("After start_music:\n");
     read_psg(0);
     read_psg(1);
     read_psg(7);
     read_psg(8);
 
+    /* keep updating until keypress */
+    while (!Cconis()) {
+        update_music(30);
+    }
+
+    printf("Before stop_sound:\n");
+    read_psg(0);
+    read_psg(1);
+    read_psg(7);
+    read_psg(8);
+
+    stop_sound();
+
+    printf("After stop_sound:\n");
+    read_psg(0);
+    read_psg(1);
+    read_psg(7);
+    read_psg(8);
+
+    Cnecin();
 }
 
 void envelope_tst() {
@@ -72,7 +93,5 @@ void envelope_tst() {
 
 int main () {
     music_tst();
-    envelope_tst();
-
     return 0;
 }

@@ -7,6 +7,7 @@
 #include <osbind.h>
 #include "input.h"
 #include "start.h"
+#include "sound.h"
 /* @author Paolo 
     Copied most of the professor's screenshot on the checkpoint PDF
 */
@@ -57,6 +58,7 @@ int main() {
     Model_init(&frogger);
     render_initial_state(&frogger, back);
     render_initial_state(&frogger, front);
+    start_music();
     
     timeThen = get_time();
     while (frogger.gameOver != 2 && frogger.gameOver != 3) {
@@ -84,6 +86,7 @@ int main() {
             cond_update(&frogger);
             back = front; /* realized had to do this because it looked too choppy even though it was working */
             master_render(&frogger, back); /* TO DO: need to optimize render_road */
+            update_music(30);
             
             Setscreen(-1L, (long)back, -1L);
             Vsync();
