@@ -1,3 +1,4 @@
+#include <osbind.h>
 #include "start.h"
 
 /* 16x16 Bitmap for 'C' */
@@ -141,7 +142,8 @@ void splashscreen_chars(UINT32 *base) {
 
 }
 
-void make_splashscreen(UINT32 *base){
+int make_splashscreen(UINT32 *base){
+    int key;
     plot_title(base);
     prompt_sq(base);
     
@@ -149,4 +151,18 @@ void make_splashscreen(UINT32 *base){
     make_playButton(base);
 
     splashscreen_chars(base);
+
+    while (1) {
+        key = (int)(Cnecin() & 0xFF);
+        if (key == 'p' || key == 'q') {
+       
+            if (key == 'p') {
+                return 0;
+            } else if (key == 'q') {
+                return 1;
+            }
+        }
+    }
+
+    return -1;
 }

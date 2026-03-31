@@ -21,7 +21,7 @@ void prompt_sq(UINT32 *base);
 void splashscreen_chars(UINT32 *base);
 void make_quitButton(UINT32 *base);
 void make_playButton(UINT32 *base);
-void make_splashscreen(UINT32 *base);
+int make_splashscreen(UINT32 *base);
 
 
 #endif
