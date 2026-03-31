@@ -52,14 +52,16 @@ frogger.o: frogger.c
 	$(CC) -g -c frogger.c
 
 # meagan's sound testing make files
-tst_snd.tos: tst_snd.o psg.o sound.o
-	cc68x -g tst_snd.o psg.o sound.o -o tst_snd.tos
-tst_snd.o: tst_snd.c psg.o sound.o
+tst_snd.tos: tst_snd.o psg.o sound.o effects.o
+	cc68x -g tst_snd.o psg.o sound.o effects.o -o tst_snd.tos
+tst_snd.o: tst_snd.c psg.o sound.o effects.o
 	cc68x -g -c tst_snd.c
 psg.o: psg.c psg.h
 	cc68x -g -c psg.c
 sound.o: sound.c sound.h
 	cc68x -g -c sound.c
+effects.o: effects.c effects.h
+	cc68x -g -c effects.c
 
 # mainpage test drivers
 tst_st: tst_st.o raster.o rast_asm.o font.o model.o renderer.o start.o

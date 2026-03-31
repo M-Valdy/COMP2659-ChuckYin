@@ -23,6 +23,11 @@ void start_music();
 */
 void update_music(UINT32 time_elapsed);
 
+/* got this from Paolo's code in frogger.c for timing the sounds */
+UINT32 get_clock();
+
+/* Function for delaying music */
+void delay(int count);
 
 
 

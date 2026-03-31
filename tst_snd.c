@@ -1,5 +1,6 @@
 #include "psg.h"
 #include "sound.h"
+#include "effects.h"
 #include <stdio.h>
 #include <osbind.h>
 
@@ -16,7 +17,7 @@ void psg_tst () {
 
 }
 
-void music_tst(void) {
+void music_tst() {
     /* initial register state */
     printf("Before start_music:\n");
     read_psg(0);
@@ -91,7 +92,57 @@ void envelope_tst() {
     Cnecin();
 }
 
+void noise_tst() {
+    /* enable noise on channel A */
+    enable_channel(0, 0, 1);   /* tone OFF, noise ON */
+    set_volume(0, 10);
+    
+    set_noise(0x01);
+    delay(30);
+
+    set_noise(0x03);
+    delay(30);
+
+    set_noise(0x07);
+    delay(30);
+    
+    set_noise(0x0F);
+    delay(30);
+
+    set_noise(0x1F);
+    delay(30);
+
+    set_volume(0, 0);
+}
+
+
+void effects_tst() {
+    int i;
+    for (i = 0; i <= 10; i++) {
+        printf("Chuck walks\n");
+        play_chuck_walking();
+        delay(10);
+    }
+    printf("--------------------------\n");
+    for (i = 0; i <= 10; i++) {
+        printf("Chuck wins\n");
+        play_chuck_win();
+        delay(10);
+    }
+    printf("--------------------------\n");
+    for (i = 0; i <= 10; i++) {
+        printf("Chuck touches edge\n");
+        play_touch_edge();
+        delay(10);
+    }
+    printf("--------------------------\n");
+    for (i = 0; i <= 10; i++) {
+        printf("Chuck collides with women\n");
+        play_women_collide();
+    }
+}
+
 int main () {
-    music_tst();
+    effects_tst();
     return 0;
 }
