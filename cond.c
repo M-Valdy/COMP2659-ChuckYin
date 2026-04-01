@@ -5,6 +5,7 @@ void cond_update(Model *model) {
     int i;
     int h;
     
+    /* This is probably gonna be for if youre walking on the edge now */
     if (model->chuck.isColliding == 1) {
         stopWalking(&model->chuck);
         model->chuck.isColliding = 0;

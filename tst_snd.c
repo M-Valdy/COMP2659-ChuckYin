@@ -143,6 +143,6 @@ void effects_tst() {
 }
 
 int main () {
-    effects_tst();
+    music_tst();
     return 0;
 }

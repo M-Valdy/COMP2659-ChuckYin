@@ -21,7 +21,7 @@ model.o: model.c model.h
 	cc68x -g -c model.c
 cond.o: cond.c cond.h
 	cc68x -g -c cond.c
-asynch.o: asynch.c asynch.h
+asynch.o: asynch.c asynch.h effects.o
 	cc68x -g -c asynch.c
 synch.o: synch.c synch.h
 	cc68x -g -c synch.c
@@ -46,8 +46,8 @@ modeltst.o: modeltst.c
 	$(CC) -g -c modeltst.c
 
 # main game module
-frogger.tos: frogger.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o input.o start.o sound.o psg.o
-	cc68x -g frogger.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o input.o start.o sound.o psg.o -o frogger.tos
+frogger.tos: frogger.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o input.o start.o sound.o psg.o effects.o
+	cc68x -g frogger.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o input.o start.o sound.o psg.o effects.o -o frogger.tos
 frogger.o: frogger.c
 	$(CC) -g -c frogger.c
 
