@@ -363,12 +363,22 @@ void updateChuck(Chuck* chuck) {
     chuck->oldx = chuck->x;
     chuck->oldy = chuck->y;
     if (chuck->isWalking) {
-        if (chuck->x >= 6 && chuck->x <= 633) {
-            chuck->x += chuck->deltaX;
+        int newX = chuck->x + chuck->deltaX;
+        int newY = chuck->y + chuck->deltaY;
+
+        if (newX < 0) {
+            newX = 0;
+        } else if (newX > 640 - CHUCK_HEIGHT) {
+            newX = 640 - CHUCK_HEIGHT;
         }
-        if (chuck->y >= 6 && chuck->y <= 393) {
-            chuck->y += chuck->deltaY;
+        if (newY < 0) {
+            newY = 0;
+        } else if (newY > 400 - CHUCK_HEIGHT) {
+            newY = 400 - CHUCK_HEIGHT;
         }
+        chuck->x = newX;
+        chuck->y = newY;
+
         stopWalking(chuck);
     }
 }
@@ -494,6 +504,7 @@ void initRoad(Road* road, UINT16 x, UINT16 y, int z) {
     road->y = y;
     road->isLower = z;
     road->isColliding = 0;
+    road->isPrevColliding = 0;
 }
 
 /* @author Paolo */
@@ -507,8 +518,10 @@ void isRoadCollidingWalker(Road* road, WomenWalking* womenWalking) {
 
 /* @author Paolo */
 void isRoadCollidingChuck(Road* road, Chuck* chuck) {
-    if (chuck->x < road->x + ROAD_HEIGHT && chuck->x + CHUCK_HEIGHT > road->x &&
-        chuck->y < road->y + ROAD_HEIGHT && chuck->y + CHUCK_HEIGHT > road->y) {
+    if ((chuck->x < road->x + ROAD_HEIGHT && chuck->x + CHUCK_HEIGHT > road->x &&
+        chuck->y < road->y + ROAD_HEIGHT && chuck->y + CHUCK_HEIGHT > road->y) || 
+        (chuck->oldx < road->x + ROAD_HEIGHT && chuck->oldx + CHUCK_HEIGHT > road->x &&
+        chuck->oldy < road->y + ROAD_HEIGHT && chuck->oldy + CHUCK_HEIGHT > road->y)) {
         road->isColliding = 1;
     } else {
         road->isColliding = 0;

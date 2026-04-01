@@ -5,7 +5,6 @@ void cond_update(Model *model) {
     int i;
     int h;
     
-    /* This is probably gonna be for if youre walking on the edge now */
     if (model->chuck.isColliding == 1) {
         stopWalking(&model->chuck);
         model->chuck.isColliding = 0;
@@ -18,6 +17,9 @@ void cond_update(Model *model) {
         model->chuck.deathCounter++;
     }
     /* Paolo's note: i didn't spend that much time trying to optimize this i just wanted it to work for now*/
+    for (h = 0; h < 120; h++) { 
+        isRoadCollidingChuck(&model->road[h], &model->chuck);
+    }
 
     for (i = 0; i < 15; i++) {
         collisionWomenWalking(&model->womenWalking[i], &model->chuck);

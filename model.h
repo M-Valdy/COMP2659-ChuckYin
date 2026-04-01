@@ -41,7 +41,7 @@ typedef struct {
     int isWalking;
     int deltaX;
     int deltaY;
-    int isColliding; /* 1 = edge collision, 0 = no collision, 2 = death collision */
+    int isColliding; /* 1 = obstacle collision, 0 = no collision, 2 = death collision */
     int deathCounter;
 } Chuck;
 
@@ -64,6 +64,7 @@ typedef struct {
     unsigned int x,y;
     int isLower;
     int isColliding;
+    int isPrevColliding;
 } Road;
 
 typedef struct {

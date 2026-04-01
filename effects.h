@@ -26,11 +26,9 @@ void play_chuck_walking();
 void play_chuck_win();
 
 
-/* When touching the edges play C2, also pllaning to use this for
-    pressing x or when chuck won't move */
+/* When touching the edges play C2 */
 void play_touch_edge();
 
 
-/* When colliding with obstacle, play E2 then C2 
-    or if the player presses P */
+/* When colliding with obstacle, play E2 then C2 */
 void play_women_collide();
