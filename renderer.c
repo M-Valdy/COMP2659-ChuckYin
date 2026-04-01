@@ -68,6 +68,14 @@ void master_render(const Model *model, UINT32 *base) {
     int l;
     /*render_road(base, 350, 320, &model->road[40]);*/
     for (h = 0; h < 2; h++) {
+        for (i = 0; i < 120; i++) {
+            if (model->road[i].isColliding == 1) {
+                clear_region(base, model->road[i].y, model->road[i].x, ROAD_HEIGHT, ROAD_HEIGHT);
+                if (h == 1) {
+                    render_road(base, model->road[i].y, model->road[i].x, &model->road[i]);
+                }
+            }
+        }
         /*for (i = 0; i < 120; i++) {
             clear_region(base, model->road[i].y, model->road[i].x, ROAD_HEIGHT, ROAD_HEIGHT);
             if (h == 1) {
@@ -89,6 +97,7 @@ void master_render(const Model *model, UINT32 *base) {
                 }
             }
         }*/
+
         for (i = 0; i < 20; i++) {
             render_water(base, model->water[i].y, model->water[i].x, &model->water[i]);
         }
