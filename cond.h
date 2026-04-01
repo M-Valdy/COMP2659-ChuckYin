@@ -2,6 +2,8 @@
 #define COND_H
 
 #include "model.h"
+#include "effects.h"
+#include "sound.h"
 
 /* @author Paolo Deocareza
 

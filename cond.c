@@ -1,5 +1,4 @@
 #include "cond.h"
-#include "effects.h"
 
 /* @author Paolo  did the function bodies*/
 void cond_update(Model *model) {

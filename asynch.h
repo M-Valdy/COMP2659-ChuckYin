@@ -2,7 +2,8 @@
 #define ASYNCH_H
 
 #include "model.h"
-
+#include "effects.h"
+#include "sound.h"
 /*
     This file contains the function prototypes for asynchronous button handling in the game.
     It defines functions that handle input events for the W, A, S, and D keys.

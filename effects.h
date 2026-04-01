@@ -1,3 +1,6 @@
+#ifndef EFFECTS_H
+#define EFFECTS_H
+
 #include "psg.h"
 #include "events.h"
 #include "model.h"
@@ -32,3 +35,5 @@ void play_touch_edge();
 
 /* When colliding with obstacle, play E2 then C2 */
 void play_women_collide();
+
+#endif
