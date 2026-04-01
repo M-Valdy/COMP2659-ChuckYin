@@ -18,6 +18,7 @@ void psg_tst () {
 }
 
 void music_tst() {
+    UINT32 timeThen;
     /* initial register state */
     printf("Before start_music:\n");
     read_psg(0);
@@ -36,7 +37,7 @@ void music_tst() {
 
     /* keep updating until keypress */
     while (!Cconis()) {
-        update_music(30);
+        update_music(30);   /* 7 ticks on 70 Hz clock */
     }
 
     printf("Before stop_sound:\n");
@@ -118,31 +119,35 @@ void noise_tst() {
 
 void effects_tst() {
     int i;
-    for (i = 0; i <= 10; i++) {
+    start_music();
+    while (i != 11*4) {
+        update_music(30);
         printf("Chuck walks\n");
         play_chuck_walking();
         delay(10);
-    }
-    printf("--------------------------\n");
-    for (i = 0; i <= 10; i++) {
+        set_volume(2,0);
+        update_music(30);
+        printf("--------------------------\n");
         printf("Chuck wins\n");
         play_chuck_win();
         delay(10);
-    }
-    printf("--------------------------\n");
-    for (i = 0; i <= 10; i++) {
+        set_volume(2,0);
+        update_music(30);
+        printf("--------------------------\n");
         printf("Chuck touches edge\n");
         play_touch_edge();
         delay(10);
-    }
-    printf("--------------------------\n");
-    for (i = 0; i <= 10; i++) {
+        set_volume(2,0);
+        update_music(30);
+        printf("--------------------------\n");
         printf("Chuck collides with women\n");
         play_women_collide();
+        i += 1;
     }
+    set_volume(0,0);
 }
 
 int main () {
-    music_tst();
+    effects_tst();
     return 0;
 }

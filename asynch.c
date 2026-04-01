@@ -34,5 +34,5 @@ void asynch_button_X(Model *model) {
 /* @author Paolo */
 void asynch_button_P(Model *model) {
     model->gameOver = 3;
-    play_women_collide();
+    stop_sound();
 }

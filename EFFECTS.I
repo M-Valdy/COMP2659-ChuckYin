@@ -303,7 +303,7 @@ void stop_sound();
 # 1 "./model.h" 1
 # 1 "./types.h" 1
 # 4 "./model.h" 2
-# 27 "./model.h"
+# 28 "./model.h"
 extern const UINT32 Chuck_bitmap[32 ];
 extern const UINT32 womenWalking_bitmap[32 ];
 extern const UINT32 womenSwimming_forward_bitmap[32 ];
@@ -355,43 +355,44 @@ typedef struct {
     int oldCrossCount;
     Chuck chuck;
     WomenWalking womenWalking[15];
+
     WomenSwimming womenSwimming[30];
-    Water water[80];
+    Water water[20];
     Road road[120];
 } Model;
-# 100 "./model.h"
+# 102 "./model.h"
 void initChuck(Chuck* chuck, int x, int y);
-# 119 "./model.h"
+# 121 "./model.h"
 void startWalking(Chuck* chuck, int deltaX, int deltaY);
-# 138 "./model.h"
+# 140 "./model.h"
 void updateChuck(Chuck* chuck);
-# 154 "./model.h"
+# 156 "./model.h"
 void stopWalking(Chuck* chuck);
-# 170 "./model.h"
+# 172 "./model.h"
 void initWomenWalking(WomenWalking* womenWalking, unsigned int x, unsigned int y);
-# 184 "./model.h"
+# 186 "./model.h"
 void updateWomenWalking(WomenWalking* womenWalking);
-# 198 "./model.h"
+# 200 "./model.h"
 void collisionWomenWalking(WomenWalking* womenWalking, Chuck* chuck);
-# 212 "./model.h"
+# 214 "./model.h"
 int intGenerator(int max);
-# 231 "./model.h"
+# 233 "./model.h"
 void initWomenSwimming(WomenSwimming* womenSwimming, unsigned int x, unsigned int y);
-# 247 "./model.h"
+# 249 "./model.h"
 void updateWomenSwimming(WomenSwimming* womenSwimming);
-# 263 "./model.h"
+# 265 "./model.h"
 void collisionWomenSwimming(WomenSwimming* womenSwimming, Chuck* chuck);
 
 void initRoad(Road* road, UINT16 x, UINT16 y, int z);
 void isRoadCollidingWalker(Road* road, WomenWalking* womenWalking);
 void isRoadCollidingChuck(Road* road, Chuck* chuck);
-# 284 "./model.h"
+# 286 "./model.h"
 void initWater(Water* water, unsigned int x, unsigned int y);
-# 295 "./model.h"
+# 297 "./model.h"
 void Model_init(Model *model);
-# 306 "./model.h"
+# 308 "./model.h"
 void init_land(Model *model);
-# 317 "./model.h"
+# 319 "./model.h"
 void init_women(Model *model);
 # 4 "./events.h" 2
 # 1 "./asynch.h" 1
@@ -455,7 +456,9 @@ void play_chuck_win();
 
 
 
+
 void play_touch_edge();
+
 
 
 
