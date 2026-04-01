@@ -34,6 +34,9 @@ void cond_update(Model *model) {
     for (i = 0; i < 30; i++) {
         collisionWomenSwimming(&model->womenSwimming[i], &model->chuck);
     }
+    for (i = 0; i < 30; i++) {
+        isWaterColliding(&model->water[i], &model->chuck);
+    }
     
     if (model->chuck.y <= 16) { /* Send Chuck back to spawn point to cross again */
         model->crossCount++;

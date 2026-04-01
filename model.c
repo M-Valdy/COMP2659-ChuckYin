@@ -14,13 +14,26 @@ static const Coords WALKERS_SPAWN_POINTS[15] = {
 };
 
 /* @author Paolo */
-static const Coords SWIMMERS_SPAWN_POINTS[30] = {
+/*static const Coords SWIMMERS_SPAWN_POINTS[30] = {
     {  23, 208 }, {  67, 208 }, { 116, 208 }, { 253, 208 }, { 300, 208 },
     { 435, 208 }, { 483, 208 }, { 527, 208 }, { 2, 240 }, { 69, 240 },
     {  140, 240 }, { 217, 240 }, { 343, 240 }, { 418, 240 }, { 495, 240 },
     {  23, 80 }, {  67, 80 }, { 116, 80 }, { 253, 80 }, { 300, 80 },
     { 435, 80 }, { 483, 80 }, { 527, 80 }, { 2, 112 }, { 175, 80 },
     {  140, 112 }, { 279, 112 }, { 343, 112 }, { 598, 80 }, { 588, 112 }
+};*/
+static const Coords SWIMMERS_SPAWN_POINTS[30] = { /* delete after this is only for gauriks testing */
+    {  0, 208 }, {  32, 208 }, { 64, 208 }, { 96, 208 }, { 128, 208 },
+    { 160, 208 }, { 192, 208 }, { 224, 208 }, { 256, 208 }, { 288, 208 },
+    { 320, 208 }, { 352, 208 }, { 384, 208 }, { 416, 208 }, { 448, 208 },
+    { 480, 208 }, {  512, 208 }, { 544, 208 }, { 576, 208 }, { 0, 240 },
+    { 32, 240 }, { 64, 240 }, { 96, 240 }, { 128, 240 }, { 160, 240 },
+    { 192, 240 }, { 224, 240 }, { 256, 240 }, { 288, 240 }, { 320, 240 }
+};
+
+static const Coords WATER_SPAWN_POINTS[20] = {
+    {  0, 80 }, { 64, 80 }, { 128, 80 }, { 192, 80 }, { 256, 80 }, { 320, 80 }, { 384, 80 }, { 448, 80 }, {  512, 80 }, { 576, 80 },
+    {  0, 112 }, { 64, 112 }, { 128, 112 }, { 192, 112 }, { 256, 112 }, { 320, 112 }, { 384, 112 }, { 448, 112 }, {  512, 112 }, { 576, 112 }
 };
 
 /*
@@ -249,7 +262,7 @@ const UINT32 road_bitmap_lower[ROAD_HEIGHT] =
     0xFFFFFFFF  
 };
 
-const UINT32 water_bitmap[WATER_HEIGHT] =
+/*const UINT32 water_bitmap[WATER_HEIGHT] =
 {
     0x00000000, 
     0x00000000, 
@@ -283,6 +296,41 @@ const UINT32 water_bitmap[WATER_HEIGHT] =
     0x00000000, 
     0x00000000, 
     0x00000000,
+};*/
+const UINT32 water_bitmap[WATER_HEIGHT] =
+{
+    0x80000001,
+    0x40000002,
+    0x20000004,
+    0x10000008,
+    0x08000010,
+    0x04000020,
+    0x02000040,
+    0x01000080,
+    0x00800100,
+    0x00400200,
+    0x00200400,
+    0x00100800,
+    0x00081000,
+    0x00042000,
+    0x00024000,
+    0x00018000,
+    0x00018000,
+    0x00024000,
+    0x00042000,
+    0x00081000,
+    0x00100800,
+    0x00200400,
+    0x00400200,
+    0x00800100,
+    0x01000080,
+    0x02000040,
+    0x04000020,
+    0x08000010,
+    0x10000008,
+    0x20000004,
+    0x40000002,
+    0x80000001
 };
 
 /* @author Meagan & Paolo
@@ -459,8 +507,8 @@ void isRoadCollidingWalker(Road* road, WomenWalking* womenWalking) {
 
 /* @author Paolo */
 void isRoadCollidingChuck(Road* road, Chuck* chuck) {
-    if (chuck->x < road->x + ROAD_HEIGHT || chuck->x + CHUCK_HEIGHT > road->x ||
-        chuck->y < road->y + ROAD_HEIGHT || chuck->y + CHUCK_HEIGHT > road->y) {
+    if (chuck->x < road->x + ROAD_HEIGHT && chuck->x + CHUCK_HEIGHT > road->x &&
+        chuck->y < road->y + ROAD_HEIGHT && chuck->y + CHUCK_HEIGHT > road->y) {
         road->isColliding = 1;
     } else {
         road->isColliding = 0;
@@ -481,8 +529,10 @@ void initWater(Water* water, UINT16 x, UINT16 y) {
     - i don't minus 5 because water is now small and its the players fault if they accidentally run over it
  Function to check if Chuck goes into the water (might change later) */
 void isWaterColliding(Water* water, Chuck* chuck) {
-    if (chuck->x < water->x + WATER_HEIGHT || chuck->x + CHUCK_HEIGHT > water->x ||
-        chuck->y < water->y + WATER_HEIGHT || chuck->y + CHUCK_HEIGHT > water->y) {
+    /* (womenSwimming->x+SWIMMER_HEIGHT-6 >= chuck->x && womenSwimming->x <= chuck->x+CHUCK_HEIGHT-6 &&  
+        womenSwimming->y <= chuck->y+CHUCK_HEIGHT-6 && womenSwimming->y+SWIMMER_HEIGHT-6 >= chuck->y) */
+    if (chuck->x < water->x + WATER_HEIGHT && chuck->x + CHUCK_HEIGHT > water->x &&
+        chuck->y < water->y + WATER_HEIGHT && chuck->y + CHUCK_HEIGHT > water->y) {
         /* Collision detected, change Chuck's state to death collision */
         chuck->isColliding = 2;
     }
@@ -498,9 +548,9 @@ void init_land(Model *model) {
     int count = 0;
     int isDown = 0;
     for (i = 0; i < 120; i++) {
-        if (i < 80) { /* spawn area shouldnt be water, so i added this if statement after this realization*/
+        /*if (i < 80) {  spawn area shouldnt be water, so i added this if statement after this realization
             initWater(&model->water[i], x, y+64);
-        }
+        }*/
         initRoad(&model->road[i], x, y, isDown);
         x += 32;
         count++;
@@ -517,15 +567,26 @@ void init_land(Model *model) {
             x = 0;
         }
     }
+
+    for (i = 0; i < 20; i++) {
+        initWater(&model->water[i], WATER_SPAWN_POINTS[i].x, WATER_SPAWN_POINTS[i].y);
+    }
 }
 
 /* @author Paolo */
 void init_women(Model *model) {
     int i;
 
-    for (i = 0; i < 15; i++) {
+    /*for (i = 0; i < 15; i++) {
         initWomenWalking(&model->womenWalking[i], WALKERS_SPAWN_POINTS[i].x, WALKERS_SPAWN_POINTS[i].y);
-    }
+    }*/
+    /* delete the 3 inits below and uncomment above this, only for gauriks testings */
+    initWomenWalking(&model->womenWalking[1], WALKERS_SPAWN_POINTS[1].x, WALKERS_SPAWN_POINTS[1].y); 
+    initWomenWalking(&model->womenWalking[5], WALKERS_SPAWN_POINTS[5].x, WALKERS_SPAWN_POINTS[5].y); 
+    initWomenWalking(&model->womenWalking[11], WALKERS_SPAWN_POINTS[11].x, WALKERS_SPAWN_POINTS[11].y); 
+    
+
+
     for (i = 0; i < 30; i++) {
         initWomenSwimming(&model->womenSwimming[i], SWIMMERS_SPAWN_POINTS[i].x, SWIMMERS_SPAWN_POINTS[i].y); 
     }
