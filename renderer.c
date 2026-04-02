@@ -2,6 +2,28 @@
 
 void render_initial_state(const Model *model, UINT32 *base) {
     int i;
+    /*for (i = 0; i < 120; i++) {
+            clear_region(base, model->road[i].y, model->road[i].x, ROAD_HEIGHT, ROAD_HEIGHT);
+            if (h == 1) {
+                render_road(base, model->road[i].y, model->road[i].x, &model->road[i]);
+            }
+            if (i < 80) {
+                render_water(base, model->water[i].y, model->water[i].x, &model->water[i]);
+            }
+            for (l = 0; i < 15; i++) {
+                if (&model->road[i].y == &model->womenWalking[l].y) {
+                    isRoadCollidingWalker(&model->road[i], &model->womenWalking[l]);
+                }
+            }
+            isRoadCollidingChuck(&model->road[i], &model->chuck);
+            if (model->road[i].isColliding == 1) {
+                clear_region(base, model->road[i].y, model->road[i].x, ROAD_HEIGHT, ROAD_HEIGHT);
+                if (h == 1) {
+                    render_road(base, model->road[i].y, model->road[i].x, &model->road[i]);
+                }
+            }
+        }*/
+
     clear_screen(base);
     for (i = 0; i < 120; i++) {
         if (i < 20) {
@@ -22,8 +44,8 @@ void render_initial_state(const Model *model, UINT32 *base) {
         }
     }
     render_Chuck(base, model->chuck.y, model->chuck.x, &model->chuck);
-    plot_string(base, 390, 15, "Cross Count is");
-    plot_character(base, 390, 135, model->crossCount + '0');
+    plot_string(base, 0, 15, "Cross Count is");
+    plot_character(base, 0, 135, model->crossCount + '0');
 }
 
 void render_Chuck(UINT32 *base, UINT16 row, UINT16 col, const Chuck* chuck){
@@ -68,35 +90,31 @@ void master_render(const Model *model, UINT32 *base) {
     int l;
     /*render_road(base, 350, 320, &model->road[40]);*/
     for (h = 0; h < 2; h++) {
-        for (i = 0; i < 120; i++) {
-            if (model->road[i].isColliding == 1) {
+        /*for (i = 0; i < 120; i++) {
+            if ((model->road[i].isColliding == 1 || model->road[i].isPrevColliding == 1) &&
+                (model->chuck.oldx != model->chuck.x || model->chuck.oldy != model->chuck.y)) {
                 clear_region(base, model->road[i].y, model->road[i].x, ROAD_HEIGHT, ROAD_HEIGHT);
                 if (h == 1) {
                     render_road(base, model->road[i].y, model->road[i].x, &model->road[i]);
+                }
+            }
+
+                test below for prevCollide
+            if (model->road[i].isPrevColliding == 1 && model->road[i].isColliding == 0) {
+                render_road(base, model->road[i].y, model->road[i].x, &model->road[i]);
+                resetRoadCollision(&model->road[i]);
+            }
+        }*/
+        for (i = 0; i < 120; i++) {
+            if (model->road[i].isColliding == 1 &&
+                (model->chuck.oldx != model->chuck.x || model->chuck.oldy != model->chuck.y) ) {
+                clear_region(base, model->road[i].y, model->road[i].x, ROAD_HEIGHT, ROAD_HEIGHT);
+                if (h == 1) {
+                    render_road(base, model->road[i].y, model->road[i].x, &model->road[i]);
+                    
                 }
             }
         }
-        /*for (i = 0; i < 120; i++) {
-            clear_region(base, model->road[i].y, model->road[i].x, ROAD_HEIGHT, ROAD_HEIGHT);
-            if (h == 1) {
-                render_road(base, model->road[i].y, model->road[i].x, &model->road[i]);
-            }
-            if (i < 80) {
-                render_water(base, model->water[i].y, model->water[i].x, &model->water[i]);
-            }
-            for (l = 0; i < 15; i++) {
-                if (&model->road[i].y == &model->womenWalking[l].y) {
-                    isRoadCollidingWalker(&model->road[i], &model->womenWalking[l]);
-                }
-            }
-            isRoadCollidingChuck(&model->road[i], &model->chuck);
-            if (model->road[i].isColliding == 1) {
-                clear_region(base, model->road[i].y, model->road[i].x, ROAD_HEIGHT, ROAD_HEIGHT);
-                if (h == 1) {
-                    render_road(base, model->road[i].y, model->road[i].x, &model->road[i]);
-                }
-            }
-        }*/
 
         for (i = 0; i < 20; i++) {
             render_water(base, model->water[i].y, model->water[i].x, &model->water[i]);
@@ -140,11 +158,13 @@ void master_render(const Model *model, UINT32 *base) {
             }
         }
         
-        if (model->crossCount != model->oldCrossCount || (model->chuck.x <= 175 && model->chuck.y >= 358)) {
-            clear_region(base, 390, 15, 8, 120);
+        if (model->oldCrossCount != model->crossCount ) { /* || (model->chuck.x <= 175 && model->chuck.y >= 358) */
+            
+            clear_region(base, 0, 15, 8, 140);
             if (h == 1) {
-                plot_string(base, 390, 15, "Cross Count is");
-                plot_character(base, 390, 135, model->crossCount + '0');
+                plot_string(base, 0, 15, "Cross Count is");
+                plot_character(base, 0, 135, model->crossCount + '0');
+                updateScore(model);
             }
         }
         /* TO DO: clear_region calls messing with plotted string, making it look weird.  */
@@ -155,6 +175,4 @@ void master_render(const Model *model, UINT32 *base) {
             }
         }
     }
-    
-    
 }

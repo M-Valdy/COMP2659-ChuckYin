@@ -83,6 +83,9 @@ typedef struct {
     Road road[120]; /* need 40 road segments per road (20 to cover the whole screen width, double it to make it 64 pixels high), 3 roads total */ 
 } Model;
 
+void updateScore(Model *model);
+void resetRoadCollision(Road* road);
+
 /*----- Function: initChuck -----
 
  PURPOSE: Initializes the Chuck struct by setting his initial position, walking state, 

@@ -1,5 +1,6 @@
 #include "model.h"
 #include "raster.h"
+#include "effects.h"
 
 typedef struct {
     int x;
@@ -333,6 +334,11 @@ const UINT32 water_bitmap[WATER_HEIGHT] =
     0x80000001
 };
 
+/* @author Paolo, needed this in renderer for the minimized plotting of the score */
+void updateScore(Model *model) {
+    model->oldCrossCount = model->crossCount;
+}
+
 /* @author Meagan & Paolo
 function for initializing Chuck's position and state */
 void initChuck(Chuck* chuck, int x, int y) {
@@ -347,6 +353,7 @@ void initChuck(Chuck* chuck, int x, int y) {
     chuck->isColliding = 0;
     chuck->deltaX = 0;
     chuck->deltaY = 0;
+    stopWalking(chuck);
 }
 
 /* @author Meagan */
@@ -367,11 +374,13 @@ void updateChuck(Chuck* chuck) {
         int newY = chuck->y + chuck->deltaY;
 
         if (newX < 0) {
+            play_touch_edge();
             newX = 0;
         } else if (newX > 640 - CHUCK_HEIGHT) {
             newX = 640 - CHUCK_HEIGHT;
         }
         if (newY < 0) {
+            play_touch_edge();
             newY = 0;
         } else if (newY > 400 - CHUCK_HEIGHT) {
             newY = 400 - CHUCK_HEIGHT;
@@ -518,14 +527,21 @@ void isRoadCollidingWalker(Road* road, WomenWalking* womenWalking) {
 
 /* @author Paolo */
 void isRoadCollidingChuck(Road* road, Chuck* chuck) {
-    if ((chuck->x < road->x + ROAD_HEIGHT && chuck->x + CHUCK_HEIGHT > road->x &&
-        chuck->y < road->y + ROAD_HEIGHT && chuck->y + CHUCK_HEIGHT > road->y) || 
-        (chuck->oldx < road->x + ROAD_HEIGHT && chuck->oldx + CHUCK_HEIGHT > road->x &&
-        chuck->oldy < road->y + ROAD_HEIGHT && chuck->oldy + CHUCK_HEIGHT > road->y)) {
+    if ((chuck->x < road->x + ROAD_HEIGHT && chuck->x + CHUCK_HEIGHT > road->x && chuck->y < road->y + ROAD_HEIGHT && chuck->y + CHUCK_HEIGHT > road->y) || 
+        (chuck->oldx < road->x + ROAD_HEIGHT && chuck->oldx + CHUCK_HEIGHT > road->x && chuck->oldy < road->y + ROAD_HEIGHT && chuck->oldy + CHUCK_HEIGHT > road->y)) {
+        road->isPrevColliding = road->isColliding;
         road->isColliding = 1;
     } else {
-        road->isColliding = 0;
+        if (road->isPrevColliding == 0) {
+            road->isPrevColliding = road->isColliding;
+            road->isColliding = 0;
+        }
     }
+}
+
+/* @author Paolo */
+void resetRoadCollision(Road* road) {
+    road->isPrevColliding = 0;
 }
 
 
