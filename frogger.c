@@ -7,6 +7,7 @@
 #include <osbind.h>
 #include "input.h"
 #include "start.h"
+#include "sound.h"
 /* @author Paolo 
     Copied most of the professor's screenshot on the checkpoint PDF
 */
@@ -22,6 +23,29 @@ UINT32 get_time() {
 
     return time;
 }
+
+/*Function so that the keyboard doesn't have any sound 
+    @author Parker from Class and the teacher, Meagan*/
+
+void no_keysound(){
+    long old_ssp = Super(0);
+    volatile char* console_address = 0x000484;
+    UINT8 console_state = *console_address;
+    console_state &= 0xFE; /* Clear bit 0 to disable keyboard sound */
+    *console_address = console_state;
+    Super(old_ssp);
+}
+
+
+void return_keysound(){
+    long old_ssp = Super(0);
+    volatile char* console_address = 0x000484;
+    UINT8 console_state = *console_address;
+    console_state |= 0x01; /* Clear bit 0 to disable keyboard sound */
+    *console_address = console_state;
+    Super(old_ssp);
+}
+
 
 /* @author Paolo for the main flow */ 
 /* @author Gaurik for integrating the title screen */
@@ -45,15 +69,16 @@ int main() {
     player_choice = make_splashscreen(base);
     
     if (player_choice == 0) { 
- 
         void *front, *back;
         void *raw_back;
         front = base;
         raw_back = (void *)Malloc(32000L + 255L);
         back = (void *)(((long)raw_back + 255L) & 0xFFFFFF00L);
-    
+
+        no_keysound();
         Model_init(&frogger);
         render_initial_state(&frogger, back);
+        start_music();
         render_initial_state(&frogger, front);
     
         timeThen = get_time();
@@ -72,6 +97,7 @@ int main() {
                     asynch_button_X(&frogger);
                 } else if (ch == 'p') {
                     asynch_button_P(&frogger);
+                    return_keysound();
                 }
             }
 
@@ -82,7 +108,7 @@ int main() {
                 cond_update(&frogger);
                 back = front; /* realized had to do this because it looked too choppy even though it was working */
                 master_render(&frogger, back); /* TO DO: need to optimize render_road */
-            
+                update_music(30);
                 Setscreen(-1L, (long)back, -1L);
                 Vsync();
                 /* swap buffers */
