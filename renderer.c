@@ -7,7 +7,7 @@ void render_initial_state(const Model *model, UINT32 *base) {
             if (h == 1) {
                 render_road(base, model->road[i].y, model->road[i].x, &model->road[i]);
             }
-            if (i < 80) {
+            if (i < 60) {
                 render_water(base, model->water[i].y, model->water[i].x, &model->water[i]);
             }
             for (l = 0; i < 15; i++) {
@@ -26,18 +26,18 @@ void render_initial_state(const Model *model, UINT32 *base) {
 
     clear_screen(base);
     for (i = 0; i < 120; i++) {
-        if (i < 20) {
+        if (i < 60) {
             render_water(base, model->water[i].y, model->water[i].x, &model->water[i]);
         }
         render_road(base, model->road[i].y, model->road[i].x, &model->road[i]);
     }
-    /*for (i = 0; i < 15; i++) {
+    for (i = 0; i < 15; i++) {
         render_WomenWalking(base, model->womenWalking[i].y, model->womenWalking[i].x, &model->womenWalking[i]);
-    }*/
-    render_WomenWalking(base, model->womenWalking[1].y, model->womenWalking[1].x, &model->womenWalking[1]);
+    }
+    /*render_WomenWalking(base, model->womenWalking[1].y, model->womenWalking[1].x, &model->womenWalking[1]);
     render_WomenWalking(base, model->womenWalking[5].y, model->womenWalking[5].x, &model->womenWalking[5]);
-    render_WomenWalking(base, model->womenWalking[11].y, model->womenWalking[11].x, &model->womenWalking[11]);
-    for (i = 0; i < 30; i++) {
+    render_WomenWalking(base, model->womenWalking[11].y, model->womenWalking[11].x, &model->womenWalking[11]);*/
+    for (i = 0; i < 20; i++) {
         render_women_swimming(base, model->womenSwimming[i].y, model->womenSwimming[i].x, &model->womenSwimming[i]);
         if (model->womenSwimming[i].frameCount <= 31 && model->womenSwimming[i].frameCount >= 25) {
             plot_square(base, model->womenSwimming[i].y, model->womenSwimming[i].x, SWIMMER_HEIGHT);
@@ -115,38 +115,23 @@ void master_render(const Model *model, UINT32 *base) {
                 }
             }
         }
-
-        for (i = 0; i < 20; i++) {
+        /*for (i = 0; i < 60; i++) {
             render_water(base, model->water[i].y, model->water[i].x, &model->water[i]);
-        }
-
-        clear_region(base, model->womenWalking[1].oldy, model->womenWalking[1].oldx, WALKER_HEIGHT, WALKER_HEIGHT);
-        render_road(base, model->womenWalking[1].oldy, model->womenWalking[1].oldx, &model->road[0]);
-        render_WomenWalking(base, model->womenWalking[1].y, model->womenWalking[1].x, &model->womenWalking[1]);
-        
-        clear_region(base, model->womenWalking[5].oldy, model->womenWalking[5].oldx, WALKER_HEIGHT, WALKER_HEIGHT);
-        render_road(base, model->womenWalking[5].oldy+1, model->womenWalking[5].oldx, &model->road[0]);
-        render_WomenWalking(base, model->womenWalking[5].y, model->womenWalking[5].x, &model->womenWalking[5]);
-        
-        clear_region(base, model->womenWalking[11].oldy, model->womenWalking[11].oldx, WALKER_HEIGHT, WALKER_HEIGHT);
-        render_road(base, model->womenWalking[11].oldy+1, model->womenWalking[11].oldx, &model->road[0]);
-        render_WomenWalking(base, model->womenWalking[11].y, model->womenWalking[11].x, &model->womenWalking[11]);
-        /*for (i = 0; i < 15; i++) {
+        }*/
+        for (i = 0; i < 15; i++) {
             clear_region(base, model->womenWalking[i].oldy, model->womenWalking[i].oldx, WALKER_HEIGHT, WALKER_HEIGHT);
-            render_road(base, model->womenWalking[i].oldy, model->womenWalking[i].oldx, &model->road[0]);*/
-            /*if (model->womenWalking[i].oldy == 16) {
+            /*render_road(base, model->womenWalking[i].oldy, model->womenWalking[i].oldx, &model->road[0]);*/
+            if (model->womenWalking[i].oldy == 16) {
                 render_road(base, model->womenWalking[i].oldy, model->womenWalking[i].oldx, &model->road[0]);
             } else {
                 render_road(base, model->womenWalking[i].oldy+1, model->womenWalking[i].oldx, &model->road[0]);
             }
-            
-             turns out that render_road doesn't need to render at their position, so you can render two road[0] 
+             /* turns out that render_road doesn't need to render at their position, so you can render two road[0] */
             if (h == 1) { 
-                /render_WomenWalking(base, model->womenWalking[i].y, model->womenWalking[i].x, &model->womenWalking[i]);
+                render_WomenWalking(base, model->womenWalking[i].y, model->womenWalking[i].x, &model->womenWalking[i]);
             }
-        }*/
-
-        for (i = 0; i < 30; i++) {
+        }
+        for (i = 0; i < 20; i++) {
             if (model->womenSwimming[i].frameCount <= 1 || model->womenSwimming[i].isColliding == 1) {
                 clear_region(base, model->womenSwimming[i].y, model->womenSwimming[i].x, SWIMMER_HEIGHT, SWIMMER_HEIGHT);
                 if (h == 1) {
@@ -157,7 +142,6 @@ void master_render(const Model *model, UINT32 *base) {
                 plot_square(base, model->womenSwimming[i].y, model->womenSwimming[i].x, SWIMMER_HEIGHT);
             }
         }
-        
         if (model->oldCrossCount != model->crossCount ) { /* || (model->chuck.x <= 175 && model->chuck.y >= 358) */
             
             clear_region(base, 0, 15, 8, 140);
@@ -167,7 +151,6 @@ void master_render(const Model *model, UINT32 *base) {
                 updateScore(model);
             }
         }
-        /* TO DO: clear_region calls messing with plotted string, making it look weird.  */
         if (model->chuck.x != model->chuck.oldx || model->chuck.y != model->chuck.oldy) {
             clear_region(base, model->chuck.oldy, model->chuck.oldx, CHUCK_HEIGHT, CHUCK_HEIGHT);
             if (h == 1) {

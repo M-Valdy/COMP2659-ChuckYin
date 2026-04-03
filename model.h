@@ -15,8 +15,8 @@
     Team names: Meagan Valderrama, Paolo Deocareza, and Gaurik Khullar
     @authors Meagan Valderrama, Paolo Deocareza
 */
-/*#define CHUCK_SPEED 6*/
-#define CHUCK_SPEED 32 /* change this after this is only for gauriks testing */
+#define CHUCK_SPEED 6
+/*#define CHUCK_SPEED 32  change this after this is only for gauriks testing */
 #define WALKER_SPEED 8
 #define MAX_FRAMES 63
 
@@ -78,8 +78,8 @@ typedef struct {
     Chuck chuck;
     WomenWalking womenWalking[15];
     /*WomenWalking womenWalking[3];*/
-    WomenSwimming womenSwimming[30];
-    Water water[20]; /* need 40 Water objects per stream (20 to cover the whole screen width, double it to make it 64 pixels high), 3 water streams total */ 
+    WomenSwimming womenSwimming[20];
+    Water water[90]; /* need 40 Water objects per stream (20 to cover the whole screen width, double it to make it 64 pixels high), 3 water streams total */ 
     Road road[120]; /* need 40 road segments per road (20 to cover the whole screen width, double it to make it 64 pixels high), 3 roads total */ 
 } Model;
 
