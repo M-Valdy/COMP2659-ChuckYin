@@ -7,13 +7,10 @@
 void play_chuck_walking() {
     enable_channel(2, 1, 0);   /* tone on, noise off */
     set_envelope(0x0A, 0x2000);
-    set_volume(2, 8);
-
-    set_tone(2, 0x1ac);        /* C4-ish */
-    delay(10);
+    set_volume(2, 12);
 
     set_tone(2, 0x0d6);        /* C5-ish */
-    delay(20);
+    delay(2);
 
     set_volume(2, 0);
 }
@@ -22,7 +19,7 @@ void play_chuck_walking() {
 void play_chuck_win() {
     enable_channel(2, 1, 0);   /* tone on, noise off */
     set_envelope(0x0A, 0x2000);
-    set_volume(2, 8);
+    set_volume(2, 12);
 
     set_tone(2, 0x0be);        /* D5-ish */
     delay(20);
@@ -37,7 +34,7 @@ void play_chuck_win() {
 void play_touch_edge() {
     enable_channel(2, 1, 0);   /* tone on, noise off */
     set_envelope(0x0A, 0x2000);
-    set_volume(2, 8);
+    set_volume(2, 12);
 
     set_tone(2, 0x6ae);
     set_noise(0x01);
@@ -51,7 +48,7 @@ void play_touch_edge() {
 void play_women_collide() {
     enable_channel(2, 1, 1);    /* Both tone and noise are used */
     set_envelope(0x0A, 0x2000);
-    set_volume(2, 11);
+    set_volume(2, 12);
 
     set_tone(2, 0x54d);
     delay(20);

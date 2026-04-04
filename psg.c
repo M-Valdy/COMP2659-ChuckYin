@@ -130,6 +130,9 @@ void set_envelope(int shape, unsigned int sustain) {
 
 void stop_sound() {
     set_volume(0, 0);
+    set_tone(0,0);
     set_volume(1, 0);
+    set_tone(1, 0);
     set_volume(2, 0);
+    set_tone(2, 0);
 }
