@@ -3,10 +3,11 @@
 
 #include "types.h"
 #include "font.h"
+#include <osbind.h>
 
 
 UINT16 *get_video_base();
-void set_video_base(UINT16 *); /* TO DO: implemented in 68k assembly using movep */
+void set_video_base(UINT16 *addr); /* TO DO: implemented in 68k assembly using movep */
 
 
 

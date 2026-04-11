@@ -1,5 +1,4 @@
 #include "raster.h"
-#include <osbind.h>
 
 /* @author Paolo */
 UINT16 *get_video_base() {
