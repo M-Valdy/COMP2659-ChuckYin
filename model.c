@@ -7,11 +7,14 @@ typedef struct {
     int y;
 } Coords;
 
-/* @author Paolo */
+/* @author Paolo 
 static const Coords WALKERS_SPAWN_POINTS[15] = {
     {  24, 16 }, {  242, 16 }, { 453, 16 }, { 130, 48 }, { 350, 48 },
     { 133, 144 }, { 325, 144 }, { 527, 144 }, { 102, 176 }, { 397, 176 },
     {  141, 272 }, { 485, 272 }, { 60, 304 }, { 216, 304 }, { 340, 304 }
+};*/
+static const Coords WALKERS_SPAWN_POINTS[4] = {
+    { 325, 144 }, { 397, 176 }, { 485, 272 }, { 60, 304 }
 };
 
 /* @author Paolo 
@@ -646,7 +649,7 @@ void init_land(Model *model) {
         }
     }
 
-    for (i = 0; i < 60; i++) { /* delete after Gaurik's testing */
+    for (i = 0; i < 60; i++) {
         initWater(&model->water[i], WATER_SPAWN_POINTS[i].x, WATER_SPAWN_POINTS[i].y);
     }
 }
@@ -655,7 +658,7 @@ void init_land(Model *model) {
 void init_women(Model *model) {
     int i;
 
-    for (i = 0; i < 15; i++) {
+    for (i = 0; i < 4; i++) {
         initWomenWalking(&model->womenWalking[i], WALKERS_SPAWN_POINTS[i].x, WALKERS_SPAWN_POINTS[i].y);
     }
     /* delete the 3 inits below and uncomment above this, only for gauriks testings

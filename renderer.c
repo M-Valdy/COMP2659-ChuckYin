@@ -31,7 +31,7 @@ void render_initial_state(const Model *model, UINT32 *base) {
         }
         render_road(base, model->road[i].y, model->road[i].x, &model->road[i]);
     }
-    for (i = 0; i < 15; i++) {
+    for (i = 0; i < 4; i++) {
         render_WomenWalking(base, model->womenWalking[i].y, model->womenWalking[i].x, &model->womenWalking[i]);
     }
     /*render_WomenWalking(base, model->womenWalking[1].y, model->womenWalking[1].x, &model->womenWalking[1]);
@@ -118,7 +118,7 @@ void master_render(const Model *model, UINT32 *base) {
         /*for (i = 0; i < 60; i++) {
             render_water(base, model->water[i].y, model->water[i].x, &model->water[i]);
         }*/
-        for (i = 0; i < 15; i++) {
+        for (i = 0; i < 4; i++) {
             clear_region(base, model->womenWalking[i].oldy, model->womenWalking[i].oldx, WALKER_HEIGHT, WALKER_HEIGHT);
             /*render_road(base, model->womenWalking[i].oldy, model->womenWalking[i].oldx, &model->road[0]);*/
             if (model->womenWalking[i].oldy == 16) {

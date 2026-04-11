@@ -76,7 +76,7 @@ typedef struct {
     int crossCount;
     int oldCrossCount;
     Chuck chuck;
-    WomenWalking womenWalking[15];
+    WomenWalking womenWalking[4];
     /*WomenWalking womenWalking[3];*/
     WomenSwimming womenSwimming[20];
     Water water[90]; /* need 40 Water objects per stream (20 to cover the whole screen width, double it to make it 64 pixels high), 3 water streams total */ 
