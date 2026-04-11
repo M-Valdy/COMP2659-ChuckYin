@@ -66,3 +66,25 @@ effects.o: effects.c effects.h
 # mainpage test drivers
 tst_st: tst_st.o raster.o rast_asm.o font.o model.o renderer.o start.o
 	cc68x -g tst_st.o raster.o rast_asm.o font.o model.o renderer.o start.o -o tst_st.tos
+
+
+
+# isr test drivers 
+
+# object files for the ISR test
+CISROBJS = cisr.o cisr_asm.o cisr_tst.o
+
+test_isr.tos: $(CISROBJS)
+	$(CC) -g $(CISROBJS) -o test_isr.tos
+
+# The "Library" logic
+cisr.o: cisr.c cisr.h
+	$(CC) -g -c cisr.c
+
+# The "Low-level" wrapper
+cisr_asm.o: cisr_asm.s
+	gen -D -L2 cisr_asm.s
+
+# The "Test" driver
+cisr_tst.o: cisr_tst.c cisr.h
+	$(CC) -g -c cisr_tst.c
