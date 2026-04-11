@@ -113,7 +113,7 @@ int main() {
                 back = front; /* realized had to do this because it looked too choppy even though it was working */
                 master_render(&frogger, back); /* TO DO: need to optimize render_road */
                 update_music(30);
-                set_video_base(base); /*Setscreen(-1L, (long)back, -1L);*/
+                Setscreen(-1L, (long)back, -1L); /*set_video_base(base);*/
                 Vsync();
                 /* swap buffers */
                 temp = front;
@@ -123,7 +123,7 @@ int main() {
                 timeThen = timeNow;
             }
         }
-        set_video_base(base); /*Setscreen(-1L, (long)base, -1L);*/
+        Setscreen(-1L, (long)base, -1L); /*set_video_base(base); */
 
         return 0;
     }
