@@ -50,6 +50,12 @@ void asynch_button_X(Model *model) {
 }
 
 /* @author Paolo */
+void asynch_button_O(Model *model) {
+    toggleWaterCol(model);
+}
+
+
+/* @author Paolo */
 void asynch_button_P(Model *model) {
     model->gameOver = 3;
     stop_sound();

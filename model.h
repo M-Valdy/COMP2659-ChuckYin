@@ -81,6 +81,7 @@ typedef struct {
     int gameOver;
     int crossCount;
     int oldCrossCount;
+    int allowWaterCol;
     Chuck chuck;
     WomenWalking womenWalking[NUM_WALKERS];
     WomenSwimming womenSwimming[NUM_SWIMMERS];
@@ -88,6 +89,7 @@ typedef struct {
     Road road[NUM_ROADS];
 } Model;
 
+void toggleWaterCol(Model *model);
 void updateScore(Model *model);
 void resetRoadCollision(Road* road);
 

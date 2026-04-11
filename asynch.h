@@ -92,4 +92,6 @@ void asynch_button_X(Model *model);
 */
 void asynch_button_P(Model *model);
 
+void asynch_button_O(Model *model);
+
 #endif

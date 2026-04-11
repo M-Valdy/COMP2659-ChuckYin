@@ -29,8 +29,10 @@ void cond_update(Model *model) {
     for (i = 0; i < NUM_SWIMMERS; i++) {
         collisionWomenSwimming(&model->womenSwimming[i], &model->chuck);
     }
-    for (i = 0; i < NUM_WATER; i++) {
-        isWaterColliding(&model->water[i], &model->chuck);
+    if (model->allowWaterCol == 1) {
+        for (i = 0; i < NUM_WATER; i++) {
+            isWaterColliding(&model->water[i], &model->chuck);
+        }
     }
     
     if (model->chuck.y <= 32) { /* Send Chuck back to spawn point to cross again */

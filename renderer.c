@@ -59,6 +59,11 @@ void master_render(const Model *model, UINT32 *base) {
     int i;
     int h;
     int l;
+    if (model->allowWaterCol == 0) {
+        plot_string(base, 0, 280, "Cheats on!");
+    } else {
+        clear_region(base, 0, 280, 8, 80);
+    }
     for (h = 0; h < 2; h++) {
         for (i = 0; i < NUM_ROADS; i++) {
             if (model->road[i].isColliding == 1 &&

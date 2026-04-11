@@ -98,6 +98,8 @@ int main() {
                 } else if (ch == 'p') {
                     asynch_button_P(&frogger);
                     return_keysound();
+                } else if (ch == 'o') {
+                    asynch_button_O(&frogger);
                 } /* i think i need to clear the user input to prevent continuous walking despite key release */
             }
 

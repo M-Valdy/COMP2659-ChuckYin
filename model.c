@@ -577,7 +577,17 @@ void Model_init(Model *model) {
     model->crossCount = 0;
     model->oldCrossCount = 0;
     model->chuck.deathCounter = 0;
+    model->allowWaterCol = 1;
     init_land(model);
     init_women(model);
     initChuck(&model->chuck, 320, 336);
+}
+
+/* @author Paolo */
+void toggleWaterCol(Model *model) {
+    if (model->allowWaterCol == 1) {
+        model->allowWaterCol = 0;
+    } else {
+        model->allowWaterCol = 1;
+    }
 }
