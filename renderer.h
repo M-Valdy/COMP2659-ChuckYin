@@ -29,6 +29,8 @@ void render_initial_state(const Model *model, UINT32 *base);
 */
 void master_render(const Model *model, UINT32 *base);
 
+void old_master_render(const Model *model, UINT32 *base);
+
 /*----- Function: render_Chuck -----
     PURPOSE: Renders Chuck on the screen at their current positions.
     

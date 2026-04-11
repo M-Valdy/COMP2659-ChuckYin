@@ -25,6 +25,12 @@
 #define SWIMMER_HEIGHT 32
 #define ROAD_HEIGHT 32
 #define WATER_HEIGHT 32
+
+#define NUM_WALKERS 4
+#define NUM_SWIMMERS 20
+#define NUM_WATER 60
+#define NUM_ROADS 120
+
 extern const UINT32 Chuck_bitmap[CHUCK_HEIGHT];
 extern const UINT32 womenWalking_bitmap[WALKER_HEIGHT];
 extern const UINT32 womenSwimming_forward_bitmap[SWIMMER_HEIGHT];
@@ -68,7 +74,7 @@ typedef struct {
 } Road;
 
 typedef struct {
-    unsigned int x,y;
+    int x,y;
 } Water;
 
 typedef struct {
@@ -76,11 +82,10 @@ typedef struct {
     int crossCount;
     int oldCrossCount;
     Chuck chuck;
-    WomenWalking womenWalking[4];
-    /*WomenWalking womenWalking[3];*/
-    WomenSwimming womenSwimming[20];
-    Water water[90]; /* need 40 Water objects per stream (20 to cover the whole screen width, double it to make it 64 pixels high), 3 water streams total */ 
-    Road road[120]; /* need 40 road segments per road (20 to cover the whole screen width, double it to make it 64 pixels high), 3 roads total */ 
+    WomenWalking womenWalking[NUM_WALKERS];
+    WomenSwimming womenSwimming[NUM_SWIMMERS];
+    Water water[NUM_WATER]; 
+    Road road[NUM_ROADS];
 } Model;
 
 void updateScore(Model *model);

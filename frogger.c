@@ -84,7 +84,7 @@ int main() {
         timeThen = get_time();
         while (frogger.gameOver != 2 && frogger.gameOver != 3) {
             if (has_input()) {
-                ch = get_input();
+                ch = get_latest_input();
                 if (ch == 'w') {
                     asynch_button_W(&frogger);
                 } else if (ch == 'a') {
@@ -98,7 +98,7 @@ int main() {
                 } else if (ch == 'p') {
                     asynch_button_P(&frogger);
                     return_keysound();
-                }
+                } /* i think i need to clear the user input to prevent continuous walking despite key release */
             }
 
             timeNow = get_time();

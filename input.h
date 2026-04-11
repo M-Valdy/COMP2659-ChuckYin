@@ -3,5 +3,6 @@
 
 int has_input();
 char get_input();
+char get_latest_input();
 
 #endif

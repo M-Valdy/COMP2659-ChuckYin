@@ -16,20 +16,20 @@ void cond_update(Model *model) {
         initChuck(&model->chuck, 320, 336); /* Reset Chuck to starting position to bottom middle of screen */
         model->chuck.deathCounter++;
     }
+
     /* Paolo's note: i didn't spend that much time trying to optimize this i just wanted it to work for now*/
-    for (h = 0; h < 120; h++) { 
-        
+    for (h = 0; h < NUM_ROADS; h++) { 
         isRoadCollidingChuck(&model->road[h], &model->chuck);
     }
 
-    for (i = 0; i < 15; i++) {
+    for (i = 0; i < NUM_WALKERS; i++) {
         collisionWomenWalking(&model->womenWalking[i], &model->chuck);
     }
     
-    for (i = 0; i < 30; i++) {
+    for (i = 0; i < NUM_SWIMMERS; i++) {
         collisionWomenSwimming(&model->womenSwimming[i], &model->chuck);
     }
-    for (i = 0; i < 30; i++) {
+    for (i = 0; i < NUM_WATER; i++) {
         isWaterColliding(&model->water[i], &model->chuck);
     }
     
@@ -38,6 +38,7 @@ void cond_update(Model *model) {
         model->crossCount++;
         initChuck(&model->chuck, 320, 336);
     }
+
     /* Chuck needs to cross the roads 5 times */
     if (model->crossCount == 5) { 
         model->gameOver = 1;
@@ -45,6 +46,4 @@ void cond_update(Model *model) {
         model->oldCrossCount = model->crossCount;
         model->crossCount = 0;
     }
-
-    /* TO DO: for loop for water col now*/
 }
