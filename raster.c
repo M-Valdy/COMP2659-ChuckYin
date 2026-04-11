@@ -1,4 +1,22 @@
 #include "raster.h"
+#include <osbind.h>
+
+/* @author Paolo */
+UINT16 *get_video_base() {
+    volatile UINT8 *video_base_hi = (volatile UINT8 *)0xFFFF8201;
+    volatile UINT8 *video_base_mi = (volatile UINT8 *)0xFFFF8203;
+
+    unsigned long old_ssp;
+    unsigned long addr;
+
+    old_ssp = Super(0);
+
+    addr = ((unsigned long)(*video_base_hi) << 16) | ((unsigned long)(*video_base_mi) << 8);
+
+    Super(old_ssp);
+
+    return (UINT16 *)addr;
+}
 
 /* @author: Gaurik*/
 /* constants */

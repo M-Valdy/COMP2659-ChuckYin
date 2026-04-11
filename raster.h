@@ -4,6 +4,12 @@
 #include "types.h"
 #include "font.h"
 
+
+UINT16 *get_video_base();
+void set_video_base(UINT16 *); /* TO DO: implemented in 68k assembly using movep */
+
+
+
 /*----- Function: clear_screen -----
 v
  PURPOSE: Clears the entire screen.

@@ -8,6 +8,8 @@
 #include "input.h"
 #include "start.h"
 #include "sound.h"
+#include "raster.h"
+
 /* @author Paolo 
     Copied most of the professor's screenshot on the checkpoint PDF
 */
@@ -63,7 +65,7 @@ int main() {
     /* https://stackoverflow.com/questions/38088732/explanation-to-aligned-malloc-implementation */
     /* Professor said in page9 of chuckpoint 3 that we need to allocated 32k bytes but NOT on the stack. We put it in the heap using GEMDOS' Malloc() */
     /* Also said that we need to make frame buffers to be 256 byte aligned */
-    void *base = Physbase();
+    void *base = get_video_base();
     clear_screen(base);
 
     player_choice = make_splashscreen(base);
