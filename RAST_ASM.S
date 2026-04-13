@@ -1,7 +1,4 @@
-; @author Gaurik
-; Meagan and Paolo had trouble with running and testing and they contributed a lot to this file because of XDEF 
-; and XREF issues, we didn't know how to properly link C and assembly files and that caused a major delay
-; because most of this had to be redone.
+; @author Gaurik for the raster library and Paolo for set_video_base
 
     XDEF _clear_screen
     XDEF _clear_region

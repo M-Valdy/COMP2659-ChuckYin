@@ -9,7 +9,7 @@ OBJS = chuck.o asynch.o cisr.o cisr_asm.o cond.o effects.o font.o \
        renderer.o sound.o start.o synch.o
 
 # link everything into the chuck.tos executable
-chuck.tos: $(OBJS)
+chuck.tos: $(OBJS) types.h
 	$(CC) -g $(OBJS) -o chuck.tos
 
 
@@ -33,6 +33,9 @@ font.o: font.c font.h
 
 game.o: game.c game.h
 	$(CC) -g -c game.c
+
+ikbd.o: ikbd.h ikbd.c
+	$(CC) -g -c ikbd.c
 
 input.o: input.c input.h
 	$(CC) -g -c input.c
@@ -64,3 +67,10 @@ cisr_asm.o: cisr_asm.s
 
 rast_asm.o: rast_asm.s
 	$(GLD) rast_asm.s
+
+#-----------------TEST DRIVERS----------------
+ikbd_tst.o: ikbd_tst.c
+	$(CC) -g -c ikbd_tst.c
+
+ikbd.tos: ikbd_tst.o cisr.o cisr_asm.o raster.o rast_asm.o font.o ikbd.o
+    $(CC) -g ikbd_tst.o cisr.o cisr_asm.o raster.o rast_asm.o font.o ikbd.o -o ikbd.tos

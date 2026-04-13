@@ -5,9 +5,11 @@
 
 #include <osbind.h>
 #include "types.h"
+
 /* vertical blank: vector #28 */
 #define VBL 28
-
+/* IKDB IRQ vector #70 */
+#define IKBD 70 
 /* 
  * VOLATILE
  * a type qualifier that tells the compiler that a variable's value may change unexpectedly at any
@@ -15,7 +17,8 @@
  * preventing the compiler from optimizing memory reads/writes.
  */
 extern volatile UINT32 invocations; /* global volatile sub counter to track the invocations */
-extern volatile UINT32 seconds; /*  global volatile to keep track of time seconds */
+/* extern volatile UINT32 seconds; */ 
+/*  global volatile to keep track of time seconds */
 
 extern volatile int render_request_flag;
 

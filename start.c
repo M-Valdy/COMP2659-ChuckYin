@@ -1,3 +1,5 @@
+/* @author Gaurik */
+
 #include <osbind.h>
 #include "start.h"
 

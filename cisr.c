@@ -2,7 +2,7 @@
 #include "cisr.h"
 
 volatile UINT32 invocations = 0;
-volatile UINT32 seconds = 0;
+/* volatile UINT32 seconds = 0; */
 volatile int render_request_flag = 0;
 
 Vector install_vector(int num, Vector vector) {
@@ -19,6 +19,7 @@ void uninstall_vector(int num, Vector orig)  {
     Vector *vectp = (Vector *)((long)num << 2); /* calculate the memeory address, syntax vector# * 4 */
     long old_ssp = Super(0);
     *vectp = orig; /* restore the orignal vector */
+    Super(old_ssp);
 }
 
 void timer_custom() {
