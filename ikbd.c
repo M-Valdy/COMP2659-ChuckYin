@@ -35,6 +35,7 @@ char get_kbd_input() {
             else if (scancode == 0x20) kb_in = 'D';
             else if (scancode == 0x19) kb_in = 'P';
             else if (scancode == 0x10) kb_in = 'Q';
+            else if (scancode == 0x18) kb_in = 'O';
         }
     }
     return kb_in;

@@ -57,7 +57,7 @@ void render_road(UINT32 *base, UINT16 row, UINT16 col, const Road* road){
 }
 
 /* @author Paolo */
-void master_render(const Model *model, UINT16 *base) {
+void master_render(const Model *model, UINT32 *base) {
     restore_old_regions(base, model);
     save_new_regions(base, model);
     render_dynamic_objects(base, model);
@@ -163,4 +163,11 @@ void render_dynamic_objects(UINT16 *base, Model *model) {
         clear_region(base, 0, 280, 8, 80);
     }
     render_Chuck(base, model->chuck.y, model->chuck.x, &model->chuck);
+}
+
+void copy_buffer(UINT16 *dest, UINT16 *src) {
+    int i;
+    for (i = 0; i < 16000; i++) {
+        dest[i] = src[i];
+    }
 }
