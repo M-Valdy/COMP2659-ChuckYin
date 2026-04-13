@@ -5,6 +5,7 @@
 #include "events.h"
 #include "model.h"
 #include "sound.h"
+#include <osbind.h>
 
 /*
     Channels and their purposes

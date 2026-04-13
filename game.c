@@ -38,10 +38,13 @@ int game_loop(UINT32* base, int player_choice) {
     int i = 0;
     void *temp;
     char ch;
+    Vector *old_vbl;
     UINT32 timeThen, timeNow, timeElapsed;
     Model frogger;
 
+    old_vbl = install_vector(VBL, vertical_blank_custom);
     if (player_choice == 0) { 
+        
         void *front, *back;
         void *raw_back;
         front = base;
@@ -92,7 +95,7 @@ int game_loop(UINT32* base, int player_choice) {
             }
         }
         Setscreen(-1L, (long)base, -1L); /*set_video_base(base); */
-
+        uninstall_vector(VBL, old_vbl);
         return 0;
     }
 

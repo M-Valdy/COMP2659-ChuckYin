@@ -1,8 +1,4 @@
 #include "sound.h"
-#include "psg.h"
-#include <osbind.h>
-#include <stdio.h>
-#include "model.h"
 
 /* Frogger theme song music notes:
     A#4 F#4 F#4 F#4 
@@ -26,16 +22,7 @@ static int previous_note = 0;
 
 /* got this from Paolo's code in frogger.c */
 UINT32 get_clock() {
-    long old_ssp;
-    long *timer;
-    UINT32 time;
-
-    timer = (long *)0x462;
-    old_ssp = Super(0);
-    time = *timer;
-    Super(old_ssp); 
-
-    return time;
+   return invocations;
 }
 
 

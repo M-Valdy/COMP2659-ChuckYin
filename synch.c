@@ -1,6 +1,4 @@
 #include "synch.h"
-#include "model.h"
-#include "raster.h"
 
 /* @author Paolo */
 void synch_update(Model *model) {

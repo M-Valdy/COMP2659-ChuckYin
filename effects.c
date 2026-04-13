@@ -1,6 +1,4 @@
-#include <osbind.h>
 #include "effects.h"
-#include "psg.h"
 
 /* For Chuck walking, should be C4 then C5 in quick succession
     Sustain should be longer on the C5 */

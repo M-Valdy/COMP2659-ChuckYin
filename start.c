@@ -163,6 +163,5 @@ int make_splashscreen(UINT32 *base){
             }
         }
     }
-
     return -1;
 }

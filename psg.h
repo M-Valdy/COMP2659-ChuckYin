@@ -1,8 +1,10 @@
 #ifndef PSG_H
 #define PSG_H
 
+#include <osbind.h>
 #include <stdio.h>
 #include "types.h"
+
 
 /* Writes the given byte value (0-255) to the given PSG register (0-15). This is a helper
 routine to be used by the other functions in this module. */

@@ -19,6 +19,8 @@ extern volatile UINT32 seconds; /*  global volatile to keep track of time second
 
 extern volatile int render_request_flag;
 
+extern void vertical_blank_custom();
+
 /*
  * a Vector is a function start address
  * it is a pointer to a function that has no parameters and no return value 
@@ -47,5 +49,7 @@ void uninstall_vector(int num, Vector old_vector);
  * (Honestly, I have no idea what invocations mean but it made sense from the lab notes that this can be used for timing purposes)
 */
 void timer_custom();
+
+
 
 #endif

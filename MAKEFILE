@@ -64,8 +64,3 @@ cisr_asm.o: cisr_asm.s
 
 rast_asm.o: rast_asm.s
 	$(GLD) rast_asm.s
-
-
-# jsut cuase STEEM is annoying
-clean:
-	rm -f *.o chuck.tos
