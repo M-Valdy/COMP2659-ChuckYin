@@ -15,6 +15,7 @@
     XDEF _plot_character
     XDEF _plot_string
     XDEF _set_video_base
+    XDEF _copy_buffer
 ;=====================CONSTANTS=====================================================================
 
 SCREEN_WIDTH	EQU	640	
@@ -1086,6 +1087,21 @@ _set_video_base:
         move.w  #32,-(sp)
         trap    #1
         addq.l  #6,sp
+
+        unlk    a6
+        rts
+;-------------------------------------------------------------------------------------------------
+;-------------------------------ROUTINE TO COPY BUFFER--------------------------------------------
+_copy_buffer:
+        link    a6,#0
+
+        movea.l 8(a6),a0      ; dest
+        movea.l 12(a6),a1     ; src
+        move.w  #7999,d0      ; 8000 longwords
+
+copy_loop:
+        move.l  (a1)+,(a0)+
+        dbra    d0,copy_loop
 
         unlk    a6
         rts

@@ -164,10 +164,3 @@ void render_dynamic_objects(UINT16 *base, Model *model) {
     }
     render_Chuck(base, model->chuck.y, model->chuck.x, &model->chuck);
 }
-
-void copy_buffer(UINT16 *dest, UINT16 *src) {
-    int i;
-    for (i = 0; i < 16000; i++) {
-        dest[i] = src[i];
-    }
-}

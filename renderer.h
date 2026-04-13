@@ -35,8 +35,7 @@ void restore_region(UINT16 *base, int x, int y, int width, int height, UINT16 *b
 void restore_old_regions(UINT16 *base, Model *model);
 void save_new_regions(UINT16 *base, Model *model);
 void render_dynamic_objects(UINT16 *base, Model *model);
-void copy_buffer(UINT16 *dest, UINT16 *src);
-
+void copy_buffer(UINT32 *dest, UINT32 *src);
 
 /*----- Function: render_Chuck -----
     PURPOSE: Renders Chuck on the screen at their current positions.

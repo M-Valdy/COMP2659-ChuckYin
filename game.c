@@ -92,7 +92,7 @@ int game_loop(UINT32 *base, int player_choice) {
                 render_request_flag = 0;
                 synch_update(&frogger);
                 cond_update(&frogger);
-                copy_buffer(back, front); /*back = front;*/
+                copy_buffer(back, front); /* back = front;*/
                 master_render(&frogger, back); /* TO DO: need to optimize render_road */
                 update_music(30);
                 set_video_base(back); /* Setscreen(-1L, (long)back, -1L);*/
