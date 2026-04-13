@@ -105,8 +105,6 @@ int game_loop(UINT32 *base, int player_choice) {
             }
         }
         set_video_base(base); /*Setscreen(-1L, (long)base, -1L); */
-        uninstall_vector(VBL, old_vbl);
-        uninstall_vector(IKBD, old_ikbd);
         return 0;
     }
 
