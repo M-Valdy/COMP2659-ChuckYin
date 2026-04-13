@@ -15,9 +15,9 @@
     Team names: Meagan Valderrama, Paolo Deocareza, and Gaurik Khullar
     @authors Meagan Valderrama, Paolo Deocareza
 */
-#define CHUCK_SPEED 6
+#define CHUCK_SPEED 16
 /*#define CHUCK_SPEED 32  change this after this is only for gauriks testing */
-#define WALKER_SPEED 8
+#define WALKER_SPEED 16
 #define MAX_FRAMES 63
 
 #define CHUCK_HEIGHT 32
@@ -49,6 +49,7 @@ typedef struct {
     int deltaY;
     int isColliding; /* 1 = obstacle collision, 0 = no collision, 2 = death collision */
     int deathCounter;
+    UINT16 saved_bg[64];
 } Chuck;
 
 typedef struct {
@@ -56,6 +57,7 @@ typedef struct {
     int oldx, oldy;
     int deltaX, deltaY;
     int isColliding;
+    UINT16 saved_bg[64];
 } WomenWalking;
 
 typedef struct {
@@ -64,6 +66,7 @@ typedef struct {
     int isColliding;
     int isForward; /*1 = looking forward, 0 = looking backward*/ 
     int frameCount;
+    UINT16 saved_bg[64];
 } WomenSwimming;
 
 typedef struct {
@@ -81,7 +84,7 @@ typedef struct {
     int gameOver;
     int crossCount;
     int oldCrossCount;
-    int allowWaterCol;
+    int cheatsOn;
     Chuck chuck;
     WomenWalking womenWalking[NUM_WALKERS];
     WomenSwimming womenSwimming[NUM_SWIMMERS];
@@ -89,7 +92,7 @@ typedef struct {
     Road road[NUM_ROADS];
 } Model;
 
-void toggleWaterCol(Model *model);
+void toggleCheats(Model *model);
 void updateScore(Model *model);
 void resetRoadCollision(Road* road);
 

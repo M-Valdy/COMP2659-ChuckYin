@@ -27,9 +27,15 @@ void render_initial_state(const Model *model, UINT32 *base);
  OUTPUT: Entire game screen with all game objects rendered at their current positions
 
 */
-void master_render(const Model *model, UINT32 *base);
+void master_render(const Model *model, UINT16 *base);
 
 void old_master_render(const Model *model, UINT32 *base);
+void save_region(UINT16 *base, int x, int y, int width, int height, UINT16 *background);
+void restore_region(UINT16 *base, int x, int y, int width, int height, UINT16 *background);
+void restore_old_regions(UINT16 *base, Model *model);
+void save_new_regions(UINT16 *base, Model *model);
+void render_dynamic_objects(UINT16 *base, Model *model);
+
 
 /*----- Function: render_Chuck -----
     PURPOSE: Renders Chuck on the screen at their current positions.
