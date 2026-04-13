@@ -27,8 +27,39 @@ extern volatile UINT8 * const IKBD_control;
 extern volatile const UINT8 * const IKBD_status;
 extern volatile const SCANCODE * const IKBD_RDR;
 
+/* mouse variables */
+extern volatile int mouse_x;
+extern volatile int mouse_y;
+extern volatile SCANCODE mouse_buttons;
+
+extern volatile int mouse_packet_state;   /* 0=expect header, 1=expect dx, 2=expect dy */
+extern volatile UINT8 mouse_header;
+extern volatile int mouse_dx;
+extern volatile int mouse_dy;
+
 /* the assembly function */
 extern void ikbd_custom();
+/* 
+ * Enqueues a keyboard byte into the circular buffer.
+ */
+static void enqueue_kbd_byte(SCANCODE byte) {
+    SCANCODE next_tail = (tail + 1) % BUFFER_SIZE;
+
+    if (next_tail != head) {
+        input_buffer[tail] = byte;
+        tail = next_tail;
+    }
+}
+
+/* For gettting mouse input for convenience */
+extern int get_mouse_x();
+extern int get_mouse_y();
+extern SCANCODE get_mouse_buttons();
+
+/* 
+ * Processes a mouse input byte.
+ */
+void mouse_input(UINT8 byte);
 
 /* 
  * handles the ISR. recieves an input and adds to the tail.

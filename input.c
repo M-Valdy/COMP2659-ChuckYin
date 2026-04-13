@@ -1,5 +1,6 @@
 #include <osbind.h>
 #include "input.h"
+#include "ikbd.h"
 
 /* @author Paolo */
 int has_input() {
