@@ -18,6 +18,7 @@
     Copied most of the professor's screenshot on the checkpoint PDF
 */
 UINT32 get_time();
+UINT32 *align_256(void *ptr);
 
 /*Function so that the keyboard doesn't have any sound 
     @author Parker from Class and the teacher, Meagan*/

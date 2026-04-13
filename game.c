@@ -3,8 +3,18 @@
 /* @author Paolo 
     Copied most of the professor's screenshot on the checkpoint PDF
 */
+static UINT8 back_buffer_raw[32000 + 255];
+/*static UINT8 buffer2_raw[32000 + 255]; use this Gaurik if you want to try 3rd buffer again*/
 UINT32 get_time() {
     return invocations;
+}
+UINT32 *align_256(void *ptr) {
+    unsigned long addr;
+
+    addr = (unsigned long)ptr;
+    addr = (addr + 255UL) & 0xFFFFFF00UL;
+
+    return (UINT32 *)addr;
 }
 
 /*Function so that the keyboard doesn't have any sound 
@@ -49,11 +59,9 @@ int game_loop(UINT32 *base, int player_choice) {
     clear_screen(base);
     
     if (player_choice == 0) { 
-        void *front, *back;
-        void *raw_back;
+        UINT32 *front, *back;
         front = base;
-        raw_back = (void *)Malloc(32000L + 255L);
-        back = (void *)(((long)raw_back + 255L) & 0xFFFFFF00L);
+        back = align_256(back_buffer_raw);
 
         no_keysound();
         Model_init(&frogger);
@@ -112,5 +120,6 @@ int game_loop(UINT32 *base, int player_choice) {
 
     else {
         plot_string(base, 200, 200, "AN ERROR OCCURED, PLEASE RESTART THE PROGRAM.");
+        return 0;
     }
 }

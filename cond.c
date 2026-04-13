@@ -21,15 +21,14 @@ void cond_update(Model *model) {
     for (h = 0; h < NUM_ROADS; h++) { 
         isRoadCollidingChuck(&model->road[h], &model->chuck);
     }
-
-    for (i = 0; i < NUM_WALKERS; i++) {
-        collisionWomenWalking(&model->womenWalking[i], &model->chuck);
-    }
     
-    for (i = 0; i < NUM_SWIMMERS; i++) {
-        collisionWomenSwimming(&model->womenSwimming[i], &model->chuck);
-    }
-    if (model->allowWaterCol == 1) {
+    if (model->cheatsOn == 0) {
+        for (i = 0; i < NUM_WALKERS; i++) {
+            collisionWomenWalking(&model->womenWalking[i], &model->chuck);
+        }
+        for (i = 0; i < NUM_SWIMMERS; i++) {
+            collisionWomenSwimming(&model->womenSwimming[i], &model->chuck);
+        }
         for (i = 0; i < NUM_WATER; i++) {
             isWaterColliding(&model->water[i], &model->chuck);
         }
@@ -43,7 +42,7 @@ void cond_update(Model *model) {
 
     /* Chuck needs to cross the roads 5 times */
     if (model->crossCount == 5) { 
-        model->gameOver = 1;
+        model->gameOver = 2;
         play_chuck_win();
         model->oldCrossCount = model->crossCount;
         model->crossCount = 0;

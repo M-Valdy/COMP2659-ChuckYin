@@ -59,7 +59,7 @@ void master_render(const Model *model, UINT32 *base) {
     int i;
     int h;
     int l;
-    if (model->allowWaterCol == 0) {
+    if (model->cheatsOn == 1) {
         plot_string(base, 0, 280, "Cheats on!");
     } else {
         clear_region(base, 0, 280, 8, 80);
