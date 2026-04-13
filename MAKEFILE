@@ -5,8 +5,8 @@ GLD = gen -L2 -D
 
 # List of all Object Files needed for the final game
 OBJS = chuck.o asynch.o cisr.o cisr_asm.o cond.o effects.o font.o \
-       game.o input.o model.o psg.o raster.o rast_asm.o \
-       renderer.o sound.o start.o synch.o
+       game.o ikbd.o input.o model.o psg.o raster.o rast_asm.o \
+       renderer.o sound.o start.o synch.o 
 
 # link everything into the chuck.tos executable
 chuck.tos: $(OBJS) types.h

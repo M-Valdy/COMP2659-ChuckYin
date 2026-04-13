@@ -1,4 +1,5 @@
 #include "game.h"
+#include "ikbd.h"
 
 /* @author Paolo 
     Copied most of the professor's screenshot on the checkpoint PDF
@@ -72,31 +73,27 @@ int game_loop(UINT32 *base, int player_choice) {
     
         /* timeThen = get_time(); */
         while (frogger.gameOver != 2 && frogger.gameOver != 3) {
-            if (has_input()) {
-                ch = get_latest_input();
-                if (ch == 'w') {
-                    asynch_button_W(&frogger);
-                } else if (ch == 'a') {
-                    asynch_button_A(&frogger);
-                } else if (ch == 's') {
-                    asynch_button_S(&frogger);
-                } else if (ch == 'd') {
-                    asynch_button_D(&frogger);
-                } else if (ch == 'x') {
-                    asynch_button_X(&frogger);
-                } else if (ch == 'p') {
-                    asynch_button_P(&frogger);
-                    return_keysound();
-                } else if (ch == 'o') {
-                    asynch_button_O(&frogger);
-                }
+            ch = get_kbd_input();
+            if (ch == 'W') {
+                asynch_button_W(&frogger);
+            } else if (ch == 'A') {
+                asynch_button_A(&frogger);
+            } else if (ch == 'S') {
+                asynch_button_S(&frogger);
+            } else if (ch == 'D') {
+                asynch_button_D(&frogger);
+            } else if (ch == 'P') {
+                asynch_button_P(&frogger);
+                return_keysound();
+            } else if (ch == 'O') {
+                asynch_button_O(&frogger);
             }
 
             if (render_request_flag) {
                 render_request_flag = 0;
                 synch_update(&frogger);
                 cond_update(&frogger);
-                back = front;
+                copy_buffer(back, front); /*back = front;*/
                 master_render(&frogger, back); /* TO DO: need to optimize render_road */
                 update_music(30);
                 set_video_base(back); /* Setscreen(-1L, (long)back, -1L);*/

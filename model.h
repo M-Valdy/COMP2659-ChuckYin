@@ -298,6 +298,7 @@ void isRoadCollidingChuck(Road* road, Chuck* chuck);
 
 */
 void initWater(Water* water, unsigned int x, unsigned int y);
+void isWaterColliding(Water* water, Chuck* chuck);
 
 /*----- Function: Model_init -----
 
