@@ -80,25 +80,26 @@ int game_loop(UINT32 *base, int player_choice) {
                     return_keysound();
                 } else if (ch == 'o') {
                     asynch_button_O(&frogger);
-                } /* i think i need to clear the user input to prevent continuous walking despite key release */
+                }
             }
 
             if (render_request_flag) {
                 render_request_flag = 0;
                 synch_update(&frogger);
                 cond_update(&frogger);
-                back = front; /* realized had to do this because it looked too choppy even though it was working */
+                back = front;
                 master_render(&frogger, back); /* TO DO: need to optimize render_road */
                 update_music(30);
-                Setscreen(-1L, (long)back, -1L); /*set_video_base(base);*/
+                set_video_base((long)back); /* Setscreen(-1L, (long)back, -1L);*/
                 /* Vsync(); */
+                
                 /* swap buffers */
                 temp = front;
                 front = back;
                 back = temp;
             }
         }
-        Setscreen(-1L, (long)base, -1L); /*set_video_base(base); */
+        set_video_base((long)base); /*Setscreen(-1L, (long)base, -1L); */
         uninstall_vector(VBL, old_vbl);
         return 0;
     }

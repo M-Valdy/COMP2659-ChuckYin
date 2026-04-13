@@ -17,6 +17,8 @@ UINT16 *get_video_base() {
     return (UINT16 *)addr;
 }
 
+
+
 /* @author: Gaurik*/
 /* constants */
 /* using the constants and doing basic arithmatic in the define statements so the all of these are done during compile time

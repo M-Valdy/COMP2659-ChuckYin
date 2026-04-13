@@ -968,13 +968,13 @@ _plot_character:
     ; IS_PRINTABLE(i) = (i >= ' ' && i <= '~')
     move.w  16(a6),d0 
     andi.w  #$FF,d0   
-    cmpi.b  #' ',d0   
+    cmpi.b  #32,d0   
     blt     plot_char_done  
-    cmpi.b  #'~',d0 
+    cmpi.b  #126,d0 
     bgt     plot_char_done
 
     ; GLYPH_START(i) (font + (((i) - ' ') << 3))
-    sub.w   #' ',d0 
+    sub.w   #32,d0 
     lsl.w   #3,d0 
     xref    _font 
     lea     _font,a1
@@ -1059,8 +1059,41 @@ plot_string_done:
     rts
 ;-------------------------------------------------------------------------------------------------
 ;-------------------------------ROUTINE TO SET SCREEN---------------------------------------------
+xdef    _set_video_base
+
 _set_video_base:
-       rts
+    link    a6,#-4            ; reserve 4 bytes for old_ssp
+
+        ; old_ssp = Super(0)
+        clr.l   -(sp)
+        move.w  #32,-(sp)
+        trap    #1
+        addq.l  #6,sp
+        move.l  d0,-4(a6)
+
+        ; load addr argument
+        move.l  8(a6),d0
+        lsr.l   #8,d0             ; d0 low word becomes [high][mid]
+
+        lea     $FFFF8201,a0
+
+        ; write middle byte to $FFFF8203
+        move.b  d0,2(a0)
+
+        ; shift high byte into low byte position
+        lsr.w   #8,d0
+
+        ; write high byte to $FFFF8201
+        move.b  d0,(a0)
+
+        ; Super(old_ssp)
+        move.l  -4(a6),-(sp)
+        move.w  #32,-(sp)
+        trap    #1
+        addq.l  #6,sp
+
+        unlk    a6
+        rts
 
 ;-------------------------------------------------------------------------------------------------
 ;-------------------------ROUTINE TO EXIT THE PROGRAM---------------------------------------------
