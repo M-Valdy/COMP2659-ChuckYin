@@ -5,6 +5,7 @@
 */
 static UINT8 back_buffer_raw[32000 + 255];
 /*static UINT8 buffer2_raw[32000 + 255]; use this Gaurik if you want to try 3rd buffer again*/
+
 UINT32 get_time() {
     return invocations;
 }
@@ -98,7 +99,7 @@ int game_loop(UINT32 *base, int player_choice) {
                 back = front;
                 master_render(&frogger, back); /* TO DO: need to optimize render_road */
                 update_music(30);
-                set_video_base((long)back); /* Setscreen(-1L, (long)back, -1L);*/
+                set_video_base(back); /* Setscreen(-1L, (long)back, -1L);*/
                 /* Vsync(); */
                 
                 /* swap buffers */
@@ -107,7 +108,7 @@ int game_loop(UINT32 *base, int player_choice) {
                 back = temp;
             }
         }
-        set_video_base((long)base); /*Setscreen(-1L, (long)base, -1L); */
+        set_video_base(base); /*Setscreen(-1L, (long)base, -1L); */
         uninstall_vector(VBL, old_vbl);
         return 0;
     }

@@ -9,7 +9,7 @@ typedef struct {
 
 /* @author Paolo */
 static const Coords WALKERS_SPAWN_POINTS[4] = {
-    { 325, 48 }, { 397, 144 }, { 485, 272 }, { 60, 304 }
+    { 320, 48 }, { 400, 144 }, { 480, 272 }, { 64, 304 }
 };
 
 /* @author Paolo */
@@ -379,18 +379,18 @@ void initWomenWalking(WomenWalking* womenWalking, UINT16 x, UINT16 y) {
 
 /* @author Paolo */
 void updateWomenWalking(WomenWalking* womenWalking) {
-    /*womenWalking->oldx = womenWalking->x;
-    womenWalking->oldy = womenWalking->y;*/
-    if (womenWalking->x + WALKER_HEIGHT >= 640) {
-        womenWalking->x = 640 - WALKER_HEIGHT;
-        womenWalking->deltaX = -1*WALKER_SPEED; /* Move left */
-    } else if (womenWalking->x-15 <= 0) {
-        womenWalking->x = WALKER_SPEED;
-        womenWalking->deltaX = WALKER_SPEED; /* Move right */
-    }
     womenWalking->oldx = womenWalking->x;
     womenWalking->oldy = womenWalking->y;
+
     womenWalking->x += womenWalking->deltaX;
+
+    if (womenWalking->x + WALKER_HEIGHT > 640) {
+        womenWalking->x = 640 - WALKER_HEIGHT;
+        womenWalking->deltaX = -WALKER_SPEED;
+    } else if (womenWalking->x < 0) {
+        womenWalking->x = 0;
+        womenWalking->deltaX = WALKER_SPEED;
+    }
 }
 
 /* @author Meagan & Paolo 
