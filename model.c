@@ -580,7 +580,7 @@ void Model_init(Model *model) {
     model->cheatsOn = 0;
     init_land(model);
     init_women(model);
-    initChuck(&model->chuck, 320, 336);
+    initChuck(&model->chuck, 320, 368);
 }
 
 /* @author Paolo */

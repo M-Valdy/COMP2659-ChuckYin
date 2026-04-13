@@ -13,7 +13,7 @@ void cond_update(Model *model) {
         model->oldCrossCount = model->crossCount;
         play_women_collide();
         model->crossCount = 0;
-        initChuck(&model->chuck, 320, 336); /* Reset Chuck to starting position to bottom middle of screen */
+        initChuck(&model->chuck, 320, 368); /* Reset Chuck to starting position to bottom middle of screen */
         model->chuck.deathCounter++;
     }
 
@@ -37,7 +37,7 @@ void cond_update(Model *model) {
     if (model->chuck.y <= 32) { /* Send Chuck back to spawn point to cross again */
         model->oldCrossCount = model->crossCount;
         model->crossCount++;
-        initChuck(&model->chuck, 320, 336);
+        initChuck(&model->chuck, 320, 368);
     }
 
     /* Chuck needs to cross the roads 5 times */
