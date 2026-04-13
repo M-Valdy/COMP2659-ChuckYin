@@ -24,7 +24,4 @@ void uninstall_vector(int num, Vector orig)  {
 void timer_custom() {
     invocations++; /* increment the ivocations counter */
     render_request_flag = 1; /* set the rrf every refresh */
-    if ((invocations % 70) == 0) {
-        seconds++; /* increment seconds every 70 refreshes */
-    }
 }
