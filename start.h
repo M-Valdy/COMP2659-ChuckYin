@@ -5,6 +5,8 @@
 #include "renderer.h"
 #include "model.h"
 #include "raster.h"
+#include "ikbd.h"
+#include "cisr.h" 
 
 extern const unsigned int the_c[16];
 extern const unsigned int the_h[16];

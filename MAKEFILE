@@ -4,7 +4,7 @@ ASM = gen
 GLD = gen -L2 -D
 
 # List of all Object Files needed for the final game
-OBJS = chuck.o asynch.o cisr.o cisr_asm.o cond.o effects.o font.o \
+OBJS = chuck.o asynch.o cisr.o cisr_asm.o ikbd.o cond.o effects.o font.o \
        game.o input.o model.o psg.o raster.o rast_asm.o \
        renderer.o sound.o start.o synch.o
 
@@ -72,5 +72,11 @@ rast_asm.o: rast_asm.s
 ikbd_tst.o: ikbd_tst.c
 	$(CC) -g -c ikbd_tst.c
 
-ikbd.tos: ikbd_tst.o cisr.o cisr_asm.o raster.o rast_asm.o font.o ikbd.o
-    $(CC) -g ikbd_tst.o cisr.o cisr_asm.o raster.o rast_asm.o font.o ikbd.o -o ikbd.tos
+tst_st.o: tst_st.c
+	$(CC) -g -c tst_st.c
+
+tst_st.tos:	tst_st.o raster.o rast_asm.o model.o renderer.o cisr.o ikbd.o cisr_asm.o sound.o psg.o effects.o start.o font.o
+	$(CC) tst_st.o raster.o rast_asm.o cisr.o ikbd.o cisr_asm.o sound.o psg.o effects.o start.o model.o renderer.o font.o -o tst_st.tos
+
+ikbd.tos: ikbd_tst.o cisr.o cisr_asm.o ikbd.o raster.o rast_asm.o font.o
+    $(CC) -g ikbd_tst.o cisr.o cisr_asm.o ikbd.o raster.o rast_asm.o font.o -o ikbd.tos

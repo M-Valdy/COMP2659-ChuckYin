@@ -50,7 +50,6 @@ int game_loop(UINT32 *base, int player_choice) {
     void *temp;
     char ch;
     /* UINT32 timeThen, timeNow, timeElapsed; */
-    Vector *old_vbl = install_vector(VBL, vertical_blank_custom);
     Model frogger;
     
     /* GOOGLED "atari st double buffering how to allocate 32000 bytes not on the stack" and used the AI overview for the 256 aligned part */
@@ -110,6 +109,7 @@ int game_loop(UINT32 *base, int player_choice) {
         }
         set_video_base(base); /*Setscreen(-1L, (long)base, -1L); */
         uninstall_vector(VBL, old_vbl);
+        uninstall_vector(IKBD, old_ikbd);
         return 0;
     }
 

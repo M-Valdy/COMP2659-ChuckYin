@@ -144,23 +144,24 @@ void splashscreen_chars(UINT32 *base) {
 
 }
 
-int make_splashscreen(UINT32 *base){
+int make_splashscreen(UINT32 *base) {
     int key;
     plot_title(base);
     prompt_sq(base);
-    
     make_quitButton(base);
     make_playButton(base);
-
     splashscreen_chars(base);
 
+    while (get_kbd_input() != 0);
     while (1) {
-        key = (int)(Cnecin() & 0xFF);
-        if (key == 'p' || key == 'q') {
-       
-            if (key == 'p') {
+        /* Use your custom driver instead of Cnecin() */
+        key = (int)get_kbd_input(); 
+
+        if (key != 0) {
+            if (key == 'P') {
                 return 0;
-            } else if (key == 'q') {
+            } 
+            else if (key == 'Q') {
                 return 1;
             }
         }
