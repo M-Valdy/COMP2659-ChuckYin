@@ -1,90 +1,71 @@
-CC = cc68x
+# Variables for Compilers and Flags
+CC  = cc68x
+ASM = gen
+GLD = gen -L2 -D
 
-# linking command
-tst_rast.tos: tst_rast.o raster.o rast_asm.o font.o
-	cc68x -g tst_rast.o raster.o rast_asm.o font.o -o tst_rast.tos
+# List of all Object Files needed for the final game
+OBJS = chuck.o asynch.o cisr.o cisr_asm.o cond.o effects.o font.o \
+       game.o input.o model.o psg.o raster.o rast_asm.o \
+       renderer.o sound.o start.o synch.o
 
-# indivisual compilation commands
-tst_rast.o: tst_rast.c raster.h
-	cc68x -g -c tst_rast.c
+# link everything into the chuck.tos executable
+chuck.tos: $(OBJS)
+	$(CC) -g $(OBJS) -o chuck.tos
 
-raster.o: raster.c raster.h
-	cc68x -g -c raster.c
 
-font.o: font.c font.h
-	cc68x -g -c font.c
-
-rast_asm.o: rast_asm.s
-	gen -D -L2 rast_asm.s
-
-model.o: model.c model.h
-	cc68x -g -c model.c
-cond.o: cond.c cond.h
-	cc68x -g -c cond.c
 asynch.o: asynch.c asynch.h
-	cc68x -g -c asynch.c
-synch.o: synch.c synch.h
-	cc68x -g -c synch.c
-renderer.o: renderer.c renderer.h
-	cc68x -g -c renderer.c
-events.o: events.c events.h
-	cc68x -g -c events.c
-input.o: input.c input.h
-	cc68x -g -c input.c
+	$(CC) -g -c asynch.c
 
+chuck.o: chuck.c
+	$(CC) -g -c chuck.c
 
-# paolos awesome render test driver hehe
-rendrtst.tos: rendrtst.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o
-	cc68x -g rendrtst.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o -o rendrtst.tos
-rendrtst.o: rendrtst.c
-	$(CC) -g -c rendrtst.c
-
-# paolos awesome model test driver hehe
-modeltst.tos: modeltst.o model.o cond.o synch.o asynch.o
-	cc68x -g modeltst.o model.o cond.o synch.o asynch.o -o modeltst.tos
-modeltst.o: modeltst.c
-	$(CC) -g -c modeltst.c
-
-# main game module
-frogger.tos: frogger.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o input.o start.o psg.o sound.o effects.o
-	cc68x -g frogger.o model.o cond.o asynch.o synch.o raster.o rast_asm.o font.o renderer.o events.o input.o start.o psg.o sound.o  effects.o -o frogger.tos
-frogger.o: frogger.c
-	$(CC) -g -c frogger.c
-
-# meagan's sound testing make files
-tst_snd.tos: tst_snd.o psg.o sound.o effects.o
-	cc68x -g tst_snd.o psg.o sound.o effects.o -o tst_snd.tos
-tst_snd.o: tst_snd.c psg.o sound.o effects.o
-	cc68x -g -c tst_snd.c
-psg.o: psg.c psg.h
-	cc68x -g -c psg.c
-sound.o: sound.c sound.h
-	cc68x -g -c sound.c
-effects.o: effects.c effects.h
-	cc68x -g -c effects.c
-
-# mainpage test drivers
-tst_st: tst_st.o raster.o rast_asm.o font.o model.o renderer.o start.o
-	cc68x -g tst_st.o raster.o rast_asm.o font.o model.o renderer.o start.o -o tst_st.tos
-
-
-
-# isr test drivers 
-
-# object files for the ISR test
-CISROBJS = cisr.o cisr_asm.o cisr_tst.o
-
-test_isr.tos: $(CISROBJS)
-	$(CC) -g $(CISROBJS) -o test_isr.tos
-
-# The "Library" logic
 cisr.o: cisr.c cisr.h
 	$(CC) -g -c cisr.c
 
-# The "Low-level" wrapper
-cisr_asm.o: cisr_asm.s
-	gen -D -L2 cisr_asm.s
+cond.o: cond.c cond.h
+	$(CC) -g -c cond.c
 
-# The "Test" driver
-cisr_tst.o: cisr_tst.c cisr.h
-	$(CC) -g -c cisr_tst.c
+effects.o: effects.c effects.h
+	$(CC) -g -c effects.c
+
+font.o: font.c font.h
+	$(CC) -g -c font.c
+
+game.o: game.c game.h
+	$(CC) -g -c game.c
+
+input.o: input.c input.h
+	$(CC) -g -c input.c
+
+model.o: model.c model.h
+	$(CC) -g -c model.c
+
+psg.o: psg.c psg.h
+	$(CC) -g -c psg.c
+
+raster.o: raster.c raster.h
+	$(CC) -g -c raster.c
+
+renderer.o: renderer.h renderer.c
+	$(CC) -g -c renderer.c
+
+sound.o: sound.h sound.c
+	$(CC) -g -c sound.c
+
+start.o: start.h start.c
+	$(CC) -g -c start.c
+
+synch.o: synch.h synch.c
+	$(CC) -g -c synch.c
+
+# This handles your assembly VBL wrapper
+cisr_asm.o: cisr_asm.s
+	$(GLD) cisr_asm.s
+
+rast_asm.o: rast_asm.s
+	$(GLD) rast_asm.s
+
+
+# jsut cuase STEEM is annoying
+clean:
+	rm -f *.o chuck.tos

@@ -1,29 +1,30 @@
+/* author @Gaurik */
 #include "cisr.h"
 
-volatile int seconds = 0; /*  to keep track of seconds */
-volatile int invocations = 0; /* sub counter to track the invcations and update seconds in regard to the 70Hz */
+volatile UINT32 invocations = 0;
+volatile UINT32 seconds = 0;
+volatile int render_request_flag = 0;
 
 Vector install_vector(int num, Vector vector) {
     Vector orig;
     Vector *vectp = (Vector *)((long)num << 2); /* calculate the memeory address, syntax vector# * 4 */
-    long old_ssp = Super(0); /* enter Supervisor Mode */
+    long old_ssp = Super(0); 
     orig = *vectp; /* save the TOS handler */
-    *vectp = vector; /* Install new handler */
-    Super(old_ssp); /* Return to User Mode */
-    return orig;  /* return old handler for later restoration */
+    *vectp = vector; /* Install new handler */ 
+    Super(old_ssp); 
+    return orig; /* return old handler for later reinstallation */
 }
 
-void uninstall_vector(int num, Vector old_vector) {
-    Vector *vectp = (Vector*)((long)num << 2);
+void uninstall_vector(int num, Vector orig)  {
+    Vector *vectp = (Vector *)((long)num << 2); /* calculate the memeory address, syntax vector# * 4 */
     long old_ssp = Super(0);
-    *vectp = old_vector; /* put the original vector back */
-    Super(old_ssp);
+    *vectp = orig; /* restore the orignal vector */
 }
 
-void isr_timer(){
-    invocations++;
-    if (invocations >= 70) {
-        seconds++;
-        invocations = 0; /* reset sub-counter */
+void timer_custom() {
+    invocations++; /* increment the ivocations counter */
+    render_request_flag = 1; /* set the rrf every refresh */
+    if ((invocations % 70) == 0) {
+        seconds++; /* increment seconds every 70 refreshes */
     }
 }

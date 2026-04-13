@@ -1,29 +1,10 @@
-#include <stdio.h>
-#include "model.h"
-#include "cond.h"
-#include "asynch.h"
-#include "synch.h"
-#include "renderer.h"
-#include <osbind.h>
-#include "input.h"
-#include "start.h"
-#include "sound.h"
-#include "raster.h"
+#include "game.h"
 
 /* @author Paolo 
     Copied most of the professor's screenshot on the checkpoint PDF
 */
 UINT32 get_time() {
-    long old_ssp;
-    long *timer;
-    UINT32 time;
-
-    timer = (long *)0x462;
-    old_ssp = Super(0);
-    time = *timer;
-    Super(old_ssp); 
-
-    return time;
+    return invocations;
 }
 
 /*Function so that the keyboard doesn't have any sound 
@@ -53,23 +34,13 @@ void return_keysound(){
 /* @author Gaurik for integrating the title screen */
 /* @author Meagan for integrating the sound */
 
-int main() {
+int game_loop(UINT32* base, int player_choice) {
     int i = 0;
     void *temp;
     char ch;
     UINT32 timeThen, timeNow, timeElapsed;
     Model frogger;
-    int player_choice;
-    
-    /* GOOGLED "atari st double buffering how to allocate 32000 bytes not on the stack" and used the AI overview for the 256 aligned part */
-    /* https://stackoverflow.com/questions/38088732/explanation-to-aligned-malloc-implementation */
-    /* Professor said in page9 of chuckpoint 3 that we need to allocated 32k bytes but NOT on the stack. We put it in the heap using GEMDOS' Malloc() */
-    /* Also said that we need to make frame buffers to be 256 byte aligned */
-    void *base = get_video_base();
-    clear_screen(base);
 
-    player_choice = make_splashscreen(base);
-    
     if (player_choice == 0) { 
         void *front, *back;
         void *raw_back;
@@ -110,16 +81,13 @@ int main() {
             if (timeElapsed > 0) {
                 synch_update(&frogger);
                 cond_update(&frogger);
-                back = front; /* realized had to do this because it looked too choppy even though it was working */
-                master_render(&frogger, back); /* TO DO: need to optimize render_road */
+                master_render(&frogger, back);
                 update_music(30);
-                Setscreen(-1L, (long)back, -1L); /*set_video_base(base);*/
-                Vsync();
-                /* swap buffers */
+                Setscreen(-1L, (long)back, -1L);
+
                 temp = front;
                 front = back;
                 back = temp;
-
                 timeThen = timeNow;
             }
         }
