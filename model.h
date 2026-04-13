@@ -81,10 +81,17 @@ typedef struct {
 } Water;
 
 typedef struct {
+    int x,y;
+    int oldx,oldy;
+    UINT16 saved_bg[64];
+} Mouse;
+
+typedef struct {
     int gameOver;
     int crossCount;
     int oldCrossCount;
     int cheatsOn;
+    Mouse mouse;
     Chuck chuck;
     WomenWalking womenWalking[NUM_WALKERS];
     WomenSwimming womenSwimming[NUM_SWIMMERS];
@@ -95,6 +102,7 @@ typedef struct {
 void toggleCheats(Model *model);
 void updateScore(Model *model);
 void resetRoadCollision(Road* road);
+void updateMouse(Mouse* mouse);
 
 /*----- Function: initChuck -----
 
