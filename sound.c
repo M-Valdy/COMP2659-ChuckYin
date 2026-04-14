@@ -20,7 +20,8 @@ static int total_notes = sizeof(notes) / sizeof(notes[0]);
 static UINT32 next_time = 0;
 static int previous_note = 0;
 
-/* got this from Paolo's code in frogger.c */
+/* got this from Paolo's code in frogger.c 
+modifications: @Gaurik */
 UINT32 get_clock() {
    return invocations;
 }
