@@ -83,7 +83,7 @@ const unsigned int the_m[16] = {
     0xC003, 0xC003, 0xC003, 0x0000
 };
 
-/* Bitmap for the pointer */
+/* 16x16 Bitmap for the pointer */
 const unsigned int pointer_bitmap[16] = {
     0x8000, 0xC000, 0xE000, 0xF000,
     0xF800, 0xFC00, 0xFE00, 0xFF00,
@@ -93,13 +93,21 @@ const unsigned int pointer_bitmap[16] = {
 
 UINT16 hor_start = 100; /* for aligning things */
 
-/* Helper function to check if a point is inside a rectangle */
+/* @author Meagan
+    Helper function to check if a point is inside a rectangle. The function takes in
+    the x and y coordinates of the pointer, the x and y coordinates of the rectangle, 
+    and the length and width of the rectangle.
+ */
 int point_in_rect(int x, int y, int rect_top, int rect_left, int rect_length, int rect_width) {
     return (x >= rect_left && x < rect_left + rect_width &&
             y >= rect_top && y < rect_top + rect_length);
 }
 
-/*Helper function to XOR a pixel */
+/* @author Meagan
+    Helper function to XOR a pixel. Takes in the base address of the screen, and the 
+    x and y coordinates of the pixel in order to flip it back and forth to black or white
+    if needed by using XOR. 
+*/
 void xor_pixel(UINT32 *base, int x, int y) {
     UINT16 *word_ptr;
     UINT16 mask;
@@ -228,11 +236,11 @@ int make_splashscreen(UINT32 *base) {
         }
 
         if (mb != old_mouse_buttons) {
-            /* if key is in play then return 0 */
+            /* if cursor is in play then return 0 */
             if (point_in_rect(mx, my, 230, hor_start+195, 20, 80)) {
                 return 0;
             } 
-            /* if key is in quit then return 1 */
+            /* if cursor is in quit then return 1 */
             else if (point_in_rect(mx, my, 230, hor_start-20, 20, 80)) {
                 return 1;
             }

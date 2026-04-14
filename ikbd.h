@@ -32,6 +32,7 @@ extern volatile int mouse_x;
 extern volatile int mouse_y;
 extern volatile SCANCODE mouse_buttons;
 
+/* mouse packet variables */
 extern volatile int mouse_packet_state;   /* 0=expect header, 1=expect dx, 2=expect dy */
 extern volatile UINT8 mouse_header;
 extern volatile int mouse_dx;
@@ -39,9 +40,11 @@ extern volatile int mouse_dy;
 
 /* the assembly function */
 extern void ikbd_custom();
-/* 
- * Enqueues a keyboard byte into the circular buffer.
- */
+
+/* @author Meagan, Gaurik
+ Enqueues a keyboard byte into the circular buffer. Checks if the buffer is full before adding.
+ If the buffer is full, the byte is discarded.
+*/
 static void enqueue_kbd_byte(SCANCODE byte) {
     SCANCODE next_tail = (tail + 1) % BUFFER_SIZE;
 
@@ -51,24 +54,30 @@ static void enqueue_kbd_byte(SCANCODE byte) {
     }
 }
 
-/* For gettting mouse input for convenience */
+/* @author Meagan
+    For gettting mouse input for convenience to be used in the splashscreen loop.
+    Keeps track of whether the mouse is moving and whether the buttons are being pressed.
+    get_mouse_buttons() looks at both the left and the right keys so the game allows for both
+    to be pressed.  
+*/
 extern int get_mouse_x();
 extern int get_mouse_y();
 extern SCANCODE get_mouse_buttons();
 
-/* 
+/* @author Meagan.
  * Processes a mouse input byte.
- */
+*/
 void mouse_input(UINT8 byte);
 
-/* 
- * handles the ISR. recieves an input and adds to the tail.
+/* @author Meagan, Gaurik
+    handles the ISR. recieves an input and adds to the tail. This function is in charge
+    of knowing whether the user is doing keyboard input or mouse input. 
 */
 void ikbd_isr();
 
-/*
-* The fucntion that accesses the buffer and pops of values from the queue to proces
- * the input.
+/*  @author Gaurik
+* The fucntion that accesses the buffer and pops of values from the queue to process the input.
+  This function is exclusively in charge of 
 */
 char get_kbd_input();
 

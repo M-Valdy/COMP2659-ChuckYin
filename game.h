@@ -8,16 +8,21 @@
 #include "synch.h"
 #include "renderer.h"
 #include <osbind.h>
-#include "input.h"
 #include "start.h"
 #include "sound.h"
 #include "raster.h"
 #include "cisr.h"
 
-/* @author Paolo 
-    Copied most of the professor's screenshot on the checkpoint PDF
+/* @author Gaurik, Paolo 
+    Gets the invocations from VBL ISR to time the game.
 */
 UINT32 get_time();
+
+/* @author Paolo
+    Aligns a pointer to the next 256 byte boundary. Used for double buffering.
+    Used this instead of malloc, setting setting aside memory for the buffers 
+    needs them to have their last 2 bits be '00'.
+*/
 UINT32 *align_256(void *ptr);
 
 /*Function so that the keyboard doesn't have any sound 

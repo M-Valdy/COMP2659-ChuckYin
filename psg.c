@@ -6,7 +6,7 @@ static UINT16 psg_regs[16] = {0};
 
 UINT8 mixer_val = 0x3F;
 
-/* Helper functions are located here*/
+/*-------Helper functions are located here------*/
 void write_psg(int reg, UINT8 val) {
     long old_ssp = Super(0);
     *PSG_reg_select = reg;
@@ -15,9 +15,18 @@ void write_psg(int reg, UINT8 val) {
     psg_regs[reg] = val;
 }
 
+/* @author Meagan
+    A simple helper function to check if the channel number is valid.
+    Takes in the channel number and the valid range of numbers to be used for that channel
+    and returns 1 if the channel is invalid and 0 if it is valid.
+    Each function has a different valid range for the channel number 
+    because some functions only work for certain channels.
+*/
 int channel_check(int channel, int first, int last){
     return (channel < first || channel > last);
 }
+
+/*------End of helper functions area------*/
 
 void read_psg(int reg) {
     /*reads the current value of the psg reg*/

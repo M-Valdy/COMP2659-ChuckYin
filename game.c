@@ -30,7 +30,8 @@ void no_keysound(){
     Super(old_ssp);
 }
 
-
+/*Function so that the keyboard goes back to normal and has sound again. 
+    @author Parker from Class and the teacher, Meagan*/
 void return_keysound(){
     long old_ssp = Super(0);
     volatile char* console_address = 0x000484;
