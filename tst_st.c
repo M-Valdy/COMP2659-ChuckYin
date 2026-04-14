@@ -4,9 +4,10 @@
 #include "cisr.h" 
 
 /* @author Gaurik */
+
 int main()
 {
-int player_choice;
+    int player_choice;
     Vector *old_ikbd = install_vector(IKBD, ikbd_custom);
     void *base = Physbase();
     clear_screen(base);

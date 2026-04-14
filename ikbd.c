@@ -1,4 +1,4 @@
-/* @author Gaurik */
+/* @author Gaurik and Meagan */
 
 #include "ikbd.h"
 #include "cisr.h"
@@ -59,16 +59,16 @@ void mouse_input(UINT8 byte) {
 
         /* clamp to screen bounds */
         if (mouse_x < 0)   mouse_x = 0;
-        if (mouse_x > 319) mouse_x = 319;
+        if (mouse_x > 640 - 16) mouse_x = 640 - 16;
         if (mouse_y < 0)   mouse_y = 0;
-        if (mouse_y > 199) mouse_y = 199;
+        if (mouse_y > 400 - 16) mouse_y = 400 - 16;
 
         mouse_packet_state = 0;
     }
 }
 
 
-void ikbd_isr(void) {
+void ikbd_isr() {
     UINT8 byte;
 
     if (*IKBD_status & RDR_FULL) {

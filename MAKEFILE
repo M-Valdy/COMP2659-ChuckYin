@@ -78,5 +78,5 @@ tst_st.o: tst_st.c
 tst_st.tos:	tst_st.o raster.o rast_asm.o model.o renderer.o cisr.o ikbd.o cisr_asm.o sound.o psg.o effects.o start.o font.o
 	$(CC) tst_st.o raster.o rast_asm.o cisr.o ikbd.o cisr_asm.o sound.o psg.o effects.o start.o model.o renderer.o font.o -o tst_st.tos
 
-ikbd.tos: ikbd_tst.o cisr.o cisr_asm.o ikbd.o raster.o rast_asm.o font.o
-    $(CC) -g ikbd_tst.o cisr.o cisr_asm.o ikbd.o raster.o rast_asm.o font.o -o ikbd.tos
+ikbd.tos: ikbd_tst.o cisr.o cisr_asm.o start.o ikbd.o raster.o rast_asm.o model.o renderer.o psg.o sound.o effects.o font.o
+    $(CC) -g ikbd_tst.o cisr.o cisr_asm.o start.o ikbd.o raster.o rast_asm.o model.o renderer.o psg.o sound.o effects.o font.o -o ikbd.tos

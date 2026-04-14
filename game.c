@@ -21,7 +21,6 @@ UINT32 *align_256(void *ptr) {
 
 /*Function so that the keyboard doesn't have any sound 
     @author Parker from Class and the teacher, Meagan*/
-
 void no_keysound(){
     long old_ssp = Super(0);
     volatile char* console_address = 0x000484;
@@ -36,7 +35,7 @@ void return_keysound(){
     long old_ssp = Super(0);
     volatile char* console_address = 0x000484;
     UINT8 console_state = *console_address;
-    console_state |= 0x01; /* Clear bit 0 to disable keyboard sound */
+    console_state |= 0x01; /* Set bit 0 to enable keyboard sound */
     *console_address = console_state;
     Super(old_ssp);
 }

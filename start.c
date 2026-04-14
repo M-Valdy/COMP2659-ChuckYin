@@ -1,4 +1,4 @@
-/* @author Gaurik */
+/* @author Gaurik and Meagan */
 
 #include <osbind.h>
 #include "start.h"
@@ -83,7 +83,32 @@ const unsigned int the_m[16] = {
     0xC003, 0xC003, 0xC003, 0x0000
 };
 
+/* Bitmap for the pointer */
+const unsigned int pointer_bitmap[16] = {
+    0x8000, 0xC000, 0xE000, 0xF000,
+    0xF800, 0xFC00, 0xFE00, 0xFF00,
+    0xFE00, 0xFC00, 0xF800, 0xF800,
+    0x9C00, 0x0E00, 0x0700, 0x0380
+};
+
 UINT16 hor_start = 100; /* for aligning things */
+
+/* Helper function to check if a point is inside a rectangle */
+int point_in_rect(int x, int y, int rect_top, int rect_left, int rect_length, int rect_width) {
+    return (x >= rect_left && x < rect_left + rect_width &&
+            y >= rect_top && y < rect_top + rect_length);
+}
+
+/*Helper function to XOR a pixel */
+void xor_pixel(UINT32 *base, int x, int y) {
+    UINT16 *word_ptr;
+    UINT16 mask;
+
+    word_ptr = (UINT16 *)base + (y * 40) + (x >> 4);
+    mask = 0x8000 >> (x & 15);
+
+    *word_ptr ^= mask;
+}
 
 void plot_title(UINT32 *base){
     hor_start = hor_start + 50;
@@ -120,6 +145,21 @@ void make_playButton(UINT32 *base) {
     plot_string(base, 237, hor_start+218, "Play");
 }
 
+void plot_mouse(UINT32 *base, UINT16 x, UINT16 y) {
+    int row, col;
+    unsigned int bits;
+
+    for (row = 0; row < 16; row++) {
+        bits = pointer_bitmap[row];
+
+        for (col = 0; col < 16; col++) {
+            if (bits & (0x8000 >> col)) {
+                xor_pixel(base, x + col, y + row);
+            }
+        }
+    }
+}
+
 void splashscreen_chars(UINT32 *base) {
     int i, j;
     
@@ -146,17 +186,31 @@ void splashscreen_chars(UINT32 *base) {
 
 int make_splashscreen(UINT32 *base) {
     int key;
+    int mx, my;
+    int mb;
+    int old_mouse_x;
+    int old_mouse_y;
+    int old_mouse_buttons;
+    int old_left_down, left_now;
+
+    old_mouse_x = get_mouse_x();
+    old_mouse_y = get_mouse_y();
+    old_mouse_buttons = get_mouse_buttons();
+
     plot_title(base);
     prompt_sq(base);
     make_quitButton(base);
     make_playButton(base);
     splashscreen_chars(base);
+    plot_mouse(base, old_mouse_x, old_mouse_y);
 
     while (get_kbd_input() != 0);
     while (1) {
-        /* Use your custom driver instead of Cnecin() */
-        key = (int)get_kbd_input(); 
+        mx = get_mouse_x();
+        my = get_mouse_y();
+        mb = get_mouse_buttons();
 
+        key = (int)get_kbd_input(); 
         if (key != 0) {
             if (key == 'P') {
                 return 0;
@@ -165,6 +219,26 @@ int make_splashscreen(UINT32 *base) {
                 return 1;
             }
         }
+
+        if (mx != old_mouse_x || my != old_mouse_y) {
+            plot_mouse(base, old_mouse_x, old_mouse_y);
+            plot_mouse(base, mx, my);
+            old_mouse_x = mx;
+            old_mouse_y = my;
+        }
+
+        if (mb != old_mouse_buttons) {
+            /* if key is in play then return 0 */
+            if (point_in_rect(mx, my, 230, hor_start+195, 20, 80)) {
+                return 0;
+            } 
+            /* if key is in quit then return 1 */
+            else if (point_in_rect(mx, my, 230, hor_start-20, 20, 80)) {
+                return 1;
+            }
+        }
+
+        old_mouse_buttons = mb;
     }
     return -1;
 }
