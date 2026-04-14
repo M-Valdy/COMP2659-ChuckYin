@@ -1,6 +1,7 @@
 #include "model.h"
 #include "raster.h"
 #include "effects.h"
+#include "ikbd.h"
 
 typedef struct {
     int x;
@@ -578,9 +579,15 @@ void Model_init(Model *model) {
     model->oldCrossCount = 0;
     model->chuck.deathCounter = 0;
     model->cheatsOn = 0;
+    model->mouse.x = 320;
+    model->mouse.y = 200;
     init_land(model);
     init_women(model);
-    initChuck(&model->chuck, 320, 336);
+    initChuck(&model->chuck, 320, 368);
+}
+
+void updateMouse(Mouse* mouse) {
+    
 }
 
 /* @author Paolo */

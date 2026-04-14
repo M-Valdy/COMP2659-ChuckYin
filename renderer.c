@@ -127,6 +127,7 @@ void restore_old_regions(UINT16 *base, Model *model) {
         restore_region(base, model->womenWalking[i].oldx, model->womenWalking[i].oldy, 32, 32, model->womenWalking[i].saved_bg);
     }
     restore_region(base, model->chuck.oldx, model->chuck.oldy, 32, 32, model->chuck.saved_bg);
+    restore_region(base, model->mouse.oldx, model->mouse.oldy, 2, 2, model->mouse.saved_bg);
 }
 
 void save_new_regions(UINT16 *base, Model *model) {
@@ -139,6 +140,7 @@ void save_new_regions(UINT16 *base, Model *model) {
         save_region(base, model->womenWalking[i].x, model->womenWalking[i].y, 32, 32, model->womenWalking[i].saved_bg);
     }
     save_region(base, model->chuck.x, model->chuck.y, 32, 32, model->chuck.saved_bg); 
+    save_region(base, model->mouse.x, model->mouse.y, 2, 2, model->mouse.saved_bg);
 }
 
 void render_dynamic_objects(UINT16 *base, Model *model) {
@@ -157,6 +159,7 @@ void render_dynamic_objects(UINT16 *base, Model *model) {
         plot_character(base, 0, 135, model->crossCount + '0');
         updateScore(model);
     }
+    plot_square(base, model->mouse.x, model->mouse.y, 2);
     if (model->cheatsOn == 1) {
         plot_string(base, 0, 280, "Cheats on!");
     } else {
