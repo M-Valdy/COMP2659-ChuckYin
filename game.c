@@ -1,20 +1,23 @@
 #include "game.h"
 #include "ikbd.h"
 
-/* @author Paolo 
-    Copied most of the professor's screenshot on the checkpoint PDF
-*/
-static UINT8 back_buffer_raw[32000 + 255];
+/* @author Paolo */
+static UINT8 back_buffer_raw[32000 + 255]; /* add 255 bytes to make sure we still have 32000 memory because address given by align_256 might not be at the beginning of the allocated space */
 /*static UINT8 buffer2_raw[32000 + 255]; use this Gaurik if you want to try 3rd buffer again*/
 
+/* @author Gaurik */
 UINT32 get_time() {
     return invocations;
 }
+
+/* @author Paolo 
+returns address you can start writing to for the back buffer, which is 256 byte aligned
+*/
 UINT32 *align_256(void *ptr) {
     unsigned long addr;
 
-    addr = (unsigned long)ptr;
-    addr = (addr + 255UL) & 0xFFFFFF00UL;
+    addr = (unsigned long)ptr; 
+    addr = (addr + 255UL) & 0xFFFFFF00UL; /* add 255 so you don't point before the buffer */
 
     return (UINT32 *)addr;
 }
@@ -45,12 +48,10 @@ void return_keysound(){
 /* @author Paolo for the main flow */ 
 /* @author Gaurik for integrating the title screen */
 /* @author Meagan for integrating the sound */
-
 int game_loop(UINT32 *base, int player_choice) {
     int i = 0;
     void *temp;
     char ch;
-    /* UINT32 timeThen, timeNow, timeElapsed; */
     Model frogger;
     
     /* GOOGLED "atari st double buffering how to allocate 32000 bytes not on the stack" and used the AI overview for the 256 aligned part */
@@ -70,7 +71,6 @@ int game_loop(UINT32 *base, int player_choice) {
         start_music();
         render_initial_state(&frogger, front);
     
-        /* timeThen = get_time(); */
         while (frogger.gameOver != 2 && frogger.gameOver != 3) {
             ch = get_kbd_input();
             if (ch == 'W') {
@@ -92,11 +92,10 @@ int game_loop(UINT32 *base, int player_choice) {
                 render_request_flag = 0;
                 synch_update(&frogger);
                 cond_update(&frogger);
-                copy_buffer(back, front); /* back = front;*/
-                master_render(&frogger, back); /* TO DO: need to optimize render_road */
+                copy_buffer(back, front); /* Well... flickering was caused by me actually drawing on the live frame. back = front was written off since it left after images initially */
+                master_render(&frogger, back);
                 update_music(30);
-                set_video_base(back); /* Setscreen(-1L, (long)back, -1L);*/
-                /* Vsync(); */
+                set_video_base(back);
                 
                 /* swap buffers */
                 temp = front;
@@ -104,7 +103,7 @@ int game_loop(UINT32 *base, int player_choice) {
                 back = temp;
             }
         }
-        set_video_base(base); /*Setscreen(-1L, (long)base, -1L); */
+        set_video_base(base);
         return 0;
     }
 

@@ -58,7 +58,7 @@ void render_road(UINT32 *base, UINT16 row, UINT16 col, const Road* road){
 
 /* @author Paolo */
 void master_render(const Model *model, UINT32 *base) {
-    restore_old_regions(base, model);
+    restore_old_regions(base, model); /* render initial state must do save_new_regions just in case this call plots random stuff */
     save_new_regions(base, model);
     render_dynamic_objects(base, model);
 }
@@ -86,6 +86,7 @@ void old_master_render(const Model *model, UINT32 *base) {
     render_Chuck(base, model->chuck.y, model->chuck.x, &model->chuck);
 }
 
+/* each dynamic object has a 'saved background' bitmap and the order of master_render makes it so background is saved before dynamic objects are rendered */
 void save_region(UINT16 *base, int x, int y, int width, int height, UINT16 *background) {
     int row;
     UINT16 *screen_ptr;
@@ -94,14 +95,16 @@ void save_region(UINT16 *base, int x, int y, int width, int height, UINT16 *back
     for (row = 0; row < height; row++) {
         screen_ptr = base + ((y + row) * 40) + (x >> 4);
 
-        /* width assumed 32 pixels = so 2 words */
-        bg_ptr[0] = screen_ptr[0];
-        bg_ptr[1] = screen_ptr[1];
+        bg_ptr[0] = screen_ptr[0]; /* first word of background in the row = first word of screen in the same row*/
+        bg_ptr[1] = screen_ptr[1]; /* second word of background = second word of screen */
 
-        bg_ptr += 2;
+        bg_ptr += 2; /* next row */
     }
 }
 
+/* @author Paolo
+plots the saved background bitmap 
+*/
 void restore_region(UINT16 *base, int x, int y, int width, int height, UINT16 *background) {
     int row;
     UINT16 *screen_ptr;
@@ -113,10 +116,11 @@ void restore_region(UINT16 *base, int x, int y, int width, int height, UINT16 *b
         screen_ptr[0] = bg_ptr[0];
         screen_ptr[1] = bg_ptr[1];
 
-        bg_ptr += 2;
+        bg_ptr += 2; /* next row */
     }
 }
 
+/* @author Paolo */
 void restore_old_regions(UINT16 *base, Model *model) {
     int i;
 
@@ -130,6 +134,7 @@ void restore_old_regions(UINT16 *base, Model *model) {
     restore_region(base, model->mouse.oldx, model->mouse.oldy, 2, 2, model->mouse.saved_bg);
 }
 
+/* @author Paolo */
 void save_new_regions(UINT16 *base, Model *model) {
     int i;
 
@@ -143,6 +148,7 @@ void save_new_regions(UINT16 *base, Model *model) {
     save_region(base, model->mouse.x, model->mouse.y, 2, 2, model->mouse.saved_bg);
 }
 
+/* @author Paolo */
 void render_dynamic_objects(UINT16 *base, Model *model) {
     int i;
 

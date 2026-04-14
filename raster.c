@@ -1,6 +1,8 @@
 #include "raster.h"
 
-/* @author Paolo */
+/* @author Paolo 
+gets address from memory map and returns it as a pointer to the video memory base... replaces Physbase() 
+*/
 UINT16 *get_video_base() {
     volatile UINT8 *video_base_hi = (volatile UINT8 *)0xFFFF8201;
     volatile UINT8 *video_base_mi = (volatile UINT8 *)0xFFFF8203;
@@ -10,7 +12,8 @@ UINT16 *get_video_base() {
 
     old_ssp = Super(0);
 
-    addr = ((unsigned long)(*video_base_hi) << 16) | ((unsigned long)(*video_base_mi) << 8);
+    /* use logical shift left to put them in the appropriate positions */
+    addr = ((unsigned long)(*video_base_hi) << 16) | ((unsigned long)(*video_base_mi) << 8); /* combine high and middle bytes to get the full address */
 
     Super(old_ssp);
 
