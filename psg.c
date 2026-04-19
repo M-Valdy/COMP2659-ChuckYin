@@ -63,14 +63,14 @@ void set_volume(int channel, int volume) {
     if (channel_check(channel, 0, 2)) {
         return;
     }
-    if (volume > 0 || volume < 31) {
+    if (volume >= 0 && volume <= 31) {
         if (channel == 0) {
-        write_psg(8, volume);
-    } else if (channel == 1) {
-        write_psg(9, volume);
-    } else if (channel == 2) {
-        write_psg(10, volume);
-    }
+            write_psg(8, volume);
+        } else if (channel == 1) {
+            write_psg(9, volume);
+        } else if (channel == 2) {
+            write_psg(10, volume);
+        }
     }
 }
 
